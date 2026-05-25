@@ -1,0 +1,61 @@
+/* --- SPINNING ODOMETER PRELOADER --- */
+.spinning-preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.8s cubic-bezier(0.86, 0, 0.07, 1);
+    transform-origin: top;
+}
+
+.spinning-preloader.exit {
+    transform: scaleY(0); /* Aggressive slide-up exit */
+}
+
+.meter-wrapper {
+    display: flex;
+    font-family: var(--font-mono); /* Switched to Monospace to fix horizontal jitter */
+    font-size: clamp(2rem, 8vw, 6rem); /* Responsive sizing so string fits mobile */
+    font-weight: 400; /* Technical weight */
+    color: var(--text-main); /* Alabaster off-white */
+    line-height: 1;
+    overflow: hidden; /* Hide the overflow of the spinning columns */
+    height: 1.2em; /* Accommodate exact internal heights */
+    padding: 0 1rem;
+    align-items: center;
+}
+
+.char-column-container {
+    position: relative;
+    width: 1ch; /* Flawless grid lock for monospace */
+    height: 100%;
+}
+
+.char-column-container.is-space {
+    width: 1ch;
+}
+
+.char-column {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    will-change: transform, filter;
+    /* CSS transform and transition applied dynamically via React inline styles */
+}
+
+.char-slot {
+    height: 1.2em; /* Exact matching scalar */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
