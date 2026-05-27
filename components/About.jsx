@@ -9,10 +9,8 @@ export default function About() {
 
             <div className="about-grid">
                 <div className="about-statement scroll-reveal">
-                    <span className="drop-cap" aria-hidden="true">I</span>
                     <p>
-                        <span className="dc-spacer" aria-hidden="true" />
-                        build software at the intersection of <em>intelligence</em> and <em>infrastructure</em> &mdash;
+                        I build software at the intersection of <em>intelligence</em> and <em>infrastructure</em> &mdash;
                         on-device machine learning, vector retrieval, and mobile systems that hold up
                         under real constraints. Outside of code, I lead logistics for student
                         organizations at FEU Tech, where execution beats intention.

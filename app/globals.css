@@ -485,11 +485,7 @@ a {
     margin-bottom: clamp(4rem, 8vw, 8rem);
     border-bottom: 1px solid var(--border);
     padding-bottom: 2rem;
-    position: sticky;
-    top: -1px; /* Sticks precisely beneath the active screen edge without a line */
-    z-index: 20; /* Keep above project images */
-    background: var(--bg);
-    padding-top: 110px; /* Expands solid black background upwards to cover the area underneath the navbar */
+    padding-top: clamp(6rem, 10vw, 9rem);
 }
 
 .section-num {
@@ -982,27 +978,6 @@ a {
 /* --- ABOUT visual treatments --- */
 .about-statement {
     position: relative;
-}
-
-.drop-cap {
-    position: absolute;
-    top: -1.5rem;
-    left: -0.25rem;
-    font-family: var(--font-display);
-    font-style: italic;
-    font-weight: 300;
-    font-size: clamp(8rem, 14vw, 12rem);
-    line-height: 1;
-    color: transparent;
-    -webkit-text-stroke: 1px rgba(227, 66, 52, 0.35);
-    pointer-events: none;
-    user-select: none;
-    z-index: 0;
-}
-
-.dc-spacer {
-    display: inline-block;
-    width: 2.5rem;
 }
 
 .about-signature {
