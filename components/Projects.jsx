@@ -52,7 +52,6 @@ function ProjectCover({ project }) {
                 <span>{project.index}</span>
                 <span className="project-cover-divider">/</span>
                 <span>04</span>
-                <span className="project-cover-status">ACTIVE</span>
             </div>
             <div className="project-cover-name">{project.name}</div>
             <div className="project-cover-tags">{project.tags}</div>

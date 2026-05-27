@@ -22,6 +22,9 @@ export default function Footer() {
           >
             acunaamieljosiah@gmail.com
           </MagneticElement>
+          <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="footer-link">
+            Download Resume
+          </a>
         </div>
         <div className="footer-col">
           <span className="footer-label">Socials</span>

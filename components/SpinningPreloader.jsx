@@ -31,8 +31,7 @@ export default function SpinningPreloader({ onComplete }) {
                 return;
             }
             
-            // duration = 0.4 + (index * 0.15) sec -> 400 + (150 * index) ms
-            const durationMs = 400 + (index * 150);
+            const durationMs = 300 + (index * 30);
             const timeout = setTimeout(() => {
                 setLockedIndices(prev => {
                     const next = [...prev];
@@ -45,19 +44,16 @@ export default function SpinningPreloader({ onComplete }) {
         });
 
         // The final character stops at:
-        const totalDurationMs = 400 + ((CHAR_ARRAY.length - 1) * 150);
-        
+        const totalDurationMs = 300 + ((CHAR_ARRAY.length - 1) * 30);
+
         let exitStartTimer;
         let finalUnmountTimer;
 
-        // Sequence the exit flow
         const finishTimer = setTimeout(() => {
-            // Wait 800ms for the user to read the sharp target string
             exitStartTimer = setTimeout(() => {
-                setIsExiting(true); // Aggressive slide up
-                // Unmount component from page.jsx precisely when the slide finishes
-                finalUnmountTimer = setTimeout(onComplete, 800);
-            }, 800);
+                setIsExiting(true);
+                finalUnmountTimer = setTimeout(onComplete, 400);
+            }, 150);
         }, 50 + totalDurationMs);
 
         return () => {
@@ -89,7 +85,7 @@ export default function SpinningPreloader({ onComplete }) {
 
                     if (!columnChars || columnChars.length === 0) return null;
 
-                    const durationSec = 0.4 + (idx * 0.15);
+                    const durationSec = 0.3 + (idx * 0.03);
                     const isLocked = lockedIndices[idx];
 
                     return (
