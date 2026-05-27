@@ -484,8 +484,11 @@ a {
     align-items: baseline;
     margin-bottom: clamp(4rem, 8vw, 8rem);
     border-bottom: 1px solid var(--border);
-    padding-bottom: 2rem;
-    padding-top: clamp(6rem, 10vw, 9rem);
+    padding: clamp(6rem, 10vw, 9rem) 5vw 1.5rem 5vw;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg);
 }
 
 .section-num {
@@ -503,10 +506,11 @@ a {
 
 /* --- ABOUT / STACK --- */
 .about {
-    padding: 0 5vw 8vw 5vw;
+    padding: 0 0 8vw 0;
 }
 
 .about-grid {
+    padding: 0 5vw;
     display: grid;
     grid-template-columns: 1.1fr 1fr;
     gap: clamp(3rem, 6vw, 6rem);
@@ -571,10 +575,11 @@ a {
 
 /* --- PROJECTS COMPOSITION --- */
 .projects {
-    padding: 10vw 5vw;
+    padding: 0 0 10vw 0;
 }
 
 .project-wrapper {
+    margin: 0 5vw;
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     gap: 2vw;
@@ -676,10 +681,11 @@ a {
 
 /* --- LEADERSHIP TIMELINE --- */
 .leadership {
-    padding: 0 5vw 10vw 5vw;
+    padding: 0 0 10vw 0;
 }
 
 .timeline {
+    padding: 0 5vw;
     border-left: 1px solid var(--border);
     padding-left: 4vw;
     margin-left: 2vw;
