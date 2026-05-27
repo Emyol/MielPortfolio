@@ -353,39 +353,6 @@ a {
 .frame-corner.bl { bottom: 0; left: 0; border-right: none; border-top: none; }
 .frame-corner.br { bottom: 0; right: 0; border-left: none; border-top: none; }
 
-.frame-crosshair {
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: var(--accent);
-    font-family: var(--font-body);
-    font-size: 0.9rem;
-    z-index: 3;
-}
-
-.frame-caption,
-.frame-coords {
-    position: absolute;
-    font-family: var(--font-body);
-    font-size: 0.65rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    z-index: 3;
-}
-.frame-caption {
-    top: 50%;
-    left: -2rem;
-    transform: translateY(-50%) rotate(-90deg);
-    transform-origin: center;
-    white-space: nowrap;
-}
-.frame-coords {
-    bottom: -1rem;
-    right: 0;
-}
-
 .hero-image-wrapper {
     position: relative;
     width: 100%;

@@ -34,12 +34,6 @@ export default function Hero() {
 
                 <div className="hero-visual fade-in dl-3">
                     <div className="hero-visual-frame">
-                        <span className="frame-corner tl" aria-hidden="true" />
-                        <span className="frame-corner tr" aria-hidden="true" />
-                        <span className="frame-corner bl" aria-hidden="true" />
-                        <span className="frame-corner br" aria-hidden="true" />
-                        <span className="frame-crosshair" aria-hidden="true">+</span>
-
                         <div className="hero-image-wrapper">
                             <div className="hero-image-bg"></div>
                             <Image
@@ -51,9 +45,6 @@ export default function Hero() {
                                 className="hero-img"
                             />
                         </div>
-
-                        <span className="frame-caption" aria-hidden="true">SUBJ_001 // PORTRAIT</span>
-                        <span className="frame-coords" aria-hidden="true">14.5995° N · 120.9842° E</span>
                     </div>
                 </div>
             </div>
