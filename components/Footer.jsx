@@ -22,8 +22,17 @@ export default function Footer() {
           >
             acunaamieljosiah@gmail.com
           </MagneticElement>
-          <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="footer-link">
-            Download Resume
+          <a href="tel:+639610459227" className="footer-link">
+            +63 961 045 9227
+          </a>
+          <a
+            href="/Amiel_Acuna_CV.pdf"
+            download="Amiel_Acuna_CV.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-link"
+          >
+            Download CV
           </a>
         </div>
         <div className="footer-col">
@@ -31,10 +40,16 @@ export default function Footer() {
           <a href="https://github.com/Emyol" target="_blank" rel="noopener noreferrer" className="footer-link">
             GitHub
           </a>
-          <a href="https://www.linkedin.com/in/amiel-acu%C3%B1a/" target="_blank" rel="noopener noreferrer" className="footer-link">
+          <a href="https://www.linkedin.com/in/amiel-josiah-acu%C3%B1a-4786a515a" target="_blank" rel="noopener noreferrer" className="footer-link">
             LinkedIn
           </a>
         </div>
+      </div>
+      <div className="footer-totop">
+        <a href="#hero" className="back-to-top" aria-label="Back to top">
+          <span className="back-to-top-tick" aria-hidden="true" />
+          Back to top
+        </a>
       </div>
       <div className="footer-bottom">
         <p>&copy; {new Date().getFullYear()} Amiel Acu&ntilde;a. All rights reserved.</p>

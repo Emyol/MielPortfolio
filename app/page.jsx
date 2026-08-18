@@ -9,6 +9,8 @@ import Leadership from '../components/Leadership';
 import Footer from '../components/Footer';
 import BackgroundLayer from '../components/BackgroundLayer';
 import ScrollProgress from '../components/ScrollProgress';
+import SectionIndicator from '../components/SectionIndicator';
+import CustomCursor from '../components/CustomCursor';
 import useScrollReveal from '../hooks/useScrollReveal';
 import SpinningPreloader from '../components/SpinningPreloader';
 
@@ -19,8 +21,10 @@ export default function Home() {
   return (
     <>
       <a href="#main" className="skip-link">Skip to content</a>
+      <CustomCursor />
       <BackgroundLayer />
       <ScrollProgress />
+      <SectionIndicator />
       {loading && <SpinningPreloader onComplete={() => setLoading(false)} />}
       <main id="main">
         <Navbar />

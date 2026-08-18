@@ -1,28 +1,28 @@
 const PROJECTS = [
     {
         layout: 'pt-1',
-        meta: 'Undergraduate Thesis — 2024',
+        meta: 'Undergraduate Thesis — 2026',
         name: 'KitaKo',
-        tags: 'Flutter / Dart / Computer Vision / On-device ML',
-        desc: "A mobile image retrieval application built around on-device machine learning. KitaKo classifies and indexes a user's private gallery in real time, enabling semantic search across personal photos without offloading data to the cloud.",
+        tags: 'Flutter / ONNX Runtime / SigLIP-2 / IVF-PQ',
+        desc: 'An on-device semantic image search app built with SigLIP-2 vision-language embeddings and IVF-PQ nearest-neighbor search via ONNX Runtime. KitaKo processes Taglish queries locally with zero server dependency and sub-second retrieval latency.',
         href: 'https://github.com/Emyol/KitaKo_Codebase',
         index: '01',
     },
     {
         layout: 'pt-2',
-        meta: 'Internal Tooling — 2025',
+        meta: 'Internal Tooling — 2026',
         name: 'iCARE Reservation',
         tags: 'JavaScript / Web App',
-        desc: 'A room reservation system built for a school office during my role as a Student Assistant. Streamlines booking workflows, conflict-checking, and schedule visibility for staff managing shared meeting spaces.',
+        desc: 'An internal room reservation portal for university administrative staff. Automates booking workflows, schedule visibility, and multi-room conflict checking for shared facilities.',
         href: 'https://github.com/Emyol/iCARE-Reservation',
         index: '02',
     },
     {
         layout: 'pt-1',
-        meta: 'Programming Languages Course — 2024',
+        meta: 'Domain-Specific Language — 2026',
         name: 'BekiLang',
-        tags: 'Python / Compiler / Interpreter',
-        desc: 'A custom programming language built around Philippine Gay Lingo (Swardspeak). Ships with its own interpreter, compiler, and web playground — turning keywords like kunwari, periodt, and ganern into a working language with full control flow, typing, and I/O.',
+        tags: 'Python / Compiler / Interpreter / AST',
+        desc: 'A custom programming language built around Philippine Gay Lingo (Swardspeak). Ships with a full lexer, parser, AST, interpreter, and web playground — turning keywords like kunwari, periodt, and ganern into a working language with control flow, typing, and I/O.',
         href: 'https://github.com/Emyol/BekiLang',
         index: '03',
     },
@@ -30,7 +30,7 @@ const PROJECTS = [
         layout: 'pt-2',
         meta: 'NASA Space Apps Challenge — 2025',
         name: 'CitySense',
-        tags: 'TypeScript / Leaflet / NASA GIBS / SEDAC',
+        tags: 'TypeScript / Leaflet / NASA GIBS / DeepSeek',
         desc: 'A geospatial intelligence cockpit for urban planners shaping climate-resilient policy. CitySense streams live NASA, WorldPop, GHSL, and SEDAC layers into a unified map, surfacing heat, greenspace, water, and equity indicators alongside a DeepSeek-powered planning assistant.',
         href: 'https://github.com/Emyol/city-sense',
         index: '04',
@@ -63,7 +63,7 @@ export default function Projects() {
     return (
         <section id="projects" className="projects">
             <div className="section-header scroll-reveal">
-                <h2 className="section-num">(003)</h2>
+                <span className="section-num" aria-hidden="true">(003)</span>
                 <h2 className="section-title">Selected Works</h2>
             </div>
 

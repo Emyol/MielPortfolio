@@ -2,7 +2,7 @@ export default function About() {
     return (
         <section id="about" className="about">
             <div className="section-header scroll-reveal">
-                <h2 className="section-num">(002)</h2>
+                <span className="section-num" aria-hidden="true">(002)</span>
                 <h2 className="section-title">Discipline</h2>
                 <span className="section-rule" aria-hidden="true" />
             </div>
@@ -11,13 +11,13 @@ export default function About() {
                 <div className="about-statement scroll-reveal">
                     <p>
                         I build software at the intersection of <em>intelligence</em> and <em>infrastructure</em> &mdash;
-                        on-device machine learning, vector retrieval, and mobile systems that hold up
-                        under real constraints. Outside of code, I lead logistics for student
-                        organizations at FEU Tech, where execution beats intention.
+                        on-device edge AI, custom language interpreters, and geospatial systems that hold up
+                        under real constraints. Ranked in FEU Tech&rsquo;s top academic tier, I also
+                        direct campus logistics and facilitate review sessions for 700+ STEM students.
                     </p>
                     <div className="about-signature" aria-hidden="true">
                         <span>— A. ACUÑA</span>
-                        <span>MNL · 2026</span>
+                        <span>BSCSSE · FEU TECH · 2026</span>
                     </div>
                 </div>
 
@@ -31,8 +31,8 @@ export default function About() {
                             <li>Python</li>
                             <li>TypeScript</li>
                             <li>Dart</li>
-                            <li>Java</li>
-                            <li>C#</li>
+                            <li>Kotlin</li>
+                            <li>C / C++</li>
                         </ul>
                     </div>
                     <div className="stack-group">
@@ -43,8 +43,8 @@ export default function About() {
                         <ul className="stack-list">
                             <li>Flutter</li>
                             <li>Next.js</li>
-                            <li>React</li>
-                            <li>Node.js</li>
+                            <li>ONNX Runtime</li>
+                            <li>REST APIs</li>
                         </ul>
                     </div>
                     <div className="stack-group">
@@ -55,8 +55,8 @@ export default function About() {
                         <ul className="stack-list">
                             <li>On-device ML</li>
                             <li>Vector retrieval</li>
-                            <li>Computer vision</li>
                             <li>Geospatial</li>
+                            <li>Compilers</li>
                         </ul>
                     </div>
                     <div className="stack-group">
@@ -66,11 +66,70 @@ export default function About() {
                         </span>
                         <ul className="stack-list">
                             <li>Git</li>
-                            <li>Docker</li>
-                            <li>Leaflet</li>
-                            <li>Figma</li>
+                            <li>SAP Activate</li>
+                            <li>Agile / Scrum</li>
+                            <li>Claude Code</li>
                         </ul>
                     </div>
+                </div>
+            </div>
+
+            <div className="about-marks scroll-reveal">
+                <div className="stack-group">
+                    <span className="stack-label">
+                        <span className="stack-label-dot" aria-hidden="true" />
+                        Distinctions
+                    </span>
+                    <ul className="marks-list">
+                        <li>
+                            <span className="role-year">2026</span>
+                            <span>Top Performing Student — Rank 2, Batch &rsquo;27 · Rank 5, BSCSSE</span>
+                        </li>
+                        <li>
+                            <span className="role-year">2025</span>
+                            <span>Active Student Leader — FEU Institute of Technology</span>
+                        </li>
+                        <li>
+                            <span className="role-year">2024</span>
+                            <span>4th Place Finalist — Code Green For Campuses, First Gen Corporation</span>
+                        </li>
+                        <li>
+                            <span className="role-year">2024</span>
+                            <span>Top Performing Student — Rank 2, Batch &rsquo;27 · Rank 7, BSCSSE</span>
+                        </li>
+                    </ul>
+                </div>
+                <div className="stack-group">
+                    <span className="stack-label">
+                        <span className="stack-label-dot" aria-hidden="true" />
+                        Certifications
+                    </span>
+                    <ul className="marks-list">
+                        <li>
+                            <span className="role-year">PMI</span>
+                            <span>Project Management Ready™</span>
+                        </li>
+                        <li>
+                            <span className="role-year">SAP</span>
+                            <span>Certified Project Manager — SAP Activate</span>
+                        </li>
+                        <li>
+                            <span className="role-year">Certiport</span>
+                            <span>IT Specialist — Python</span>
+                        </li>
+                        <li>
+                            <span className="role-year">Anthropic</span>
+                            <span>Claude Code in Action</span>
+                        </li>
+                        <li>
+                            <span className="role-year">Google</span>
+                            <span>Gemini Certified University Student</span>
+                        </li>
+                        <li>
+                            <span className="role-year">MathWorks</span>
+                            <span>MATLAB Onramp</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </section>

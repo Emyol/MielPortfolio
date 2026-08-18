@@ -2,13 +2,13 @@ import './globals.css';
 
 const SITE_URL = 'https://miel.dev';
 const TITLE = 'Amiel Acuña — Software Engineer & Student Leader';
-const DESCRIPTION = 'Software Engineering student & leader at FEU Institute of Technology. Specializing in AI/ML, vector retrieval, and advanced mobile architectures.';
+const DESCRIPTION = 'Software Engineering student and certified project manager at FEU Tech — Rank 2 in Batch ’27. Specializing in on-device edge AI, vector retrieval, and geospatial intelligence.';
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
   title: TITLE,
   description: DESCRIPTION,
-  keywords: ['Amiel Acuña', 'Software Engineer', 'AI/ML', 'Flutter', 'Next.js', 'FEU Tech', 'Manila', 'Portfolio'],
+  keywords: ['Amiel Acuña', 'Software Engineer', 'Edge AI', 'Flutter', 'ONNX', 'Next.js', 'FEU Tech', 'Project Manager', 'Manila', 'Portfolio'],
   authors: [{ name: 'Amiel Acuña' }],
   creator: 'Amiel Acuña',
   openGraph: {
@@ -44,8 +44,10 @@ const jsonLd = {
   url: SITE_URL,
   email: 'acunaamieljosiah@gmail.com',
   address: { '@type': 'PostalAddress', addressLocality: 'Manila', addressCountry: 'PH' },
-  sameAs: ['https://github.com/Emyol', 'https://www.linkedin.com/in/amiel-acu%C3%B1a/'],
-  knowsAbout: ['AI/ML', 'Vector Retrieval', 'Mobile Architecture', 'Flutter', 'Next.js', 'TypeScript'],
+  telephone: '+639610459227',
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'FEU Institute of Technology' },
+  sameAs: ['https://github.com/Emyol', 'https://www.linkedin.com/in/amiel-josiah-acu%C3%B1a-4786a515a'],
+  knowsAbout: ['On-device ML', 'Vector Retrieval', 'Geospatial Intelligence', 'Flutter', 'ONNX Runtime', 'TypeScript', 'Project Management'],
 };
 
 export default function RootLayout({ children }) {

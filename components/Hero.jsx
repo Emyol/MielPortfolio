@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 export default function Hero() {
     return (
-        <section className="hero">
+        <section id="hero" className="hero">
             <div className="hero-bg-numeral fade-in dl-1" aria-hidden="true">01</div>
 
             <div className="hero-layout">
@@ -27,7 +27,7 @@ export default function Hero() {
                     </h1>
 
                     <div className="hero-footer fade-in dl-3">
-                        <p className="hero-desc">Software Engineering student & leader at FEU Institute of Technology. Specializing in AI/ML, vector retrieval, and advanced mobile architectures.</p>
+                        <p className="hero-desc">Software Engineering student and certified project manager at FEU Tech — Rank 2 in Batch &rsquo;27. Specializing in on-device edge AI, vector retrieval, and geospatial intelligence.</p>
                         <MagneticElement as="a" href="#contact" className="btn-primary">Initiate Contact &rarr;</MagneticElement>
                     </div>
                 </div>
