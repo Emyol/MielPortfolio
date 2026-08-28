@@ -1,11 +1,18 @@
 "use client";
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function MagneticElement({ children, className = '', as: Component = 'div', style = {}, ...props }) {
     const ref = useRef(null);
     const [position, setPosition] = useState({ x: 0, y: 0 });
+    const finePointerRef = useRef(false);
+
+    useEffect(() => {
+        finePointerRef.current = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    }, []);
 
     const handleMouse = (e) => {
+        if (!finePointerRef.current || !ref.current) return;
+
         const { clientX, clientY } = e;
         const { height, width, left, top } = ref.current.getBoundingClientRect();
         const middleX = clientX - (left + width / 2);
