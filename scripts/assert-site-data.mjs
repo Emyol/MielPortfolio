@@ -1,7 +1,6 @@
 import assert from 'node:assert/strict';
 import { kit } from '../data/kit.js';
 import { site } from '../data/site.js';
-import { nodeById, nodes, railIds, ROOT_ID } from '../data/tree.js';
 
 assert.equal(typeof site.name, 'string');
 assert.ok(site.name.length > 0);
@@ -72,24 +71,7 @@ assert.ok(site.contact.phone);
 assert.ok(site.contact.github);
 assert.ok(site.contact.linkedin);
 assert.ok(site.contact.cvHref);
-
-assert.equal(ROOT_ID, 'amiel');
-assert.equal(nodeById.amiel.label, 'AMIEL');
-assert.ok(nodeById.amiel.body.includes('Manila') || nodeById.amiel.location.includes('MANILA'));
-assert.ok(nodes.length >= 15);
-
-for (const project of site.projects) {
-  assert.ok(nodeById[project.id], `missing project node ${project.id}`);
-  assert.equal(nodeById[project.id].href, project.href);
-}
-for (const org of site.orgs) {
-  assert.ok(nodeById[org.id], `missing org node ${org.id}`);
-}
-
-assert.ok(nodeById.distinctions.items.some((row) => row.text.includes('Rank 2')));
-assert.ok(nodeById.certifications.items.some((row) => row.text.includes('SAP Activate')));
-assert.equal(nodeById.contact.contact.email, site.contact.email);
-assert.ok(railIds.includes('citysense'));
-assert.ok(railIds.includes('icare'));
+assert.ok(!site.description.includes('Rank 2'));
+assert.ok(site.certifications.some((row) => row.text.includes('SAP Activate')));
 
 console.log('site data ok');

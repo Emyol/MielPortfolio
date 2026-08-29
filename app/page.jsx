@@ -1,14 +1,5 @@
-import ParseApp from '../components/parse/ParseApp';
+import MeltLab from '../components/melt/MeltLab';
 
 export default function Home() {
-  return (
-    <>
-      <a href="#main" className="skip-link">
-        Skip to content
-      </a>
-      <main id="main">
-        <ParseApp />
-      </main>
-    </>
-  );
+  return <MeltLab />;
 }
