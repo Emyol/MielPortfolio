@@ -1,30 +1,31 @@
 import './globals.css';
+import { site } from '../data/site';
 
-const SITE_URL = 'https://miel.dev';
-const TITLE = 'Amiel Acuña — Software Engineer & Student Leader';
-const DESCRIPTION = 'Software Engineering student and certified project manager at FEU Tech — Rank 2 in Batch ’27. Specializing in on-device edge AI, vector retrieval, and geospatial intelligence.';
+const SITE_URL = site.url;
+const TITLE = site.title;
+const DESCRIPTION = site.description;
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
   title: TITLE,
   description: DESCRIPTION,
-  keywords: ['Amiel Acuña', 'Software Engineer', 'Edge AI', 'Flutter', 'ONNX', 'Next.js', 'FEU Tech', 'Project Manager', 'Manila', 'Portfolio'],
-  authors: [{ name: 'Amiel Acuña' }],
-  creator: 'Amiel Acuña',
+  keywords: site.keywords,
+  authors: [{ name: site.name }],
+  creator: site.name,
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: SITE_URL,
     title: TITLE,
     description: DESCRIPTION,
-    siteName: 'Amiel Acuña',
-    images: [{ url: '/hero-profile.png', width: 1200, height: 1200, alt: 'Amiel Acuña' }],
+    siteName: site.name,
+    images: [{ url: site.portrait.src, width: 1200, height: 1200, alt: site.name }],
   },
   twitter: {
     card: 'summary_large_image',
     title: TITLE,
     description: DESCRIPTION,
-    images: ['/hero-profile.png'],
+    images: [site.portrait.src],
   },
   robots: { index: true, follow: true },
   icons: { icon: '/favicon.ico' },
@@ -40,15 +41,15 @@ export const viewport = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
-  name: 'Amiel Acuña',
-  jobTitle: 'Software Engineer',
+  name: site.name,
+  jobTitle: site.jobTitle,
   url: SITE_URL,
-  email: 'acunaamieljosiah@gmail.com',
-  address: { '@type': 'PostalAddress', addressLocality: 'Manila', addressCountry: 'PH' },
-  telephone: '+639610459227',
-  alumniOf: { '@type': 'CollegeOrUniversity', name: 'FEU Institute of Technology' },
-  sameAs: ['https://github.com/Emyol', 'https://www.linkedin.com/in/amiel-josiah-acu%C3%B1a-4786a515a'],
-  knowsAbout: ['On-device ML', 'Vector Retrieval', 'Geospatial Intelligence', 'Flutter', 'ONNX Runtime', 'TypeScript', 'Project Management'],
+  email: site.contact.email,
+  address: { '@type': 'PostalAddress', addressLocality: site.location.city, addressCountry: site.location.country },
+  telephone: site.contact.phone,
+  alumniOf: { '@type': 'CollegeOrUniversity', name: site.contact.alumniOf },
+  sameAs: [site.contact.github, site.contact.linkedin],
+  knowsAbout: site.contact.knowsAbout,
 };
 
 export default function RootLayout({ children }) {

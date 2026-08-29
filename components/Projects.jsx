@@ -1,41 +1,4 @@
-const PROJECTS = [
-    {
-        layout: 'pt-1',
-        meta: 'Undergraduate Thesis — 2026',
-        name: 'KitaKo',
-        tags: 'Flutter / ONNX Runtime / SigLIP-2 / IVF-PQ',
-        desc: 'An on-device semantic image search app built with SigLIP-2 vision-language embeddings and IVF-PQ nearest-neighbor search via ONNX Runtime. KitaKo processes Taglish queries locally with zero server dependency and sub-second retrieval latency.',
-        href: 'https://github.com/Emyol/KitaKo_Codebase',
-        index: '01',
-    },
-    {
-        layout: 'pt-2',
-        meta: 'Internal Tooling — 2026',
-        name: 'iCARE Reservation',
-        tags: 'JavaScript / Web App',
-        desc: 'An internal room reservation portal for university administrative staff. Automates booking workflows, schedule visibility, and multi-room conflict checking for shared facilities.',
-        href: 'https://github.com/Emyol/iCARE-Reservation',
-        index: '02',
-    },
-    {
-        layout: 'pt-1',
-        meta: 'Domain-Specific Language — 2026',
-        name: 'BekiLang',
-        tags: 'Python / Compiler / Interpreter / AST',
-        desc: 'A custom programming language built around Philippine Gay Lingo (Swardspeak). Ships with a full lexer, parser, AST, interpreter, and web playground — turning keywords like kunwari, periodt, and ganern into a working language with control flow, typing, and I/O.',
-        href: 'https://github.com/Emyol/BekiLang',
-        index: '03',
-    },
-    {
-        layout: 'pt-2',
-        meta: 'NASA Space Apps Challenge — 2025',
-        name: 'CitySense',
-        tags: 'TypeScript / Leaflet / NASA GIBS / DeepSeek',
-        desc: 'A geospatial intelligence cockpit for urban planners shaping climate-resilient policy. CitySense streams live NASA, WorldPop, GHSL, and SEDAC layers into a unified map, surfacing heat, greenspace, water, and equity indicators alongside a DeepSeek-powered planning assistant.',
-        href: 'https://github.com/Emyol/city-sense',
-        index: '04',
-    },
-];
+import { site } from '../data/site';
 
 function ProjectCover({ project }) {
     return (
@@ -63,11 +26,11 @@ export default function Projects() {
     return (
         <section id="projects" className="projects">
             <div className="section-header scroll-reveal">
-                <span className="section-num" aria-hidden="true">(003)</span>
-                <h2 className="section-title">Selected Works</h2>
+                <span className="section-num" aria-hidden="true">{site.projectsSection.sectionNum}</span>
+                <h2 className="section-title">{site.projectsSection.sectionTitle}</h2>
             </div>
 
-            {PROJECTS.map((p) => (
+            {site.projects.map((p) => (
                 <article key={p.name} className={`project-wrapper ${p.layout} scroll-reveal`}>
                     {p.layout === 'pt-2' ? (
                         <>
