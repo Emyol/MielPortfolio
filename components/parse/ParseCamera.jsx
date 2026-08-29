@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react';
 import { OrbitControls } from '@react-three/drei';
 import { useParse } from './ParseContext';
 
-const HOME = [0, 0.2, 7.4];
+const HOME = [0, 0.06, 5.9];
 
 export default function ParseCamera() {
   const ref = useRef();
@@ -23,12 +23,12 @@ export default function ParseCamera() {
       ref={ref}
       makeDefault
       enableDamping={!reduced}
-      dampingFactor={0.08}
+      dampingFactor={0.085}
       enablePan={false}
-      minDistance={4.2}
-      maxDistance={14}
-      minPolarAngle={0.35}
-      maxPolarAngle={Math.PI - 0.35}
+      minDistance={3.6}
+      maxDistance={12}
+      minPolarAngle={0.42}
+      maxPolarAngle={Math.PI - 0.42}
       onStart={() => {
         skipCompile();
         setMoving(true);

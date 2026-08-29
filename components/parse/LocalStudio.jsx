@@ -4,40 +4,75 @@ import { useLayoutEffect } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 
-function face(stopA, stopB, stopC) {
-  const size = 128;
+function paint(draw) {
+  const size = 256;
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext('2d');
-  const g = ctx.createLinearGradient(0, 0, size, size);
-  g.addColorStop(0, stopA);
-  g.addColorStop(0.45, stopB);
-  g.addColorStop(1, stopC);
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, size, size);
+  draw(ctx, size);
   return canvas;
+}
+
+function studioFaces() {
+  return [
+    paint((ctx, s) => {
+      ctx.fillStyle = '#1c1c1c';
+      ctx.fillRect(0, 0, s, s);
+      ctx.fillStyle = '#f4f4f4';
+      ctx.fillRect(18, 28, 70, 200);
+      ctx.fillStyle = '#9a9a9a';
+      ctx.fillRect(160, 40, 70, 80);
+    }),
+    paint((ctx, s) => {
+      ctx.fillStyle = '#080808';
+      ctx.fillRect(0, 0, s, s);
+      ctx.fillStyle = '#6a6a6a';
+      ctx.fillRect(s - 90, 90, 50, 90);
+    }),
+    paint((ctx, s) => {
+      ctx.fillStyle = '#ececec';
+      ctx.fillRect(0, 0, s, s);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(40, 20, 176, 90);
+    }),
+    paint((ctx, s) => {
+      ctx.fillStyle = '#050505';
+      ctx.fillRect(0, 0, s, s);
+      ctx.fillStyle = '#2a2a2a';
+      ctx.fillRect(0, s * 0.62, s, 24);
+      ctx.fillStyle = '#7a7a7a';
+      ctx.fillRect(80, s * 0.7, 96, 8);
+    }),
+    paint((ctx, s) => {
+      ctx.fillStyle = '#111111';
+      ctx.fillRect(0, 0, s, s);
+      ctx.fillStyle = '#f7f7f7';
+      ctx.fillRect(30, 36, 110, 150);
+      ctx.fillStyle = '#bdbdbd';
+      ctx.fillRect(160, 160, 60, 40);
+    }),
+    paint((ctx, s) => {
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(0, 0, s, s);
+      ctx.fillStyle = '#4a4a4a';
+      ctx.fillRect(40, 70, s - 80, 20);
+    }),
+  ];
 }
 
 export default function LocalStudio() {
   const { scene, gl } = useThree();
 
   useLayoutEffect(() => {
-    const cube = new THREE.CubeTexture([
-      face('#f7f7f7', '#cfcfcf', '#6a6a6a'),
-      face('#d0d0d0', '#8a8a8a', '#1a1a1a'),
-      face('#ffffff', '#e8e8e8', '#bdbdbd'),
-      face('#2a2a2a', '#111111', '#000000'),
-      face('#ececec', '#9a9a9a', '#3a3a3a'),
-      face('#7a7a7a', '#2f2f2f', '#050505'),
-    ]);
+    const cube = new THREE.CubeTexture(studioFaces());
     cube.colorSpace = THREE.SRGBColorSpace;
     cube.needsUpdate = true;
 
     const pmrem = new THREE.PMREMGenerator(gl);
     const env = pmrem.fromCubemap(cube).texture;
     scene.environment = env;
-    scene.environmentIntensity = 1.15;
+    scene.environmentIntensity = 1.85;
 
     return () => {
       scene.environment = null;

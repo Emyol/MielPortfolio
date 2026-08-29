@@ -57,11 +57,9 @@ const chrome = spawn(
     `--remote-debugging-port=${PORT}`,
     `--user-data-dir=${userData}`,
     '--headless=new',
-    '--disable-gpu',
     '--hide-scrollbars',
-    '--use-gl=angle',
-    '--use-angle=swiftshader',
     '--enable-webgl',
+    '--use-gl=angle',
     `--window-size=1440,900`,
     'about:blank',
   ],
@@ -99,7 +97,7 @@ try {
   await cdp(ws, id++, 'Page.enable');
   await cdp(ws, id++, 'Runtime.enable');
   await cdp(ws, id++, 'Page.navigate', { url: BASE });
-  await wait(2500);
+  await wait(4000);
 
   const boot = await evaluate(
     ws,
@@ -206,7 +204,7 @@ try {
       const t0 = performance.now();
       function tick() {
         n += 1;
-        if (performance.now() - t0 >= 2000) resolve(n / 2);
+        if (performance.now() - t0 >= 4000) resolve(n / 4);
         else requestAnimationFrame(tick);
       }
       requestAnimationFrame(tick);
@@ -218,13 +216,13 @@ try {
     features: [{ name: 'prefers-reduced-motion', value: 'reduce' }],
   });
   await cdp(ws, id++, 'Page.reload');
-  await wait(1800);
+  await wait(2500);
   const reduced = await evaluate(
     ws,
     id++,
     `!!document.querySelector('.parse-still') && document.querySelector('.parse-still').textContent.includes('AMIEL')`
   );
-  check('reduced still tree', reduced === true);
+  check('reduced still tree', reduced === true, String(reduced));
 
   await cdp(ws, id++, 'Emulation.setDeviceMetricsOverride', {
     width: 390,

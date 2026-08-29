@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { nodes } from '../../data/tree';
 import { ParseProvider, useParse } from './ParseContext';
 import InspectSheet from './InspectSheet';
 import NodeRail from './NodeRail';
@@ -14,6 +15,13 @@ function ParseBody() {
   return (
     <div className="parse-app">
       {reduced ? <StillTree /> : <ParseScene />}
+      <ul className="parse-sr" aria-hidden="true">
+        {nodes.map((n) => (
+          <li key={n.id} className="parse-label">
+            {n.label}
+          </li>
+        ))}
+      </ul>
       <InspectSheet />
       <NodeRail />
     </div>
