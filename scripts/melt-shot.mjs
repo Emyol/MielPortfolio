@@ -9,6 +9,7 @@ const OUT = path.resolve('docs/media');
 const URL = process.argv[2] || 'http://localhost:3000/melt-lab';
 const FILE = process.argv[3] || 'chrome-matter-review-first.png';
 const SCROLL = Number(process.argv[4] || 0);
+const CLICK = process.argv[5] || '';
 
 function wait(ms) {
   return new Promise((r) => setTimeout(r, ms));
@@ -89,6 +90,16 @@ try {
       })()`,
     });
     await wait(1800);
+  }
+  if (CLICK) {
+    await cdp('Runtime.evaluate', {
+      expression: `(() => {
+        const hit = [...document.querySelectorAll('button, a')].find((el) => el.textContent.includes(${JSON.stringify(CLICK)}));
+        hit?.click();
+        return hit ? hit.textContent : 'missing';
+      })()`,
+    });
+    await wait(900);
   }
   const { data } = await cdp('Page.captureScreenshot', { format: 'png', fromSurface: true });
   const dest = path.join(OUT, FILE);

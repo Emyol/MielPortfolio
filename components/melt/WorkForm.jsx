@@ -9,7 +9,7 @@ const FORMS = [
   { id: 'icare-reservation', position: [1.7, 0.12, 0.15] },
 ];
 
-function Lens({ reduced }) {
+export function Lens({ reduced }) {
   return (
     <group>
       <mesh rotation={[Math.PI / 2, 0, 0]}>

@@ -8,10 +8,11 @@ import ChromeType from './ChromeType';
 import ContactIngot from './ContactIngot';
 import Hallmark from './Hallmark';
 import KitMint from './KitMint';
+import { inspectTargets, pickInspect } from './inspectTargets';
 import { jobWeights } from './jobs';
-import { MercuryDrop, MercuryMass } from './MercuryMaterial';
+import MercuryMaterial, { MercuryDrop, MercuryMass } from './MercuryMaterial';
 import MeltStudio from './MeltStudio';
-import WorkForm from './WorkForm';
+import WorkForm, { Lens } from './WorkForm';
 
 function MeltRig({ reduced, progress, mode }) {
   const group = useRef(null);
@@ -54,7 +55,56 @@ function MeltRig({ reduced, progress, mode }) {
   );
 }
 
-export default function MeltCanvas({ reduced = false, mode = 'studio', progress = 0 }) {
+function InspectRig({ reduced, frozenId, onFreeze }) {
+  const heat = useRef({ point: new THREE.Vector2(), amount: 0 });
+  const frozen = frozenId ? inspectTargets[frozenId] : null;
+
+  return (
+    <group>
+      <MercuryMass
+        reduced={reduced}
+        heat={frozenId || reduced ? null : heat.current}
+        position={[0, -0.9, 0]}
+        scale={[2.05, 0.52, 1.28]}
+        onPointerMove={(event) => {
+          heat.current.point.set(event.uv.x * 2 - 1, event.uv.y * 2 - 1);
+          heat.current.amount = 1;
+        }}
+        onPointerOut={() => {
+          heat.current.amount = 0;
+        }}
+        onClick={(event) => {
+          event.stopPropagation();
+          onFreeze(pickInspect(event.point.x / 2.2, event.point.y + 0.4));
+        }}
+      />
+      <group visible={!frozen} scale={0.82} position={[0, 0.22, 0.18]}>
+        <ChromeType reduced={reduced} />
+      </group>
+      {frozen?.form === 'lens' ? (
+        <group position={[0, 0.15, 0.45]} scale={1.15}>
+          <Lens reduced={reduced} />
+        </group>
+      ) : null}
+      {frozen?.form === 'stamp' ? <Hallmark amount={1} reduced={reduced} /> : null}
+      {frozen?.form === 'bar' ? (
+        <mesh position={[0, 0.05, 0.35]}>
+          <boxGeometry args={[1.6, 0.2, 0.2]} />
+          <MercuryMaterial reduced={reduced} />
+        </mesh>
+      ) : null}
+      {frozen?.form === 'ingot' ? <ContactIngot amount={1} reduced={reduced} /> : null}
+    </group>
+  );
+}
+
+export default function MeltCanvas({
+  reduced = false,
+  mode = 'studio',
+  progress = 0,
+  frozenId = null,
+  onFreeze,
+}) {
   return (
     <Canvas
       className="melt-canvas"
@@ -80,7 +130,11 @@ export default function MeltCanvas({ reduced = false, mode = 'studio', progress 
       <directionalLight position={[-6, 1.5, -4]} intensity={0.9} color="#b0b0b0" />
       <pointLight position={[0, -3.2, 5]} intensity={1.15} color="#d8d8d8" />
       <MeltStudio />
-      <MeltRig reduced={reduced} progress={progress} mode={mode} />
+      {mode === 'inspect' ? (
+        <InspectRig reduced={reduced} frozenId={frozenId} onFreeze={onFreeze} />
+      ) : (
+        <MeltRig reduced={reduced} progress={progress} mode={mode} />
+      )}
       {mode === 'studio' ? (
         <OrbitControls
           enablePan={false}

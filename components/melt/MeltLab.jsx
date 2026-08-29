@@ -7,10 +7,12 @@ import styles from './MeltLab.module.css';
 
 const MeltCanvas = dynamic(() => import('./MeltCanvas'), { ssr: false });
 const MeltScroll = dynamic(() => import('./MeltScroll'), { ssr: false });
+const MeltInspect = dynamic(() => import('./MeltInspect'), { ssr: false });
 
 function MeltLabBody() {
   const params = useSearchParams();
-  const mode = params.get('mode') === 'scroll' ? 'scroll' : 'studio';
+  const requested = params.get('mode');
+  const mode = requested === 'scroll' || requested === 'inspect' ? requested : 'studio';
   const [reduced, setReduced] = useState(false);
 
   useEffect(() => {
@@ -28,7 +30,9 @@ function MeltLabBody() {
       </a>
       <main id="melt-main" className={mode === 'scroll' ? styles.scrollLab : styles.lab}>
         <h1 className={styles.sr}>Amiel Acuña</h1>
-        {mode === 'scroll' ? <MeltScroll reduced={reduced} /> : <MeltCanvas reduced={reduced} />}
+        {mode === 'scroll' ? <MeltScroll reduced={reduced} /> : null}
+        {mode === 'inspect' ? <MeltInspect reduced={reduced} /> : null}
+        {mode === 'studio' ? <MeltCanvas reduced={reduced} /> : null}
       </main>
     </>
   );
