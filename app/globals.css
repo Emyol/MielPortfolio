@@ -64,8 +64,11 @@ a {
   transform: translateY(-200%);
 }
 
-.skip-link:focus {
+.skip-link:focus,
+.skip-link:focus-visible {
   transform: none;
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
 }
 
 @media (prefers-reduced-motion: reduce) {
