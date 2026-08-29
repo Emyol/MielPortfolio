@@ -4,7 +4,7 @@ import { edges, nodes, ROOT_ID, nodeById } from '../../data/tree';
 import { useParse } from './ParseContext';
 
 function toSvg([x, y]) {
-  return [720 + x * 95, 430 - y * 95];
+  return [720 + x * 170, 430 - y * 170];
 }
 
 export default function StillTree() {
@@ -44,6 +44,11 @@ export default function StillTree() {
             <text x={n.id === ROOT_ID ? cx : cx + r + 10} y={n.id === ROOT_ID ? cy + 6 : cy + 4} className={n.id === ROOT_ID ? 'is-root' : undefined}>
               {n.label}
             </text>
+            {n.id === ROOT_ID ? (
+              <text x={cx} y={cy + 36} className="parse-still-rank">
+                RANK 2  /  BATCH 27
+              </text>
+            ) : null}
           </g>
         );
       })}

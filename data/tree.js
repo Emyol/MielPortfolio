@@ -2,10 +2,10 @@ import { site } from './site.js';
 
 export const ROOT_ID = 'amiel';
 
-const WORK = [-3.35, 2.35, 0];
-const PROOF = [3.35, 2.35, 0];
-const LEAD = [-3.35, -2.35, 0];
-const CONTACT = [3.35, -2.35, 0];
+const WORK = [-1.68, 1.22, 0.12];
+const PROOF = [1.68, 1.22, -0.08];
+const LEAD = [-1.68, -1.12, 0.1];
+const CONTACT = [1.68, -1.12, -0.1];
 
 function offset(origin, dx, dy, dz = 0) {
   return [origin[0] + dx, origin[1] + dy, origin[2] + dz];
@@ -13,10 +13,10 @@ function offset(origin, dx, dy, dz = 0) {
 
 function projectNodes() {
   const spread = [
-    [-1.15, 1.05, 0.4],
-    [1.15, 1.05, -0.2],
-    [-1.15, -0.15, -0.35],
-    [1.15, -0.15, 0.25],
+    [-0.58, 0.52, 0.22],
+    [0.58, 0.52, -0.12],
+    [-0.58, -0.06, -0.18],
+    [0.58, -0.06, 0.14],
   ];
   return site.projects.map((project, i) => ({
     id: project.id,
@@ -36,10 +36,10 @@ function projectNodes() {
 
 function orgNodes() {
   const spread = [
-    [-1.1, -1.05, 0.3],
-    [1.1, -1.05, -0.2],
-    [-1.1, 0.15, -0.3],
-    [1.1, 0.15, 0.2],
+    [-0.55, -0.52, 0.18],
+    [0.55, -0.52, -0.12],
+    [-0.55, 0.08, -0.16],
+    [0.55, 0.08, 0.12],
   ];
   return site.orgs.map((org, i) => ({
     id: org.id,
@@ -62,7 +62,7 @@ export const nodes = [
     kind: 'root',
     parentId: null,
     position: [0, 0, 0],
-    radius: 0.62,
+    radius: 0.72,
     meta: 'RANK 2  /  BATCH 27  /  TRUNK',
     title: site.name,
     hero: site.hero.titleLines.join(' '),
@@ -98,7 +98,7 @@ export const nodes = [
     label: 'MARKS',
     kind: 'list',
     parentId: 'proof',
-    position: offset(PROOF, -0.9, 1.15, 0.2),
+    position: offset(PROOF, -0.5, 0.58, 0.12),
     radius: 0.14,
     meta: 'DISTINCTIONS',
     title: 'Distinctions',
@@ -109,7 +109,7 @@ export const nodes = [
     label: 'CERTS',
     kind: 'list',
     parentId: 'proof',
-    position: offset(PROOF, 0.95, 1.1, -0.15),
+    position: offset(PROOF, 0.52, 0.56, -0.1),
     radius: 0.14,
     meta: 'CERTIFICATIONS',
     title: 'Certifications',
