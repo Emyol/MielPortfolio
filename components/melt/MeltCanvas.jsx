@@ -14,7 +14,7 @@ import MercuryMaterial, { MercuryDrop, MercuryMass } from './MercuryMaterial';
 import MeltStudio from './MeltStudio';
 import WorkForm, { Lens } from './WorkForm';
 
-function MeltRig({ reduced, progress, mode }) {
+function MeltRig({ reduced, progress, mode, pour = 1 }) {
   const group = useRef(null);
   const weights = jobWeights(mode === 'scroll' ? progress : 0);
 
@@ -41,8 +41,8 @@ function MeltRig({ reduced, progress, mode }) {
       <MercuryDrop reduced={reduced} position={[1.92, -0.55, 0.28]} scale={[0.18, 0.26, 0.18]} />
       <MercuryDrop reduced={reduced} position={[0.08, -0.48, 0.55]} scale={[0.14, 0.2, 0.14]} />
       <group
-        scale={typeScale}
-        position={[0, 0.1 + (1 - weights.identity) * -0.8, 0.25]}
+        scale={typeScale * pour}
+        position={[0, 0.1 + (1 - weights.identity) * -0.8 - (1 - pour) * 0.85, 0.25]}
         visible={weights.identity > 0.04}
       >
         <ChromeType reduced={reduced} />
@@ -102,6 +102,7 @@ export default function MeltCanvas({
   reduced = false,
   mode = 'studio',
   progress = 0,
+  pour = 1,
   frozenId = null,
   onFreeze,
 }) {
@@ -133,7 +134,7 @@ export default function MeltCanvas({
       {mode === 'inspect' ? (
         <InspectRig reduced={reduced} frozenId={frozenId} onFreeze={onFreeze} />
       ) : (
-        <MeltRig reduced={reduced} progress={progress} mode={mode} />
+        <MeltRig reduced={reduced} progress={progress} mode={mode} pour={pour} />
       )}
       {mode === 'studio' ? (
         <OrbitControls

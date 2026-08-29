@@ -10,6 +10,7 @@ const URL = process.argv[2] || 'http://localhost:3000/melt-lab';
 const FILE = process.argv[3] || 'chrome-matter-review-first.png';
 const SCROLL = Number(process.argv[4] || 0);
 const CLICK = process.argv[5] || '';
+const PHONE = process.argv[6] === 'phone';
 
 function wait(ms) {
   return new Promise((r) => setTimeout(r, ms));
@@ -72,12 +73,10 @@ try {
     });
   };
   await cdp('Page.enable');
-  await cdp('Emulation.setDeviceMetricsOverride', {
-    width: 1440,
-    height: 900,
-    deviceScaleFactor: 1,
-    mobile: false,
-  });
+  await cdp('Emulation.setDeviceMetricsOverride', PHONE
+    ? { width: 390, height: 844, deviceScaleFactor: 2, mobile: true }
+    : { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false }
+  );
   await cdp('Page.navigate', { url: URL });
   await wait(6500);
   if (SCROLL > 0) {

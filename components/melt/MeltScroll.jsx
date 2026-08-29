@@ -12,29 +12,67 @@ const TOOLS = kit.filter((row) => row.kind === 'tool');
 export default function MeltScroll({ reduced = false }) {
   const scroller = useRef(null);
   const [progress, setProgress] = useState(0);
+  const [pour, setPour] = useState(reduced ? 1 : 0);
+
+  useEffect(() => {
+    if (reduced) {
+      setPour(1);
+      return undefined;
+    }
+    let frame;
+    let start;
+    const step = (now) => {
+      if (start == null) start = now;
+      const next = Math.min(1, (now - start) / 1800);
+      setPour(next);
+      if (next < 1) frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [reduced]);
 
   useEffect(() => {
     const el = scroller.current;
     if (!el) return undefined;
+    const skipPour = () => setPour(1);
     const onScroll = () => {
       const max = el.scrollHeight - el.clientHeight;
-      setProgress(max <= 0 ? 0 : el.scrollTop / max);
+      const top = el.scrollTop;
+      setProgress(max <= 0 ? 0 : top / max);
+      if (top > 2) skipPour();
     };
     onScroll();
     el.addEventListener('scroll', onScroll, { passive: true });
-    return () => el.removeEventListener('scroll', onScroll);
+    el.addEventListener('pointerdown', skipPour);
+    el.addEventListener('wheel', skipPour, { passive: true });
+    return () => {
+      el.removeEventListener('scroll', onScroll);
+      el.removeEventListener('pointerdown', skipPour);
+      el.removeEventListener('wheel', skipPour);
+    };
   }, []);
 
   return (
     <div ref={scroller} className={styles.scrollRoot}>
       <div className={styles.sticky}>
-        <MeltCanvas reduced={reduced} mode="scroll" progress={progress} />
+        <MeltCanvas reduced={reduced} mode="scroll" progress={progress} pour={pour} />
       </div>
       <div className={styles.track}>
         {JOBS.map((job) => (
           <section key={job.id} className={styles.chapter} data-job={job.id}>
             <p className={styles.kicker}>{job.label}</p>
-            {job.id === 'identity' ? <h2 className={styles.chapterTitle}>Amiel Acuña</h2> : null}
+            {job.id === 'identity' ? (
+              <>
+                <h2 className={styles.chapterTitle}>Amiel Acuña</h2>
+                <img
+                  className={styles.portrait}
+                  src={site.portrait.src}
+                  alt={site.portrait.alt}
+                  width={72}
+                  height={72}
+                />
+              </>
+            ) : null}
             {job.id === 'kit' ? (
               <>
                 <h2 className={styles.chapterTitle}>Kit</h2>
