@@ -1,13 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-
-const LINKS = [
-    { id: 'about', label: 'About' },
-    { id: 'projects', label: 'Work' },
-    { id: 'leadership', label: 'Leadership' },
-    { id: 'contact', label: 'Contact' },
-];
+import { site } from '../data/site';
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
@@ -29,7 +23,7 @@ export default function Navbar() {
             },
             { rootMargin: '-45% 0px -45% 0px', threshold: 0 }
         );
-        LINKS.forEach(({ id }) => {
+        site.navLinks.forEach(({ id }) => {
             const el = document.getElementById(id);
             if (el) observer.observe(el);
         });
@@ -38,9 +32,9 @@ export default function Navbar() {
 
     return (
         <nav className={`navbar fade-in dl-1 ${scrolled ? 'is-scrolled' : ''}`} aria-label="Primary">
-            <a href="#main" className="nav-brand">MIEL.</a>
+            <a href="#main" className="nav-brand">{site.brand}</a>
             <div className="nav-links">
-                {LINKS.map(({ id, label }) => (
+                {site.navLinks.map(({ id, label }) => (
                     <a
                         key={id}
                         href={`#${id}`}

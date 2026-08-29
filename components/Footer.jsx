@@ -1,47 +1,48 @@
 import MagneticElement from "./MagneticElement";
+import { site } from "../data/site";
 
 export default function Footer() {
   return (
     <footer id="contact" className="footer scroll-reveal">
-      <h2 className="footer-huge">LET&rsquo;S CONNECT</h2>
+      <h2 className="footer-huge">{site.contact.heading}</h2>
       <div className="footer-grid">
         <div className="footer-col">
           <span className="footer-label">Location</span>
           <p>
-            Manila, Philippines
+            {site.location.city}, {site.location.countryName}
             <br />
-            Available globally.
+            {site.location.available}
           </p>
         </div>
         <div className="footer-col">
           <span className="footer-label">Digital</span>
           <MagneticElement
             as="a"
-            href="mailto:acunaamieljosiah@gmail.com"
+            href={`mailto:${site.contact.email}`}
             className="footer-link"
           >
-            acunaamieljosiah@gmail.com
+            {site.contact.email}
           </MagneticElement>
-          <a href="tel:+639610459227" className="footer-link">
-            +63 961 045 9227
+          <a href={`tel:${site.contact.phone}`} className="footer-link">
+            {site.contact.phoneDisplay}
           </a>
           <a
-            href="/Amiel_Acuna_CV.pdf"
-            download="Amiel_Acuna_CV.pdf"
+            href={site.contact.cvHref}
+            download={site.contact.cvFilename}
             target="_blank"
             rel="noopener noreferrer"
             className="footer-link"
           >
-            Download CV
+            {site.contact.cvLabel}
           </a>
         </div>
         <div className="footer-col">
           <span className="footer-label">Socials</span>
-          <a href="https://github.com/Emyol" target="_blank" rel="noopener noreferrer" className="footer-link">
-            GitHub
+          <a href={site.contact.github} target="_blank" rel="noopener noreferrer" className="footer-link">
+            {site.contact.githubLabel}
           </a>
-          <a href="https://www.linkedin.com/in/amiel-josiah-acu%C3%B1a-4786a515a" target="_blank" rel="noopener noreferrer" className="footer-link">
-            LinkedIn
+          <a href={site.contact.linkedin} target="_blank" rel="noopener noreferrer" className="footer-link">
+            {site.contact.linkedinLabel}
           </a>
         </div>
       </div>
@@ -52,10 +53,10 @@ export default function Footer() {
         </a>
       </div>
       <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} Amiel Acu&ntilde;a. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} {site.name}. All rights reserved.</p>
         <p>
           Designed with{" "}
-          <span style={{ color: "var(--accent)" }}>precision</span>.
+          <span style={{ color: "var(--accent)" }}>{site.footer.designedWith}</span>.
         </p>
       </div>
     </footer>
