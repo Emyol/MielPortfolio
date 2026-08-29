@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { site } from '../../data/site';
 import { kit } from '../../data/kit';
 import { JOBS } from './jobs';
+import KitMarks from './KitMarks';
 import MeltCanvas from './MeltCanvas';
 import styles from './MeltLab.module.css';
 
@@ -76,11 +77,7 @@ export default function MeltScroll({ reduced = false }) {
             {job.id === 'kit' ? (
               <>
                 <h2 className={styles.chapterTitle}>Kit</h2>
-                <ul className={styles.markList}>
-                  {TOOLS.map((row) => (
-                    <li key={row.id}>{row.name}</li>
-                  ))}
-                </ul>
+                <KitMarks tools={TOOLS} />
               </>
             ) : null}
             {job.id === 'work' ? (

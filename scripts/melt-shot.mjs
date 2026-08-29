@@ -8,9 +8,13 @@ const PORT = 9566;
 const OUT = path.resolve('docs/media');
 const URL = process.argv[2] || 'http://localhost:3000/melt-lab';
 const FILE = process.argv[3] || 'chrome-matter-review-first.png';
-const SCROLL = Number(process.argv[4] || 0);
-const CLICK = process.argv[5] || '';
-const PHONE = process.argv[6] === 'phone';
+const rest = process.argv.slice(4);
+const FLAGS = new Set(rest.filter((arg) => /^(phone|reduced|focus|perf|quick)$/.test(arg)));
+const SCROLL = Number(rest.find((arg) => /^\d+(\.\d+)?$/.test(arg)) || 0);
+const CLICK = rest.find((arg) => arg && !/^(phone|reduced|focus|perf|quick)$/.test(arg) && !/^\d+(\.\d+)?$/.test(arg)) || '';
+const PHONE = FLAGS.has('phone');
+const REDUCED = FLAGS.has('reduced');
+const WAIT = FLAGS.has('quick') ? 500 : Number(process.env.MELT_WAIT || 6500);
 
 function wait(ms) {
   return new Promise((r) => setTimeout(r, ms));
@@ -69,7 +73,7 @@ try {
         else resolve(msg.result);
       };
       ws.addEventListener('message', onMsg);
-      setTimeout(() => reject(new Error(method)), 20000);
+      setTimeout(() => reject(new Error(method)), FLAGS.has('perf') ? 30000 : 20000);
     });
   };
   await cdp('Page.enable');
@@ -77,8 +81,13 @@ try {
     ? { width: 390, height: 844, deviceScaleFactor: 2, mobile: true }
     : { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false }
   );
+  if (REDUCED) {
+    await cdp('Emulation.setEmulatedMedia', {
+      features: [{ name: 'prefers-reduced-motion', value: 'reduce' }],
+    });
+  }
   await cdp('Page.navigate', { url: URL });
-  await wait(6500);
+  await wait(WAIT);
   if (SCROLL > 0) {
     await cdp('Runtime.evaluate', {
       expression: `(() => {
@@ -99,6 +108,29 @@ try {
       })()`,
     });
     await wait(900);
+  }
+  if (FLAGS.has('focus')) {
+    await cdp('Runtime.evaluate', {
+      expression: `document.querySelector('.skip-link')?.focus()`,
+    });
+    await wait(200);
+  }
+  if (FLAGS.has('perf')) {
+    const fps = await cdp('Runtime.evaluate', {
+      awaitPromise: true,
+      returnByValue: true,
+      expression: `new Promise((resolve) => {
+        let n = 0;
+        const t0 = performance.now();
+        const tick = (now) => {
+          n += 1;
+          if (now - t0 < 10000) requestAnimationFrame(tick);
+          else resolve({ fps: +(n / ((now - t0) / 1000)).toFixed(1), frames: n });
+        };
+        requestAnimationFrame(tick);
+      })`,
+    });
+    console.log('perf', fps.result?.value || fps.result);
   }
   const { data } = await cdp('Page.captureScreenshot', { format: 'png', fromSurface: true });
   const dest = path.join(OUT, FILE);
