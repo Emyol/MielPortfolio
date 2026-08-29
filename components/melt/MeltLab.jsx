@@ -1,12 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
 import styles from './MeltLab.module.css';
 
 const MeltCanvas = dynamic(() => import('./MeltCanvas'), { ssr: false });
+const MeltScroll = dynamic(() => import('./MeltScroll'), { ssr: false });
 
-export default function MeltLab() {
+function MeltLabBody() {
+  const params = useSearchParams();
+  const mode = params.get('mode') === 'scroll' ? 'scroll' : 'studio';
   const [reduced, setReduced] = useState(false);
 
   useEffect(() => {
@@ -22,10 +26,18 @@ export default function MeltLab() {
       <a href="#melt-main" className="skip-link">
         Skip to content
       </a>
-      <main id="melt-main" className={styles.lab}>
+      <main id="melt-main" className={mode === 'scroll' ? styles.scrollLab : styles.lab}>
         <h1 className={styles.sr}>Amiel Acuña</h1>
-        <MeltCanvas reduced={reduced} />
+        {mode === 'scroll' ? <MeltScroll reduced={reduced} /> : <MeltCanvas reduced={reduced} />}
       </main>
     </>
+  );
+}
+
+export default function MeltLab() {
+  return (
+    <Suspense fallback={null}>
+      <MeltLabBody />
+    </Suspense>
   );
 }

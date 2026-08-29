@@ -7,11 +7,109 @@
   background: #000;
 }
 
-.lab :global(.melt-canvas) {
+.scrollLab {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 100dvh;
+  background: #000;
+}
+
+.lab :global(.melt-canvas),
+.sticky :global(.melt-canvas) {
   position: absolute;
   inset: 0;
   width: 100% !important;
   height: 100% !important;
+}
+
+.scrollRoot {
+  height: 100vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  pointer-events: none;
+}
+
+.track {
+  position: relative;
+  margin-top: -100vh;
+}
+
+.chapter {
+  min-height: 100vh;
+  padding: 12vh 8vw 8vh;
+  pointer-events: none;
+}
+
+.chapter a {
+  pointer-events: auto;
+}
+
+.kicker {
+  font-family: var(--font-body);
+  font-size: 11px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.chapterTitle {
+  margin-top: 12px;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 8vw, 5.5rem);
+  line-height: 0.92;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.markList,
+.workList {
+  margin-top: 28px;
+  max-width: 28rem;
+  list-style: none;
+  font-family: var(--font-body);
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--mute);
+}
+
+.workList a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.workList li + li {
+  margin-top: 22px;
+}
+
+.still {
+  display: block;
+  margin: 6px 0 10px;
+  padding: 28px 12px;
+  border: 1px solid var(--wire);
+  color: var(--wire);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 24px;
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+.links a {
+  color: var(--ink);
 }
 
 .sr {

@@ -8,6 +8,7 @@ const PORT = 9566;
 const OUT = path.resolve('docs/media');
 const URL = process.argv[2] || 'http://localhost:3000/melt-lab';
 const FILE = process.argv[3] || 'chrome-matter-review-first.png';
+const SCROLL = Number(process.argv[4] || 0);
 
 function wait(ms) {
   return new Promise((r) => setTimeout(r, ms));
@@ -78,6 +79,17 @@ try {
   });
   await cdp('Page.navigate', { url: URL });
   await wait(6500);
+  if (SCROLL > 0) {
+    await cdp('Runtime.evaluate', {
+      expression: `(() => {
+        const root = document.querySelector('[class*="scrollRoot"]');
+        if (!root) return 'missing';
+        root.scrollTop = root.scrollHeight * ${SCROLL};
+        return String(root.scrollTop);
+      })()`,
+    });
+    await wait(1800);
+  }
   const { data } = await cdp('Page.captureScreenshot', { format: 'png', fromSurface: true });
   const dest = path.join(OUT, FILE);
   await writeFile(dest, Buffer.from(data, 'base64'));
