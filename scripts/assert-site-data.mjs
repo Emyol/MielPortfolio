@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { kit } from '../data/kit.js';
 import { site } from '../data/site.js';
 import { nodeById, nodes, railIds, ROOT_ID } from '../data/tree.js';
 
@@ -34,6 +35,36 @@ assert.ok(site.distinctions.length >= 4);
 assert.ok(site.certifications.length >= 6);
 for (const row of [...site.distinctions, ...site.certifications]) {
   assert.ok(row.year && row.text);
+}
+
+assert.equal(site.kit, kit);
+assert.ok(Array.isArray(kit) && kit.length >= 15);
+assert.equal(kit.length, new Set(kit.map((row) => row.id)).size);
+for (const row of kit) {
+  assert.ok(row.id && row.name && row.mark);
+  assert.ok(row.kind === 'tool' || row.kind === 'cert');
+}
+for (const name of [
+  'Git',
+  'Flutter',
+  'Next.js',
+  'ONNX Runtime',
+  'SAP Activate',
+  'Claude Code',
+  'Cursor',
+  'Figma',
+  'Google Workspace',
+]) {
+  assert.ok(
+    kit.some((row) => row.kind === 'tool' && row.name === name),
+    `missing tool ${name}`
+  );
+}
+for (const issuer of [...new Set(site.certifications.map((row) => row.year))]) {
+  assert.ok(
+    kit.some((row) => row.kind === 'cert' && row.name === issuer),
+    `missing cert kit row for ${issuer}`
+  );
 }
 
 assert.equal(site.contact.email, 'acunaamieljosiah@gmail.com');

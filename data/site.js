@@ -1,3 +1,5 @@
+import { kit } from './kit.js';
+
 export const site = {
   url: 'https://miel.dev',
   brand: 'MIEL.',
@@ -6,7 +8,8 @@ export const site = {
   jobTitle: 'Software Engineer',
   title: 'Amiel Acuña — Software Engineer & Student Leader',
   description:
-    'Software Engineering student and certified project manager at FEU Tech — Rank 2 in Batch ’27. Specializing in on-device edge AI, vector retrieval, and geospatial intelligence.',
+    'Software Engineering student and certified project manager at FEU Tech. On-device edge AI, vector retrieval, and geospatial intelligence.',
+  kit,
   keywords: [
     'Amiel Acuña',
     'Software Engineer',

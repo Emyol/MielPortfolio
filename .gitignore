@@ -45,3 +45,6 @@ Thumbs.db
 
 # Turbo
 .turbo
+
+# Throwaway prototypes
+_scratch/
