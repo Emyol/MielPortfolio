@@ -3,7 +3,10 @@ import MagneticElement from "./MagneticElement";
 export default function Footer() {
   return (
     <footer id="contact" className="footer scroll-reveal">
-      <h2 className="footer-huge">LET&rsquo;S CONNECT</h2>
+      <pre className="footer-ascii-banner scroll-reveal" aria-hidden="true">{`╔══════════════════════════════════════╗
+║         LET'S CONNECT                ║
+╚══════════════════════════════════════╝`}</pre>
+      <h2 className="footer-huge visually-hidden">Let&rsquo;s Connect</h2>
       <div className="footer-grid">
         <div className="footer-col">
           <span className="footer-label">Location</span>
@@ -54,8 +57,7 @@ export default function Footer() {
       <div className="footer-bottom">
         <p>&copy; {new Date().getFullYear()} Amiel Acu&ntilde;a. All rights reserved.</p>
         <p>
-          Designed with{" "}
-          <span style={{ color: "var(--accent)" }}>precision</span>.
+          RENDERED IN <span className="ascii-accent">ASCII</span> // v2.0
         </p>
       </div>
     </footer>

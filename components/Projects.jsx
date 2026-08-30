@@ -40,6 +40,10 @@ const PROJECTS = [
 function ProjectCover({ project }) {
     return (
         <div className="project-cover" role="img" aria-label={`${project.name} cover`}>
+            <pre className="project-cover-ascii" aria-hidden="true">{`┌──────────────────────────┐
+│  ${project.index.padStart(2, '0')} / 04  SELECTED WORK    │
+│                          │
+└──────────────────────────┘`}</pre>
             <div className="project-cover-grid" aria-hidden="true" />
             <span className="project-cover-bgnum" aria-hidden="true">{project.index}</span>
             <span className="frame-corner tl" aria-hidden="true" />

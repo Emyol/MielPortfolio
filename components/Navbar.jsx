@@ -38,7 +38,7 @@ export default function Navbar() {
 
     return (
         <nav className={`navbar fade-in dl-1 ${scrolled ? 'is-scrolled' : ''}`} aria-label="Primary">
-            <a href="#main" className="nav-brand">MIEL.</a>
+            <a href="#main" className="nav-brand">&gt; MIEL_</a>
             <div className="nav-links">
                 {LINKS.map(({ id, label }) => (
                     <a
@@ -47,7 +47,7 @@ export default function Navbar() {
                         className={active === id ? 'is-active' : ''}
                         aria-current={active === id ? 'true' : undefined}
                     >
-                        {label}
+                        {active === id ? '▸ ' : '> '}{label.toUpperCase()}
                     </a>
                 ))}
             </div>

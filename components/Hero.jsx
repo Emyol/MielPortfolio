@@ -4,13 +4,18 @@ import Image from 'next/image';
 export default function Hero() {
     return (
         <section id="hero" className="hero">
-            <div className="hero-bg-numeral fade-in dl-1" aria-hidden="true">01</div>
+            <pre className="hero-ascii-art fade-in dl-1" aria-hidden="true">{`    ██╗ ██████╗ ██╗
+    ╚═╝██╔═══██╗██║
+       ██║   ██║██║
+       ██║   ██║██║
+       ╚██████╔╝██║
+        ╚═════╝ ╚═╝`}</pre>
 
             <div className="hero-layout">
                 <div className="hero-content">
                     <div className="hero-label fade-in dl-2">
                         <span className="hero-label-dot" aria-hidden="true" />
-                        <span>(001) / INDEX</span>
+                        <span>&gt; (001) / INDEX</span>
                         <span className="hero-label-spacer" aria-hidden="true" />
                         <span>BASED IN MANILA, PH</span>
                         <span className="hero-label-status">
@@ -34,6 +39,11 @@ export default function Hero() {
 
                 <div className="hero-visual fade-in dl-3">
                     <div className="hero-visual-frame">
+                        <pre className="hero-frame-ascii" aria-hidden="true">{`┌─────────────────────┐
+│  ████  PROFILE  ████ │
+│                     │
+│                     │
+└─────────────────────┘`}</pre>
                         <div className="hero-image-wrapper">
                             <div className="hero-image-bg"></div>
                             <Image

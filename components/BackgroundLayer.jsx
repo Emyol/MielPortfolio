@@ -1,7 +1,11 @@
+import AsciiCanvas from "./AsciiCanvas";
+
 export default function BackgroundLayer() {
     return (
         <div className="bg-layer" aria-hidden="true">
+            <AsciiCanvas />
             <div className="bg-grid" />
+            <div className="bg-scanlines" />
             <div className="bg-vignette" />
             <svg className="bg-noise" xmlns="http://www.w3.org/2000/svg">
                 <filter id="noiseFilter">

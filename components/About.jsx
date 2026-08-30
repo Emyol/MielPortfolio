@@ -1,3 +1,5 @@
+import CertCarousel from './CertCarousel';
+
 export default function About() {
     return (
         <section id="about" className="about">
@@ -99,37 +101,12 @@ export default function About() {
                         </li>
                     </ul>
                 </div>
-                <div className="stack-group">
+                <div className="stack-group cert-carousel-group">
                     <span className="stack-label">
                         <span className="stack-label-dot" aria-hidden="true" />
                         Certifications
                     </span>
-                    <ul className="marks-list">
-                        <li>
-                            <span className="role-year">PMI</span>
-                            <span>Project Management Ready™</span>
-                        </li>
-                        <li>
-                            <span className="role-year">SAP</span>
-                            <span>Certified Project Manager — SAP Activate</span>
-                        </li>
-                        <li>
-                            <span className="role-year">Certiport</span>
-                            <span>IT Specialist — Python</span>
-                        </li>
-                        <li>
-                            <span className="role-year">Anthropic</span>
-                            <span>Claude Code in Action</span>
-                        </li>
-                        <li>
-                            <span className="role-year">Google</span>
-                            <span>Gemini Certified University Student</span>
-                        </li>
-                        <li>
-                            <span className="role-year">MathWorks</span>
-                            <span>MATLAB Onramp</span>
-                        </li>
-                    </ul>
+                    <CertCarousel />
                 </div>
             </div>
         </section>
