@@ -1,3 +1,4 @@
+import TechStack from './TechStack';
 import CertCarousel from './CertCarousel';
 
 export default function About() {
@@ -23,57 +24,7 @@ export default function About() {
                     </div>
                 </div>
 
-                <div className="about-stack scroll-reveal">
-                    <div className="stack-group">
-                        <span className="stack-label">
-                            <span className="stack-label-dot" aria-hidden="true" />
-                            Languages
-                        </span>
-                        <ul className="stack-list">
-                            <li>Python</li>
-                            <li>TypeScript</li>
-                            <li>Dart</li>
-                            <li>Kotlin</li>
-                            <li>C / C++</li>
-                        </ul>
-                    </div>
-                    <div className="stack-group">
-                        <span className="stack-label">
-                            <span className="stack-label-dot" aria-hidden="true" />
-                            Frameworks
-                        </span>
-                        <ul className="stack-list">
-                            <li>Flutter</li>
-                            <li>Next.js</li>
-                            <li>ONNX Runtime</li>
-                            <li>REST APIs</li>
-                        </ul>
-                    </div>
-                    <div className="stack-group">
-                        <span className="stack-label">
-                            <span className="stack-label-dot" aria-hidden="true" />
-                            Domains
-                        </span>
-                        <ul className="stack-list">
-                            <li>On-device ML</li>
-                            <li>Vector retrieval</li>
-                            <li>Geospatial</li>
-                            <li>Compilers</li>
-                        </ul>
-                    </div>
-                    <div className="stack-group">
-                        <span className="stack-label">
-                            <span className="stack-label-dot" aria-hidden="true" />
-                            Tooling
-                        </span>
-                        <ul className="stack-list">
-                            <li>Git</li>
-                            <li>SAP Activate</li>
-                            <li>Agile / Scrum</li>
-                            <li>Claude Code</li>
-                        </ul>
-                    </div>
-                </div>
+                <TechStack />
             </div>
 
             <div className="about-marks scroll-reveal">

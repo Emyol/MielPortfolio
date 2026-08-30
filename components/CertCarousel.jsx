@@ -1,42 +1,81 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-
-const CERTS = [
-  {
-    issuer: "PMI",
-    title: "Project Management Ready™",
-    glyph: "  ████  \n ██  ██ \n ██████ \n ██  ██ \n  ████  ",
-  },
-  {
-    issuer: "SAP",
-    title: "Certified Project Manager — SAP Activate",
-    glyph: " ██████ \n██    ██\n ██████ \n      ██\n ██████ ",
-  },
-  {
-    issuer: "Certiport",
-    title: "IT Specialist — Python",
-    glyph: "██████  \n██  ██  \n██████  \n██      \n██      ",
-  },
-  {
-    issuer: "Anthropic",
-    title: "Claude Code in Action",
-    glyph: "  ███   \n █   █  \n █████  \n █   █  \n █   █  ",
-  },
-  {
-    issuer: "Google",
-    title: "Gemini Certified University Student",
-    glyph: " ██████ \n██      \n██  ███ \n██   ██ \n ██████ ",
-  },
-  {
-    issuer: "MathWorks",
-    title: "MATLAB Onramp",
-    glyph: "██   ██ \n███  ██ \n██ █ ██ \n██  ███ \n██   ██ ",
-  },
-];
+import Image from "next/image";
+import { CERTIFICATES, certificateImagePath } from "../data/certificates";
 
 function wrapIndex(index, length) {
   return ((index % length) + length) % length;
+}
+
+function CertCardContent({ cert, showImage }) {
+  if (showImage) {
+    return (
+      <div className="cert-card-image-wrap">
+        <Image
+          src={certificateImagePath(cert.slug)}
+          alt={`${cert.issuer} — ${cert.title}`}
+          fill
+          sizes="280px"
+          className="cert-card-image"
+        />
+        <div className="cert-card-image-meta">
+          <span className="cert-card-issuer">[ {cert.issuer} ]</span>
+          <span className="cert-card-status">● VERIFIED</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <pre className="cert-card-border" aria-hidden="true">
+{`┌─ CERTIFICATE ─────────────────────┐
+│                                   │
+│                                   │
+│                                   │
+└───────────────────────────────────┘`}
+      </pre>
+      <div className="cert-card-body">
+        <span className="cert-card-issuer">[ {cert.issuer} ]</span>
+        <h4 className="cert-card-title">{cert.title}</h4>
+        <pre className="cert-card-glyph" aria-hidden="true">{cert.glyph}</pre>
+        <span className="cert-card-status">● VERIFIED</span>
+      </div>
+    </>
+  );
+}
+
+function CertCard({ cert, offset, absOffset, isActive }) {
+  const [imageReady, setImageReady] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const img = new window.Image();
+    img.src = certificateImagePath(cert.slug);
+    img.onload = () => { if (!cancelled) setImageReady(true); };
+    img.onerror = () => { if (!cancelled) setImageReady(false); };
+    return () => { cancelled = true; };
+  }, [cert.slug]);
+
+  return (
+    <article
+      className={`cert-card ${isActive ? "is-active" : ""} ${imageReady ? "has-image" : ""}`}
+      style={{
+        "--offset": offset,
+        "--abs-offset": absOffset,
+        zIndex: 10 - absOffset,
+      }}
+      aria-hidden={!isActive}
+      aria-label={isActive ? `${cert.issuer}: ${cert.title}` : undefined}
+    >
+      {imageReady === null ? (
+        <div className="cert-card-loading" aria-hidden="true">...</div>
+      ) : (
+        <CertCardContent cert={cert} showImage={imageReady} />
+      )}
+    </article>
+  );
 }
 
 export default function CertCarousel() {
@@ -44,14 +83,14 @@ export default function CertCarousel() {
   const [paused, setPaused] = useState(false);
 
   const go = useCallback((delta) => {
-    setActive((prev) => wrapIndex(prev + delta, CERTS.length));
+    setActive((prev) => wrapIndex(prev + delta, CERTIFICATES.length));
   }, []);
 
   useEffect(() => {
     if (paused) return undefined;
 
     const timer = setInterval(() => {
-      setActive((prev) => wrapIndex(prev + 1, CERTS.length));
+      setActive((prev) => wrapIndex(prev + 1, CERTIFICATES.length));
     }, 4500);
 
     return () => clearInterval(timer);
@@ -76,40 +115,22 @@ export default function CertCarousel() {
       aria-roledescription="carousel"
     >
       <div className="cert-carousel-stage">
-        {CERTS.map((cert, index) => {
+        {CERTIFICATES.map((cert, index) => {
           let offset = index - active;
-          if (offset > CERTS.length / 2) offset -= CERTS.length;
-          if (offset < -CERTS.length / 2) offset += CERTS.length;
+          if (offset > CERTIFICATES.length / 2) offset -= CERTIFICATES.length;
+          if (offset < -CERTIFICATES.length / 2) offset += CERTIFICATES.length;
 
           const isActive = offset === 0;
           const absOffset = Math.abs(offset);
 
           return (
-            <article
-              key={cert.issuer + cert.title}
-              className={`cert-card ${isActive ? "is-active" : ""}`}
-              style={{
-                "--offset": offset,
-                "--abs-offset": absOffset,
-                zIndex: 10 - absOffset,
-              }}
-              aria-hidden={!isActive}
-              aria-label={isActive ? `${cert.issuer}: ${cert.title}` : undefined}
-            >
-              <pre className="cert-card-border" aria-hidden="true">
-{`┌─ CERTIFICATE ─────────────────────┐
-│                                   │
-│                                   │
-│                                   │
-└───────────────────────────────────┘`}
-              </pre>
-              <div className="cert-card-body">
-                <span className="cert-card-issuer">[ {cert.issuer} ]</span>
-                <h4 className="cert-card-title">{cert.title}</h4>
-                <pre className="cert-card-glyph" aria-hidden="true">{cert.glyph}</pre>
-                <span className="cert-card-status">● VERIFIED</span>
-              </div>
-            </article>
+            <CertCard
+              key={cert.slug}
+              cert={cert}
+              offset={offset}
+              absOffset={absOffset}
+              isActive={isActive}
+            />
           );
         })}
       </div>
@@ -124,9 +145,9 @@ export default function CertCarousel() {
           &lt; PREV
         </button>
         <div className="cert-carousel-dots" role="tablist" aria-label="Certificate slides">
-          {CERTS.map((cert, index) => (
+          {CERTIFICATES.map((cert, index) => (
             <button
-              key={cert.issuer}
+              key={cert.slug}
               type="button"
               role="tab"
               className={`cert-carousel-dot ${index === active ? "is-active" : ""}`}
