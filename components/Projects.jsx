@@ -20,6 +20,8 @@ const PROJECTS = [
     summary: 'Private semantic image search that understands Taglish queries and runs entirely on-device.',
     evidence: ['Zero server dependency', 'Sub-second local retrieval', 'Vision-language embeddings'],
     href: 'https://github.com/Emyol/KitaKo_Codebase',
+    live: 'https://kitako-stochastic4.vercel.app/',
+    preview: '/projects/kitako.jpg?v=7',
   },
   {
     id: 'icare', year: '2026', type: 'Internal tooling', name: 'iCARE Reservation',
@@ -27,6 +29,8 @@ const PROJECTS = [
     summary: 'A shared-facility portal that reduces booking friction and catches room conflicts before submission.',
     evidence: ['Multi-room conflict checks', 'Schedule visibility', 'Administrative workflow'],
     href: 'https://github.com/Emyol/iCARE-Reservation',
+    live: 'https://icare-reservation.vercel.app/dashboard',
+    preview: '/projects/icare.jpg?v=6',
   },
   {
     id: 'bekilang', year: '2026', type: 'Domain-specific language', name: 'BekiLang',
@@ -34,6 +38,8 @@ const PROJECTS = [
     summary: 'A working programming language and web playground built around Philippine Swardspeak.',
     evidence: ['Lexer and parser', 'Typed AST interpreter', 'Interactive playground'],
     href: 'https://github.com/Emyol/BekiLang',
+    live: 'https://beki-lang.vercel.app/',
+    preview: '/projects/bekilang.jpg?v=6',
   },
   {
     id: 'citysense', year: '2025', type: 'NASA Space Apps Challenge', name: 'CitySense',
@@ -41,6 +47,8 @@ const PROJECTS = [
     summary: 'A planning cockpit that combines live environmental layers with an AI-assisted policy workflow.',
     evidence: ['Live NASA layers', 'Equity indicators', 'Planning assistant'],
     href: 'https://github.com/Emyol/city-sense',
+    live: 'https://stochastics-city-sense.netlify.app/',
+    preview: '/projects/citysense.jpg?v=6',
   },
 ];
 
@@ -100,9 +108,14 @@ export default function Projects() {
               ))}
             </div>
             <Card className="py-0 overflow-hidden work-card" aria-live="polite">
-              <div className="work-media" aria-hidden="true">
-                <span className="work-media-meta">{activeProject.year} · {activeProject.categories.join(' / ')}</span>
-                <strong>{activeProject.name}</strong>
+              <div className="work-media">
+                <img
+                  key={activeProject.id}
+                  src={activeProject.preview}
+                  alt=""
+                  width={1600}
+                  height={900}
+                />
                 <span className="work-media-glare" />
               </div>
               <CardHeader>
@@ -120,7 +133,12 @@ export default function Projects() {
                   ))}
                 </div>
               </CardContent>
-              <CardFooter className="pb-6">
+              <CardFooter className="pb-6 gap-2 flex-wrap">
+                <Button asChild variant="outline">
+                  <a href={activeProject.live} target="_blank" rel="noopener noreferrer">
+                    Open live <ArrowUpRight />
+                  </a>
+                </Button>
                 <Button asChild>
                   <a href={activeProject.href} target="_blank" rel="noopener noreferrer">
                     View repository <ArrowUpRight />

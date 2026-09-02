@@ -10,6 +10,7 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const LINKS = [
   { id: 'about', label: 'Discipline' },
+  { id: 'credentials', label: 'Credentials' },
   { id: 'projects', label: 'Work' },
   { id: 'leadership', label: 'Leadership' },
   { id: 'contact', label: 'Contact' },

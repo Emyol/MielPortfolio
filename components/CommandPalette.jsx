@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Compass,
+  Award,
   FileText,
   FolderGit2,
   Mail,
@@ -17,6 +18,7 @@ const GROUPS = [
     heading: 'On this page',
     items: [
       { label: 'Discipline', hint: 'About', href: '#about', Icon: Compass },
+      { label: 'Certificates & awards', hint: 'Credentials', href: '#credentials', Icon: Award },
       { label: 'Selected systems', hint: 'Work', href: '#projects', Icon: SquareStack },
       { label: 'Leadership', hint: 'Record', href: '#leadership', Icon: Users },
       { label: 'Contact', hint: 'Write', href: '#contact', Icon: Mail },

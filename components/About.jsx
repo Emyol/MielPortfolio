@@ -1,6 +1,5 @@
 "use client";
 
-import CertCarousel from './CertCarousel';
 import PinTitle from './PinTitle';
 import { TextRevealByWord } from '@/components/ui/text-reveal';
 
@@ -12,13 +11,6 @@ const STACK = [
   { label: 'Runtime', items: ['Flutter', 'Next.js', 'ONNX Runtime', 'REST APIs'] },
   { label: 'Domains', items: ['On-device ML', 'Vector retrieval', 'Geospatial', 'Compilers'] },
   { label: 'Delivery', items: ['Git', 'SAP Activate', 'Agile / Scrum', 'Claude Code'] },
-];
-
-const DISTINCTIONS = [
-  { year: '2026', title: "Rank 2, Batch '27 and Rank 5, BSCSSE" },
-  { year: '2025', title: 'Active Student Leader, FEU Institute of Technology' },
-  { year: '2024', title: '4th Place, Code Green for Campuses' },
-  { year: '2024', title: "Rank 2, Batch '27 and Rank 7, BSCSSE" },
 ];
 
 const AREAS = [
@@ -54,20 +46,6 @@ export default function About() {
                   <ul>{group.items.map((item) => <li key={item}>{item}</li>)}</ul>
                 </article>
               ))}
-            </div>
-            <div className="credentials-layout">
-              <div className="distinction-list">
-                <h3>Distinctions</h3>
-                <ul>
-                  {DISTINCTIONS.map((item, index) => (
-                    <li key={`${item.year}-${index}`}>
-                      <time>{item.year}</time>
-                      <span>{item.title}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <CertCarousel />
             </div>
           </div>
         </div>

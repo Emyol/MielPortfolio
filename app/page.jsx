@@ -1,6 +1,7 @@
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import About from '../components/About';
+import CertificatesAwards from '../components/CertificatesAwards';
 import Projects from '../components/Projects';
 import Leadership from '../components/Leadership';
 import Footer from '../components/Footer';
@@ -17,6 +18,7 @@ export default function Home() {
       <main id="main" className="field-page">
         <Hero />
         <About />
+        <CertificatesAwards />
         <Projects />
         <Leadership />
         <Footer />
