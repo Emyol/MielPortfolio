@@ -1,56 +1,62 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
+import CommandPalette from './CommandPalette';
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const LINKS = [
-    { id: 'about', label: 'About' },
-    { id: 'projects', label: 'Work' },
-    { id: 'leadership', label: 'Leadership' },
-    { id: 'contact', label: 'Contact' },
+  { id: 'about', label: 'Discipline' },
+  { id: 'projects', label: 'Work' },
+  { id: 'leadership', label: 'Leadership' },
+  { id: 'contact', label: 'Contact' },
 ];
 
 export default function Navbar() {
-    const [scrolled, setScrolled] = useState(false);
-    const [active, setActive] = useState('');
+  const [active, setActive] = useState('');
+  const navRef = useRef(null);
 
-    useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 40);
-        onScroll();
-        window.addEventListener('scroll', onScroll, { passive: true });
-        return () => window.removeEventListener('scroll', onScroll);
-    }, []);
+  useGSAP(() => {
+    const trigger = ScrollTrigger.create({
+      start: 40,
+      end: 'max',
+      onUpdate: (self) => navRef.current?.classList.toggle('is-scrolled', self.scroll() > 40),
+    });
+    return () => trigger.kill();
+  }, { scope: navRef });
 
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) setActive(entry.target.id);
-                });
-            },
-            { rootMargin: '-45% 0px -45% 0px', threshold: 0 }
-        );
-        LINKS.forEach(({ id }) => {
-            const el = document.getElementById(id);
-            if (el) observer.observe(el);
-        });
-        return () => observer.disconnect();
-    }, []);
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) setActive(entry.target.id);
+      });
+    }, { rootMargin: '-45% 0px -45% 0px', threshold: 0 });
+    LINKS.forEach(({ id }) => {
+      const element = document.getElementById(id);
+      if (element) observer.observe(element);
+    });
+    return () => observer.disconnect();
+  }, []);
 
-    return (
-        <nav className={`navbar fade-in dl-1 ${scrolled ? 'is-scrolled' : ''}`} aria-label="Primary">
-            <a href="#main" className="nav-brand">MIEL.</a>
-            <div className="nav-links">
-                {LINKS.map(({ id, label }) => (
-                    <a
-                        key={id}
-                        href={`#${id}`}
-                        className={active === id ? 'is-active' : ''}
-                        aria-current={active === id ? 'true' : undefined}
-                    >
-                        {label}
-                    </a>
-                ))}
-            </div>
-        </nav>
-    );
+  return (
+    <nav ref={navRef} className="field-nav" aria-label="Primary navigation">
+      <a href="#hero" className="field-brand" aria-label="Go to introduction">Miel</a>
+      <div className="field-nav-links">
+        {LINKS.map(({ id, label }) => (
+          <a
+            key={id}
+            href={`#${id}`}
+            className={active === id ? 'is-active' : ''}
+            aria-current={active === id ? 'page' : undefined}
+          >
+            {label}
+          </a>
+        ))}
+      </div>
+      <CommandPalette />
+    </nav>
+  );
 }

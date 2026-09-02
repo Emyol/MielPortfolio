@@ -1,8 +1,23 @@
+import { Fraunces, Public_Sans } from 'next/font/google';
 import './globals.css';
+import './liquid-field.css';
+
+const display = Fraunces({
+  subsets: ['latin'],
+  variable: '--font-display-loaded',
+  display: 'swap',
+  axes: ['SOFT', 'WONK', 'opsz'],
+});
+
+const body = Public_Sans({
+  subsets: ['latin'],
+  variable: '--font-body-loaded',
+  display: 'swap',
+});
 
 const SITE_URL = 'https://miel.dev';
 const TITLE = 'Amiel Acuña — Software Engineer & Student Leader';
-const DESCRIPTION = 'Software Engineering student and certified project manager at FEU Tech — Rank 2 in Batch ’27. Specializing in on-device edge AI, vector retrieval, and geospatial intelligence.';
+const DESCRIPTION = 'Software Engineering student and certified project manager at FEU Tech. Rank 2 in Batch ’27, specializing in on-device edge AI, vector retrieval, and geospatial intelligence.';
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
@@ -53,17 +68,24 @@ const jsonLd = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${display.variable} ${body.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {/*
+          THESIS: The Surface is a volume of silver fluid a Visitor remembers; it refuses Operator Console costume and the generic metric-hero résumé.
+          OWN-WORLD: Near-black field, white/silver ink, Fraunces display + Public Sans body, 2px metal corners, Canvas UI Liquid only in the first viewport.
+          STORY: Meet Amiel through the Field, then inspect Work, leadership, and a way to write.
+          FIRST VIEWPORT: Full-viewport Liquid Field; Fraunces headline bottom-left; portrait right; actions and quiet measures under the copy.
+          FORM: Liquid Field, brief-pinned (grill + ADR-0001), seed key grill-liquid-field.
+          FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+        */}
+        {children}
+      </body>
     </html>
   );
 }

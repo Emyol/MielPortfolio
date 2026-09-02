@@ -1,29 +1,23 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useRef } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 export default function ScrollProgress() {
-    const [progress, setProgress] = useState(0);
+  const barRef = useRef(null);
 
-    useEffect(() => {
-        const update = () => {
-            const h = document.documentElement;
-            const scrolled = h.scrollTop;
-            const max = h.scrollHeight - h.clientHeight;
-            setProgress(max > 0 ? (scrolled / max) * 100 : 0);
-        };
-        update();
-        window.addEventListener('scroll', update, { passive: true });
-        window.addEventListener('resize', update);
-        return () => {
-            window.removeEventListener('scroll', update);
-            window.removeEventListener('resize', update);
-        };
-    }, []);
+  useGSAP(() => {
+    if (!barRef.current) return;
+    gsap.fromTo(barRef.current, { scaleX: 0 }, {
+      scaleX: 1,
+      ease: 'none',
+      scrollTrigger: { start: 'top top', end: 'max', scrub: 0.2 },
+    });
+  }, { scope: barRef });
 
-    return (
-        <div className="scroll-progress" aria-hidden="true">
-            <div className="scroll-progress-bar" style={{ transform: `scaleX(${progress / 100})` }} />
-        </div>
-    );
+  return <div className="scroll-progress" aria-hidden="true"><div ref={barRef} className="scroll-progress-bar" /></div>;
 }

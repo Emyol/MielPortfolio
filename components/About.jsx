@@ -1,137 +1,77 @@
+"use client";
+
+import CertCarousel from './CertCarousel';
+import PinTitle from './PinTitle';
+import { TextRevealByWord } from '@/components/ui/text-reveal';
+
+const DISCIPLINE_LEDE =
+  'I work where constrained computing meets human coordination: private AI on-device, expressive developer tools, map-based decision systems, and delivery operations.';
+
+const STACK = [
+  { label: 'Languages', items: ['Python', 'TypeScript', 'Dart', 'Kotlin', 'C / C++'] },
+  { label: 'Runtime', items: ['Flutter', 'Next.js', 'ONNX Runtime', 'REST APIs'] },
+  { label: 'Domains', items: ['On-device ML', 'Vector retrieval', 'Geospatial', 'Compilers'] },
+  { label: 'Delivery', items: ['Git', 'SAP Activate', 'Agile / Scrum', 'Claude Code'] },
+];
+
+const DISTINCTIONS = [
+  { year: '2026', title: "Rank 2, Batch '27 and Rank 5, BSCSSE" },
+  { year: '2025', title: 'Active Student Leader, FEU Institute of Technology' },
+  { year: '2024', title: '4th Place, Code Green for Campuses' },
+  { year: '2024', title: "Rank 2, Batch '27 and Rank 7, BSCSSE" },
+];
+
+const AREAS = [
+  ['Edge intelligence', 'Local inference and retrieval without server dependency.'],
+  ['Language systems', 'Lexers, parsers, ASTs, interpreters, and usable tooling.'],
+  ['Geospatial products', 'Complex environmental data made legible for decisions.'],
+  ['Operational leadership', 'Plans, resources, and teams aligned around delivery.'],
+];
+
 export default function About() {
-    return (
-        <section id="about" className="about">
-            <div className="section-header scroll-reveal">
-                <span className="section-num" aria-hidden="true">(002)</span>
-                <h2 className="section-title">Discipline</h2>
-                <span className="section-rule" aria-hidden="true" />
+  return (
+    <section id="about" className="field-section" aria-labelledby="about-title" data-pin-section>
+      <div className="field-shell field-split">
+        <PinTitle id="about-title">Discipline</PinTitle>
+        <div>
+          <TextRevealByWord text={DISCIPLINE_LEDE} />
+          <div className="discipline-grid">
+            <div className="capability-statement">
+              <blockquote>Build the system clearly. Make the handoff reliable.</blockquote>
             </div>
-
-            <div className="about-grid">
-                <div className="about-statement scroll-reveal">
-                    <p>
-                        I build software at the intersection of <em>intelligence</em> and <em>infrastructure</em> &mdash;
-                        on-device edge AI, custom language interpreters, and geospatial systems that hold up
-                        under real constraints. Ranked in FEU Tech&rsquo;s top academic tier, I also
-                        direct campus logistics and facilitate review sessions for 700+ STEM students.
-                    </p>
-                    <div className="about-signature" aria-hidden="true">
-                        <span>— A. ACUÑA</span>
-                        <span>BSCSSE · FEU TECH · 2026</span>
-                    </div>
-                </div>
-
-                <div className="about-stack scroll-reveal">
-                    <div className="stack-group">
-                        <span className="stack-label">
-                            <span className="stack-label-dot" aria-hidden="true" />
-                            Languages
-                        </span>
-                        <ul className="stack-list">
-                            <li>Python</li>
-                            <li>TypeScript</li>
-                            <li>Dart</li>
-                            <li>Kotlin</li>
-                            <li>C / C++</li>
-                        </ul>
-                    </div>
-                    <div className="stack-group">
-                        <span className="stack-label">
-                            <span className="stack-label-dot" aria-hidden="true" />
-                            Frameworks
-                        </span>
-                        <ul className="stack-list">
-                            <li>Flutter</li>
-                            <li>Next.js</li>
-                            <li>ONNX Runtime</li>
-                            <li>REST APIs</li>
-                        </ul>
-                    </div>
-                    <div className="stack-group">
-                        <span className="stack-label">
-                            <span className="stack-label-dot" aria-hidden="true" />
-                            Domains
-                        </span>
-                        <ul className="stack-list">
-                            <li>On-device ML</li>
-                            <li>Vector retrieval</li>
-                            <li>Geospatial</li>
-                            <li>Compilers</li>
-                        </ul>
-                    </div>
-                    <div className="stack-group">
-                        <span className="stack-label">
-                            <span className="stack-label-dot" aria-hidden="true" />
-                            Tooling
-                        </span>
-                        <ul className="stack-list">
-                            <li>Git</li>
-                            <li>SAP Activate</li>
-                            <li>Agile / Scrum</li>
-                            <li>Claude Code</li>
-                        </ul>
-                    </div>
-                </div>
+            <div className="discipline-areas">
+              {AREAS.map(([title, description]) => (
+                <article key={title}>
+                  <h3>{title}</h3>
+                  <p>{description}</p>
+                </article>
+              ))}
             </div>
-
-            <div className="about-marks scroll-reveal">
-                <div className="stack-group">
-                    <span className="stack-label">
-                        <span className="stack-label-dot" aria-hidden="true" />
-                        Distinctions
-                    </span>
-                    <ul className="marks-list">
-                        <li>
-                            <span className="role-year">2026</span>
-                            <span>Top Performing Student — Rank 2, Batch &rsquo;27 · Rank 5, BSCSSE</span>
-                        </li>
-                        <li>
-                            <span className="role-year">2025</span>
-                            <span>Active Student Leader — FEU Institute of Technology</span>
-                        </li>
-                        <li>
-                            <span className="role-year">2024</span>
-                            <span>4th Place Finalist — Code Green For Campuses, First Gen Corporation</span>
-                        </li>
-                        <li>
-                            <span className="role-year">2024</span>
-                            <span>Top Performing Student — Rank 2, Batch &rsquo;27 · Rank 7, BSCSSE</span>
-                        </li>
-                    </ul>
-                </div>
-                <div className="stack-group">
-                    <span className="stack-label">
-                        <span className="stack-label-dot" aria-hidden="true" />
-                        Certifications
-                    </span>
-                    <ul className="marks-list">
-                        <li>
-                            <span className="role-year">PMI</span>
-                            <span>Project Management Ready™</span>
-                        </li>
-                        <li>
-                            <span className="role-year">SAP</span>
-                            <span>Certified Project Manager — SAP Activate</span>
-                        </li>
-                        <li>
-                            <span className="role-year">Certiport</span>
-                            <span>IT Specialist — Python</span>
-                        </li>
-                        <li>
-                            <span className="role-year">Anthropic</span>
-                            <span>Claude Code in Action</span>
-                        </li>
-                        <li>
-                            <span className="role-year">Google</span>
-                            <span>Gemini Certified University Student</span>
-                        </li>
-                        <li>
-                            <span className="role-year">MathWorks</span>
-                            <span>MATLAB Onramp</span>
-                        </li>
-                    </ul>
-                </div>
+            <div className="stack-matrix">
+              {STACK.map((group) => (
+                <article key={group.label} className="stack-cluster">
+                  <h3>{group.label}</h3>
+                  <ul>{group.items.map((item) => <li key={item}>{item}</li>)}</ul>
+                </article>
+              ))}
             </div>
-        </section>
-    );
+            <div className="credentials-layout">
+              <div className="distinction-list">
+                <h3>Distinctions</h3>
+                <ul>
+                  {DISTINCTIONS.map((item, index) => (
+                    <li key={`${item.year}-${index}`}>
+                      <time>{item.year}</time>
+                      <span>{item.title}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <CertCarousel />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }

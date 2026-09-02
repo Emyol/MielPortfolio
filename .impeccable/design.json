@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-01T08:55:00.000Z",
+  "title": "Design System: Liquid Field",
+  "extensions": {
+    "colorMeta": {
+      "field-bg": { "role": "neutral", "displayName": "Field Ground", "canonical": "#070707" },
+      "field-ink": { "role": "primary", "displayName": "Field Ink", "canonical": "#ececec" },
+      "field-mute": { "role": "neutral", "displayName": "Field Mute", "canonical": "#9c9c9c" },
+      "field-line": { "role": "neutral", "displayName": "Field Line", "canonical": "rgba(236, 236, 236, 0.14)" },
+      "field-plate": { "role": "neutral", "displayName": "Field Plate", "canonical": "#141414" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Fraunces Display", "purpose": "Hero headline only." },
+      "headline": { "displayName": "Fraunces Pin Title", "purpose": "Sticky section titles." },
+      "title": { "displayName": "Fraunces Title", "purpose": "Card titles and cluster headings." },
+      "body": { "displayName": "Public Sans Body", "purpose": "Reading copy and UI." },
+      "label": { "displayName": "Public Sans Label", "purpose": "Nav, measures, years." }
+    },
+    "shadows": [],
+    "motion": [
+      { "name": "ease-standard", "value": "cubic-bezier(0.22, 1, 0.36, 1)", "purpose": "Hero fade; GSAP power3.out analogue." },
+      { "name": "pin-scrub", "value": "0.5", "purpose": "ScrollTrigger scrub on pin-and-typeset." }
+    ],
+    "breakpoints": [
+      { "name": "phone", "value": "560px" },
+      { "name": "compact", "value": "860px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Metal fill action on Work and contact.",
+      "html": "<button class=\"ds-btn-primary\">Explore work</button>",
+      "css": ".ds-btn-primary { background: #ececec; color: #070707; height: 44px; padding: 0 20px; border: 0; border-radius: 2px; font: 500 14px/1 \"Public Sans\", sans-serif; cursor: pointer; transition: background-color 200ms ease; } .ds-btn-primary:hover { background: #d4d4d4; } .ds-btn-primary:focus-visible { outline: 2px solid #ececec; outline-offset: 3px; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Hairline secondary action.",
+      "html": "<button class=\"ds-btn-outline\">Open CV</button>",
+      "css": ".ds-btn-outline { background: transparent; color: #ececec; height: 44px; padding: 0 20px; border: 1px solid rgba(236,236,236,0.14); border-radius: 2px; font: 500 14px/1 \"Public Sans\", sans-serif; cursor: pointer; } .ds-btn-outline:hover { background: #ececec; color: #070707; } .ds-btn-outline:focus-visible { outline: 2px solid #ececec; outline-offset: 3px; }"
+    },
+    {
+      "name": "Field Card",
+      "kind": "card",
+      "refersTo": "card-field",
+      "description": "Work detail and contact plate.",
+      "html": "<article class=\"ds-card\"><h3>KitaKo</h3><p>Private semantic image search that runs on-device.</p></article>",
+      "css": ".ds-card { background: #141414; color: #ececec; border: 1px solid rgba(236,236,236,0.14); border-radius: 2px; padding: 24px; } .ds-card h3 { margin: 0 0 8px; font: 500 1.85rem/1 Fraunces, serif; letter-spacing: -0.04em; } .ds-card p { margin: 0; color: #9c9c9c; font: 400 1rem/1.55 \"Public Sans\", sans-serif; }"
+    },
+    {
+      "name": "Find Trigger",
+      "kind": "input",
+      "refersTo": "command-trigger",
+      "description": "Opens the page finder.",
+      "html": "<button class=\"ds-find\">Find <span>Ctrl K</span></button>",
+      "css": ".ds-find { display: inline-flex; align-items: center; gap: 10px; background: transparent; color: #ececec; border: 1px solid rgba(236,236,236,0.14); border-radius: 2px; padding: 6px 11px; font: 400 12px/1 \"Public Sans\", sans-serif; cursor: pointer; } .ds-find span { color: #9c9c9c; } .ds-find:focus-visible { outline: 2px solid #ececec; outline-offset: 3px; }"
+    },
+    {
+      "name": "Pin Title",
+      "kind": "custom",
+      "refersTo": "headline",
+      "description": "Sticky Fraunces section title.",
+      "html": "<h2 class=\"ds-pin\">Selected systems</h2>",
+      "css": ".ds-pin { margin: 0; color: #ececec; font: 500 clamp(2.2rem, 5vw, 4rem)/0.95 Fraunces, serif; letter-spacing: -0.04em; font-variation-settings: \"SOFT\" 35, \"WONK\" 1; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Liquid Field",
+    "overview": "The Surface is a volume of silver fluid a visitor remembers. Near-black ground, white and silver ink, Fraunces plus Public Sans, 2px metal corners. Canvas UI Liquid lives only in the first viewport; Work is proof, not the costume.",
+    "keyCharacteristics": [
+      "Silver Field ink only",
+      "Liquid in the first viewport",
+      "Fraunces display, Public Sans body",
+      "2px metal corners",
+      "Pin-and-typeset titles"
+    ],
+    "rules": [
+      { "name": "One Material", "body": "Liquid is confined to the first viewport and stays white/silver.", "section": "colors" },
+      { "name": "One Type Voice", "body": "Fraunces for display; Public Sans for reading and UI.", "section": "typography" },
+      { "name": "Tonal Depth", "body": "Hairlines and plates instead of shadows.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep Liquid silver and first-viewport-only.",
+      "Do restyle shadcn Button and Card to Silver Field.",
+      "Do respect prefers-reduced-motion."
+    ],
+    "donts": [
+      "Don't revive Operator Console chrome.",
+      "Don't add a second hue or rainbow fluid.",
+      "Don't put Liquid on every Work image.",
+      "Don't use kickers or section numbers as decoration."
+    ]
+  }
+}

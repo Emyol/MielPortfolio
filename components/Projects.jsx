@@ -1,99 +1,136 @@
+"use client";
+
+import { useMemo, useState } from 'react';
+import { ArrowUpRight } from 'lucide-react';
+import PinTitle from './PinTitle';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+
 const PROJECTS = [
-    {
-        layout: 'pt-1',
-        meta: 'Undergraduate Thesis — 2026',
-        name: 'KitaKo',
-        tags: 'Flutter / ONNX Runtime / SigLIP-2 / IVF-PQ',
-        desc: 'An on-device semantic image search app built with SigLIP-2 vision-language embeddings and IVF-PQ nearest-neighbor search via ONNX Runtime. KitaKo processes Taglish queries locally with zero server dependency and sub-second retrieval latency.',
-        href: 'https://github.com/Emyol/KitaKo_Codebase',
-        index: '01',
-    },
-    {
-        layout: 'pt-2',
-        meta: 'Internal Tooling — 2026',
-        name: 'iCARE Reservation',
-        tags: 'JavaScript / Web App',
-        desc: 'An internal room reservation portal for university administrative staff. Automates booking workflows, schedule visibility, and multi-room conflict checking for shared facilities.',
-        href: 'https://github.com/Emyol/iCARE-Reservation',
-        index: '02',
-    },
-    {
-        layout: 'pt-1',
-        meta: 'Domain-Specific Language — 2026',
-        name: 'BekiLang',
-        tags: 'Python / Compiler / Interpreter / AST',
-        desc: 'A custom programming language built around Philippine Gay Lingo (Swardspeak). Ships with a full lexer, parser, AST, interpreter, and web playground — turning keywords like kunwari, periodt, and ganern into a working language with control flow, typing, and I/O.',
-        href: 'https://github.com/Emyol/BekiLang',
-        index: '03',
-    },
-    {
-        layout: 'pt-2',
-        meta: 'NASA Space Apps Challenge — 2025',
-        name: 'CitySense',
-        tags: 'TypeScript / Leaflet / NASA GIBS / DeepSeek',
-        desc: 'A geospatial intelligence cockpit for urban planners shaping climate-resilient policy. CitySense streams live NASA, WorldPop, GHSL, and SEDAC layers into a unified map, surfacing heat, greenspace, water, and equity indicators alongside a DeepSeek-powered planning assistant.',
-        href: 'https://github.com/Emyol/city-sense',
-        index: '04',
-    },
+  {
+    id: 'kitako', year: '2026', type: 'Undergraduate thesis', name: 'KitaKo',
+    categories: ['AI', 'Mobile'], stack: ['Flutter', 'ONNX Runtime', 'SigLIP-2', 'IVF-PQ'],
+    summary: 'Private semantic image search that understands Taglish queries and runs entirely on-device.',
+    evidence: ['Zero server dependency', 'Sub-second local retrieval', 'Vision-language embeddings'],
+    href: 'https://github.com/Emyol/KitaKo_Codebase',
+  },
+  {
+    id: 'icare', year: '2026', type: 'Internal tooling', name: 'iCARE Reservation',
+    categories: ['Web', 'Operations'], stack: ['JavaScript', 'Web App', 'Scheduling'],
+    summary: 'A shared-facility portal that reduces booking friction and catches room conflicts before submission.',
+    evidence: ['Multi-room conflict checks', 'Schedule visibility', 'Administrative workflow'],
+    href: 'https://github.com/Emyol/iCARE-Reservation',
+  },
+  {
+    id: 'bekilang', year: '2026', type: 'Domain-specific language', name: 'BekiLang',
+    categories: ['Languages', 'Web'], stack: ['Python', 'Compiler', 'Interpreter', 'AST'],
+    summary: 'A working programming language and web playground built around Philippine Swardspeak.',
+    evidence: ['Lexer and parser', 'Typed AST interpreter', 'Interactive playground'],
+    href: 'https://github.com/Emyol/BekiLang',
+  },
+  {
+    id: 'citysense', year: '2025', type: 'NASA Space Apps Challenge', name: 'CitySense',
+    categories: ['Geospatial', 'AI', 'Web'], stack: ['TypeScript', 'Leaflet', 'NASA GIBS', 'DeepSeek'],
+    summary: 'A planning cockpit that combines live environmental layers with an AI-assisted policy workflow.',
+    evidence: ['Live NASA layers', 'Equity indicators', 'Planning assistant'],
+    href: 'https://github.com/Emyol/city-sense',
+  },
 ];
 
-function ProjectCover({ project }) {
-    return (
-        <div className="project-cover" role="img" aria-label={`${project.name} cover`}>
-            <div className="project-cover-grid" aria-hidden="true" />
-            <span className="project-cover-bgnum" aria-hidden="true">{project.index}</span>
-            <span className="frame-corner tl" aria-hidden="true" />
-            <span className="frame-corner tr" aria-hidden="true" />
-            <span className="frame-corner bl" aria-hidden="true" />
-            <span className="frame-corner br" aria-hidden="true" />
-
-            <div className="project-cover-meta">
-                <span className="project-cover-dot" aria-hidden="true" />
-                <span>{project.index}</span>
-                <span className="project-cover-divider">/</span>
-                <span>04</span>
-            </div>
-            <div className="project-cover-name">{project.name}</div>
-            <div className="project-cover-tags">{project.tags}</div>
-        </div>
-    );
-}
+const FILTERS = ['All', 'AI', 'Web', 'Languages', 'Geospatial', 'Operations', 'Mobile'];
 
 export default function Projects() {
-    return (
-        <section id="projects" className="projects">
-            <div className="section-header scroll-reveal">
-                <span className="section-num" aria-hidden="true">(003)</span>
-                <h2 className="section-title">Selected Works</h2>
-            </div>
+  const [filter, setFilter] = useState('All');
+  const [activeId, setActiveId] = useState(PROJECTS[0].id);
+  const visibleProjects = useMemo(
+    () => (filter === 'All' ? PROJECTS : PROJECTS.filter((project) => project.categories.includes(filter))),
+    [filter],
+  );
+  const activeProject = visibleProjects.find((project) => project.id === activeId) ?? visibleProjects[0];
 
-            {PROJECTS.map((p) => (
-                <article key={p.name} className={`project-wrapper ${p.layout} scroll-reveal`}>
-                    {p.layout === 'pt-2' ? (
-                        <>
-                            <div className="project-img-container"><ProjectCover project={p} /></div>
-                            <div className="project-info">
-                                <div className="project-meta">{p.meta}</div>
-                                <h3 className="project-name">{p.name}</h3>
-                                <div className="project-tags">{p.tags}</div>
-                                <p className="project-desc">{p.desc}</p>
-                                <a href={p.href} target="_blank" rel="noopener noreferrer" className="view-link" aria-label={`View ${p.name} repository on GitHub`}>View Repository</a>
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <div className="project-info">
-                                <div className="project-meta">{p.meta}</div>
-                                <h3 className="project-name">{p.name}</h3>
-                                <div className="project-tags">{p.tags}</div>
-                                <p className="project-desc">{p.desc}</p>
-                                <a href={p.href} target="_blank" rel="noopener noreferrer" className="view-link" aria-label={`View ${p.name} repository on GitHub`}>View Repository</a>
-                            </div>
-                            <div className="project-img-container"><ProjectCover project={p} /></div>
-                        </>
-                    )}
-                </article>
+  const chooseFilter = (nextFilter) => {
+    const nextVisible = nextFilter === 'All'
+      ? PROJECTS
+      : PROJECTS.filter((project) => project.categories.includes(nextFilter));
+    setFilter(nextFilter);
+    if (!nextVisible.some((project) => project.id === activeId)) setActiveId(nextVisible[0].id);
+  };
+
+  return (
+    <section id="projects" className="field-section" aria-labelledby="projects-title" data-pin-section>
+      <div className="field-shell field-split">
+        <PinTitle id="projects-title">Selected systems</PinTitle>
+        <div>
+          <p className="field-lede">Four systems. Filter, then read one at a time.</p>
+          <div className="work-filters" aria-label="Work filters">
+            {FILTERS.map((item) => (
+              <Button
+                key={item}
+                type="button"
+                size="sm"
+                variant={filter === item ? 'default' : 'outline'}
+                aria-pressed={filter === item}
+                onClick={() => chooseFilter(item)}
+              >
+                {item}
+              </Button>
             ))}
-        </section>
-    );
+          </div>
+          <div className="work-layout">
+            <div className="work-index" role="list" aria-label="Work">
+              {visibleProjects.map((project) => (
+                <div key={project.id} role="listitem">
+                  <button
+                    type="button"
+                    className={activeProject.id === project.id ? 'is-active' : ''}
+                    aria-pressed={activeProject.id === project.id}
+                    onClick={() => setActiveId(project.id)}
+                  >
+                    <strong>{project.name}</strong>
+                    <small>{project.year}</small>
+                  </button>
+                </div>
+              ))}
+            </div>
+            <Card className="py-0 overflow-hidden work-card" aria-live="polite">
+              <div className="work-media" aria-hidden="true">
+                <span className="work-media-meta">{activeProject.year} · {activeProject.categories.join(' / ')}</span>
+                <strong>{activeProject.name}</strong>
+                <span className="work-media-glare" />
+              </div>
+              <CardHeader>
+                <CardDescription>{activeProject.type} · {activeProject.year}</CardDescription>
+                <CardTitle className="font-serif text-3xl tracking-tight">{activeProject.name}</CardTitle>
+              </CardHeader>
+              <CardContent className="grid gap-4">
+                <p className="text-muted-foreground">{activeProject.summary}</p>
+                <ul className="project-evidence" aria-label="Evidence">
+                  {activeProject.evidence.map((item) => <li key={item}>{item}</li>)}
+                </ul>
+                <div className="flex flex-wrap gap-2" aria-label="Technology stack">
+                  {activeProject.stack.map((item) => (
+                    <span key={item} className="text-sm text-muted-foreground">{item}</span>
+                  ))}
+                </div>
+              </CardContent>
+              <CardFooter className="pb-6">
+                <Button asChild>
+                  <a href={activeProject.href} target="_blank" rel="noopener noreferrer">
+                    View repository <ArrowUpRight />
+                  </a>
+                </Button>
+              </CardFooter>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
