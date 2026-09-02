@@ -23,7 +23,7 @@ const word = {
   hidden: { opacity: 0.2 },
   visible: {
     opacity: 1,
-    transition: { duration: 0.35, ease: "easeOut" },
+    transition: { duration: 0.35, ease: "easeOut" as const },
   },
 };
 
