@@ -14,6 +14,20 @@ interface RevealOptions {
     softness: number;
 }
 
+type RevealBlob = {
+    x: number;
+    y: number;
+    aspect: number;
+    rotation: number;
+    rotationSpeed: number;
+    phase: number;
+    follow: number;
+    size: number;
+    drift: number;
+    driftSpeed: number;
+    contour: number[];
+};
+
 const DEFAULTS = {
     fit: "cover" as Fit,
     focusY: 19,
@@ -97,7 +111,7 @@ function __OriginkitBase_AsciiImage(props: AsciiImageProps) {
     const imgRef = useRef<HTMLImageElement | null>(null);
     const revealRef = useRef<HTMLCanvasElement | null>(null);
     const maskRef = useRef<HTMLCanvasElement | null>(null);
-    const blobsRef = useRef<Array<{ x: number; y: number }>>([]);
+    const blobsRef = useRef<RevealBlob[]>([]);
     const seededRef = useRef(false);
     const pointer = useRef({ x: -9999, y: -9999, inside: false });
 
@@ -121,11 +135,30 @@ function __OriginkitBase_AsciiImage(props: AsciiImageProps) {
         let alive = true;
         let coverRect = { dx: 0, dy: 0, dw: 0, dh: 0 };
 
-        const BLOB_COUNT = 5;
-        blobsRef.current = Array.from({ length: BLOB_COUNT }, () => ({
-            x: 0,
-            y: 0,
-        }));
+        const BLOB_COUNT = 8 + Math.floor(Math.random() * 4);
+        blobsRef.current = Array.from({ length: BLOB_COUNT }, (_, index) => {
+            const pointCount = 10 + Math.floor(Math.random() * 7);
+            const lobes = 2 + Math.floor(Math.random() * 5);
+            const phase = Math.random() * Math.PI * 2;
+
+            return {
+                x: 0,
+                y: 0,
+                aspect: 0.45 + Math.random() * 1.2,
+                rotation: Math.random() * Math.PI * 2,
+                rotationSpeed: (Math.random() - 0.5) * 0.22,
+                phase,
+                follow: index === 0 ? 0.38 : 0.2 + Math.random() * 0.16,
+                size: 0.7 + Math.random() * 0.5,
+                drift: index === 0 ? 0 : 3 + Math.random() * 14,
+                driftSpeed: 0.35 + Math.random() * 0.8,
+                contour: Array.from({ length: pointCount }, (_, pointIndex) => {
+                    const angle = (pointIndex / pointCount) * Math.PI * 2;
+                    const lobe = Math.sin(angle * lobes + phase) * 0.2;
+                    return Math.max(0.36, 0.6 + Math.random() * 0.52 + lobe);
+                }),
+            };
+        });
         seededRef.current = false;
 
         function getSize() {
@@ -152,12 +185,108 @@ function __OriginkitBase_AsciiImage(props: AsciiImageProps) {
             return Math.max(22, Math.min(ceiling, Math.round(cssWidth / 9)));
         }
 
+        const motionField = {
+            seed: Math.random() * 1000,
+            angle: Math.random() * Math.PI * 2,
+            scaleX: 0.035 + Math.random() * 0.055,
+            scaleY: 0.045 + Math.random() * 0.065,
+            driftX: (Math.random() - 0.5) * 0.16,
+            driftY: (Math.random() - 0.5) * 0.16,
+            warp: 0.9 + Math.random() * 1.8,
+            ribbonFrequency: 0.07 + Math.random() * 0.11,
+            ribbonSpeed: (Math.random() < 0.5 ? -1 : 1) * (0.18 + Math.random() * 0.42),
+            cloudMix: 0.075 + Math.random() * 0.055,
+            ribbonMix: 0.018 + Math.random() * 0.035,
+            cellMix: 0.018 + Math.random() * 0.032,
+        };
+
+        function hash2(x: number, y: number, seed: number) {
+            const value = Math.sin(
+                x * 127.1 + y * 311.7 + seed * 74.37
+            ) * 43758.5453123;
+            return value - Math.floor(value);
+        }
+
+        function valueNoise(x: number, y: number, seed: number) {
+            const x0 = Math.floor(x);
+            const y0 = Math.floor(y);
+            const tx = x - x0;
+            const ty = y - y0;
+            const sx = tx * tx * (3 - 2 * tx);
+            const sy = ty * ty * (3 - 2 * ty);
+            const top =
+                hash2(x0, y0, seed) * (1 - sx) +
+                hash2(x0 + 1, y0, seed) * sx;
+            const bottom =
+                hash2(x0, y0 + 1, seed) * (1 - sx) +
+                hash2(x0 + 1, y0 + 1, seed) * sx;
+            return top * (1 - sy) + bottom * sy;
+        }
+
+        function fractalNoise(x: number, y: number, seed: number) {
+            let value = 0;
+            let amplitude = 0.58;
+            let frequency = 1;
+            let normalization = 0;
+
+            for (let octave = 0; octave < 3; octave++) {
+                value += valueNoise(x * frequency, y * frequency, seed + octave * 19.19) * amplitude;
+                normalization += amplitude;
+                frequency *= 2.07;
+                amplitude *= 0.47;
+            }
+
+            return value / normalization;
+        }
+
         function livingLum(base: number, c: number, r: number, t: number) {
-            const current =
-                Math.sin(t * 1.05 + c * 0.2 + r * 0.16) * 0.55 +
-                Math.sin(t * 0.41 - c * 0.11 + r * 0.24) * 0.45;
-            const band = Math.sin(r * 0.23 - t * 0.86);
-            let lum = base + current * 0.09 + band * 0.05;
+            const field = motionField;
+            const x = c * field.scaleX;
+            const y = r * field.scaleY;
+            const driftX = t * field.driftX;
+            const driftY = t * field.driftY;
+
+            const warpX =
+                fractalNoise(x * 0.72 + driftY, y * 0.72 - driftX, field.seed) * 2 - 1;
+            const warpY =
+                fractalNoise(
+                    x * 0.67 - driftX,
+                    y * 0.67 + driftY,
+                    field.seed + 137.5
+                ) * 2 - 1;
+
+            const cloud =
+                fractalNoise(
+                    x + warpX * field.warp + driftX,
+                    y + warpY * field.warp + driftY,
+                    field.seed + 271.9
+                ) * 2 - 1;
+
+            const directional =
+                c * Math.cos(field.angle) + r * Math.sin(field.angle);
+            const ribbonWarp = fractalNoise(
+                x * 1.9 + driftY,
+                y * 1.9 + driftX,
+                field.seed + 419.3
+            );
+            const ribbon = Math.sin(
+                directional * field.ribbonFrequency +
+                ribbonWarp * 5.4 +
+                t * field.ribbonSpeed
+            );
+
+            const cells =
+                valueNoise(
+                    c / 7.5 + driftX * 2.2,
+                    r / 4.5 - driftY * 2.2,
+                    field.seed + 733.1
+                ) * 2 - 1;
+
+            let lum =
+                base +
+                cloud * field.cloudMix +
+                ribbon * field.ribbonMix +
+                cells * field.cellMix;
             if (lum < 0) return 0;
             if (lum > 1) return 1;
             return lum;
@@ -291,7 +420,7 @@ function __OriginkitBase_AsciiImage(props: AsciiImageProps) {
             return layer;
         }
 
-        function updateBlobs() {
+        function updateBlobs(now: number) {
             const blobs = blobsRef.current;
             if (blobs.length === 0) return;
             const { dpr } = getSize();
@@ -305,15 +434,69 @@ function __OriginkitBase_AsciiImage(props: AsciiImageProps) {
                 seededRef.current = true;
                 return;
             }
-            blobs[0].x += (tx - blobs[0].x) * 0.35;
-            blobs[0].y += (ty - blobs[0].y) * 0.35;
+            blobs[0].x += (tx - blobs[0].x) * blobs[0].follow;
+            blobs[0].y += (ty - blobs[0].y) * blobs[0].follow;
             for (let i = 1; i < blobs.length; i++) {
-                blobs[i].x += (blobs[i - 1].x - blobs[i].x) * 0.35;
-                blobs[i].y += (blobs[i - 1].y - blobs[i].y) * 0.35;
+                const driftAngle =
+                    now * 0.001 * blobs[i].driftSpeed + blobs[i].phase;
+                const targetX =
+                    blobs[i - 1].x + Math.cos(driftAngle) * blobs[i].drift * dpr;
+                const targetY =
+                    blobs[i - 1].y + Math.sin(driftAngle * 1.17) * blobs[i].drift * dpr;
+                blobs[i].x +=
+                    (targetX - blobs[i].x) * blobs[i].follow;
+                blobs[i].y +=
+                    (targetY - blobs[i].y) * blobs[i].follow;
             }
         }
 
-        function paint() {
+        function drawOrganicBlob(
+            maskContext: CanvasRenderingContext2D,
+            blob: RevealBlob,
+            radius: number,
+            now: number
+        ) {
+            const points = blob.contour;
+            if (points.length < 3) return;
+
+            const time = now * 0.001;
+            const coordinates = points.map((profile, index) => {
+                const angle = (index / points.length) * Math.PI * 2;
+                const breathing =
+                    1 + Math.sin(time * 1.1 + blob.phase + index * 0.7) * 0.045;
+                const distance = radius * profile * breathing;
+                return {
+                    x: Math.cos(angle) * distance * blob.aspect,
+                    y: Math.sin(angle) * distance / blob.aspect,
+                };
+            });
+
+            maskContext.save();
+            maskContext.translate(blob.x, blob.y);
+            maskContext.rotate(blob.rotation + time * blob.rotationSpeed);
+            maskContext.beginPath();
+
+            const first = coordinates[0];
+            const last = coordinates[coordinates.length - 1];
+            maskContext.moveTo((last.x + first.x) / 2, (last.y + first.y) / 2);
+
+            for (let i = 0; i < coordinates.length; i++) {
+                const point = coordinates[i];
+                const next = coordinates[(i + 1) % coordinates.length];
+                maskContext.quadraticCurveTo(
+                    point.x,
+                    point.y,
+                    (point.x + next.x) / 2,
+                    (point.y + next.y) / 2
+                );
+            }
+
+            maskContext.closePath();
+            maskContext.fill();
+            maskContext.restore();
+        }
+
+        function paint(now = performance.now()) {
             const off = offRef.current;
             if (!off) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -346,10 +529,9 @@ function __OriginkitBase_AsciiImage(props: AsciiImageProps) {
             mctx.fillStyle = "#FFFFFF";
             for (let i = 0; i < blobs.length; i++) {
                 const t = blobs.length <= 1 ? 0 : i / (blobs.length - 1);
-                const radius = revealSize * dpr * (1 - t * 0.5);
-                mctx.beginPath();
-                mctx.arc(blobs[i].x, blobs[i].y, radius, 0, Math.PI * 2);
-                mctx.fill();
+                const radius =
+                    revealSize * dpr * (1 - t * 0.58) * blobs[i].size;
+                drawOrganicBlob(mctx, blobs[i], radius, now);
             }
             mctx.restore();
 
@@ -380,8 +562,8 @@ function __OriginkitBase_AsciiImage(props: AsciiImageProps) {
                 lastGlyphAt = now;
                 drawLivingAscii(now);
             }
-            updateBlobs();
-            paint();
+            updateBlobs(now);
+            paint(now);
             raf = requestAnimationFrame(loop);
         }
 

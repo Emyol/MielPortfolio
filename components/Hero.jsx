@@ -9,17 +9,6 @@ const TITLE = [
   { text: 'Leading teams.', italic: true },
 ];
 
-const METRICS = [
-  { value: 2, pad: 2, suffix: '', label: "Batch '27 rank" },
-  { value: 700, pad: 0, suffix: '+', label: 'Students supported' },
-  { value: 4, pad: 2, suffix: '', label: 'Selected systems' },
-  { value: 6, pad: 2, suffix: '', label: 'Credentials' },
-];
-
-function formatMetric(value, pad, suffix) {
-  return `${String(value).padStart(pad, '0')}${suffix}`;
-}
-
 export default function Hero() {
   return (
     <section id="hero" className="field-hero" aria-labelledby="hero-title">
@@ -49,22 +38,6 @@ export default function Hero() {
               </a>
             </Button>
           </div>
-          <dl className="field-measures" data-hero-item>
-            {METRICS.map((metric) => (
-              <div key={metric.label}>
-                <dt>{metric.label}</dt>
-                <dd>
-                  <span
-                    data-count={metric.value}
-                    data-pad={metric.pad}
-                    data-suffix={metric.suffix}
-                  >
-                    {formatMetric(metric.value, metric.pad, metric.suffix)}
-                  </span>
-                </dd>
-              </div>
-            ))}
-          </dl>
         </div>
 
         <div className="field-hero-visual" data-hero-visual>
