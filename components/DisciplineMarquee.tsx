@@ -12,6 +12,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useReducedMotion } from "framer-motion";
+import { useSyncExternalStore } from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Marquee } from "@/components/ui/3d-testimonails";
@@ -84,6 +85,10 @@ const COLUMNS: Practice[][] = [
 
 const PRACTICES = COLUMNS.flat();
 
+const subscribeToHydration = () => () => {};
+const clientSnapshot = () => true;
+const serverSnapshot = () => false;
+
 function PracticeCard({ kind, title, body, Icon }: Practice) {
   return (
     <Card className="discipline-practice-card gap-0 py-6">
@@ -106,7 +111,10 @@ function PracticeCard({ kind, title, body, Icon }: Practice) {
 }
 
 export default function DisciplineMarquee() {
-  const reduced = useReducedMotion();
+  const prefersReducedMotion = useReducedMotion();
+  // Match the server tree during hydration, then use the visitor's preference.
+  const hydrated = useSyncExternalStore(subscribeToHydration, clientSnapshot, serverSnapshot);
+  const reduced = hydrated && prefersReducedMotion;
 
   return (
     <div className="discipline-marquee-block">

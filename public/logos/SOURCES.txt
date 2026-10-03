@@ -1,0 +1,4 @@
+Brand marks downloaded from Simple Icons v16 via https://cdn.jsdelivr.net/npm/simple-icons@16/icons/{slug}.svg
+Source: https://github.com/simple-icons/simple-icons
+Collection license: CC0-1.0. Brand marks remain the property of their respective owners.
+SAP represents SAP Activate; Claude represents Claude Code; C++ represents the combined C / C++ entry.

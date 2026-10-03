@@ -494,14 +494,96 @@ a {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.discipline-stack-shell {
-  display: grid;
-  grid-template-columns: minmax(17rem, 0.42fr) minmax(0, 1fr);
-  gap: clamp(1.25rem, 3.2vw, 3rem);
+.stack-logo-cloud {
+  min-width: 0;
+  padding-block: 1.25rem;
+  border-block: 1px solid var(--field-line);
 }
 
-.discipline-stack-shell > .stack-matrix {
-  grid-column: 2;
+.stack-logo-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.stack-logo-toolbar h3 {
+  margin: 0;
+  color: var(--field-mute);
+  font-size: 0.82rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.stack-logo-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding-inline: 0.75rem;
+  border: 1px solid var(--field-line);
+  border-radius: 2px;
+  color: var(--field-ink);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background-color 160ms ease-out;
+}
+
+.stack-logo-toolbar button:hover {
+  background-color: var(--field-plate);
+}
+
+.stack-logo-toolbar button:focus-visible {
+  outline: 2px solid var(--field-ink);
+  outline-offset: 3px;
+}
+
+.stack-logo-mask {
+  mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+}
+
+.stack-logo-item {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.85rem;
+  color: var(--field-ink);
+  white-space: nowrap;
+}
+
+.stack-brand-logo {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.92;
+}
+
+.stack-logo-copy {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.stack-logo-category {
+  color: var(--field-mute);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.stack-logo-name {
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stack-logo-mask { mask-image: none; }
+  .stack-logo-toolbar button { display: none; }
+  .infinite-slider-track { width: 100%; transform: none !important; }
+  .infinite-slider-group { width: 100%; flex-wrap: wrap; gap: 1.5rem 2rem !important; }
+  .infinite-slider-copy { display: none; }
 }
 
 .discipline-marquee-block {
