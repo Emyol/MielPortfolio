@@ -1,0 +1,19 @@
+[
+  {
+    "width": 390,
+    "errors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    ],
+    "overflow": false
+  },
+  {
+    "width": 768,
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "width": 1440,
+    "errors": [],
+    "overflow": false
+  }
+]

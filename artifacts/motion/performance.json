@@ -1,0 +1,27 @@
+[
+  {
+    "name": "hero idle visible",
+    "seconds": 1.512,
+    "taskMs": 411.56,
+    "scriptMs": 261.36,
+    "layoutMs": 0
+  },
+  {
+    "name": "hero offscreen",
+    "seconds": 1.513,
+    "taskMs": 62.88,
+    "scriptMs": 9.61,
+    "layoutMs": 0
+  },
+  {
+    "name": "20 Work selections",
+    "seconds": 0.812,
+    "taskMs": 395.88,
+    "scriptMs": 81.3,
+    "layoutMs": 11.29
+  },
+  {
+    "name": "background visibility handler",
+    "paintsWhileHidden": 0
+  }
+]
