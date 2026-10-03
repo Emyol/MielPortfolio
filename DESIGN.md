@@ -83,18 +83,18 @@ components:
     padding: "1.5rem"
 ---
 
-# Design System: Liquid Field
+# Design System: Silver Field
 
 ## Overview
 
-**Creative North Star: "Liquid Field"**
+**Creative North Star: "Silver Field"**
 
-The Surface is a volume of silver fluid a visitor remembers. Near-black ground, white and silver ink, Fraunces display with Public Sans body, and 2px metal corners. Canvas UI Liquid lives only in the first viewport. After that, the page is typeset evidence: Work, leadership, CV, and a way to write.
+The Surface is a dark-and-silver Craft Showcase anchored by a living ASCII portrait. Near-black ground, white and silver ink, Fraunces display with Public Sans body, and 2px metal corners. The ASCII portrait lives only in the first viewport (ADR-0002 supersedes ADR-0001?s Liquid requirement). After that, the page is typeset evidence: Work, leadership, CV, and a way to write.
 
 Operator Console is discarded, not kept as texture. No terminal chrome, box-drawing, prompt copy, ASCII rain, custom cursor, or spinning preloader. No second hue. No rainbow fluid. No whole-page shader. shadcn Button and Card may appear on Work and contact only after they are restyled to Silver Field.
 
 **Key Characteristics:**
-- One material (Liquid) in the first viewport; one type voice (Fraunces + Public Sans) everywhere else
+- One material (ASCII portrait) in the first viewport; one type voice (Fraunces + Public Sans) everywhere else
 - Monochrome silver on near-black; hairline 2px corners
 - Pin-and-typeset section titles; Work stays ordinary vertical scroll
 - Field Components are metal plates, not Nova cards
@@ -104,8 +104,8 @@ Operator Console is discarded, not kept as texture. No terminal chrome, box-draw
 Silver Field is a two-ink system. Ground is near-black. Everything a visitor reads or stirs is white or silver. shadcn tokens map onto the same grayscale; they must not introduce a second hue.
 
 ### Primary
-- **Field Ink** (`#ececec`): Display type, primary buttons, liquid trail, focus rings, scroll progress.
-- **Field Ground** (`#070707`): Page, nav, overlay, and liquid container.
+- **Field Ink** (`#ececec`): Display type, primary buttons, portrait glyphs, focus rings, scroll progress.
+- **Field Ground** (`#070707`): Page, nav, overlay, and portrait container.
 
 ### Neutral
 - **Field Mute** (`#9c9c9c`): Body supporting copy, labels, years, secondary nav.
@@ -120,11 +120,11 @@ Tracking floor is `-0.04em`. Display never exceeds `5.6rem`. Body measure stays 
 
 ## Layout
 
-Max width `1280px` with fluid gutters. Desktop hero is a two-column first viewport: typeset bottom-left, portrait plate right. Sections after the hero use a sticky pin column (title) plus a reading column. Work is a compact index rail plus one Field Card. Below `860px`, nav links hide (Find remains), pin titles go static, and most grids collapse; the hero keeps a tight two-column so the portrait stays in the first viewport.
+Max width `1280px` with fluid gutters. Desktop hero is a two-column first viewport: typeset bottom-left, portrait plate right. Sections after the hero use a sticky pin column (title) plus a reading column. Work is a compact index rail plus one Field Card. Below `860px`, nav links hide (Find remains), pin titles go static, and most grids collapse; the hero layers its copy over the portrait so both remain in the first viewport.
 
 ## Elevation & Depth
 
-The world is tonal, not shadowed. Separation comes from hairline borders, a slightly lifted plate, and the liquid overlay. Do not add drop shadows, glass blur as decoration, or hard offset blocks.
+The world is tonal, not shadowed. Separation comes from hairline borders, a slightly lifted plate, and the portrait. Do not add drop shadows, glass blur as decoration, or hard offset blocks.
 
 ## Shapes
 
@@ -151,22 +151,31 @@ Every interactive corner is `2px`. No pills. No circles standing in for photogra
 ### Command palette
 - Find / Ctrl K. Near-black dialog, hairline border, 2px corners. Destinations, not terminal commands.
 
-### Signature: Liquid Field
-- Canvas UI Liquid wraps the first viewport only. Trail color `[1, 1, 1]`. Rainbow off. The simulation stays alive while the hero is on screen so a still frame still reads as a silver volume. Pointer-stir and the overlay hide when `prefers-reduced-motion: reduce`.
+### Signature: ASCII portrait
+- The existing canvas portrait is the sole hero effect. Ambient glyph movement works without hover; desktop pointers reveal the photograph locally.
+- Pause offscreen and in background tabs. Reduced motion renders a static frame and responds to changes while the page is open.
+- Keep the portrait's assets, framing, inputs, and monochrome ink. Do not add Liquid or terminal decoration.
 
-### Signature: Pin-and-typeset
-- Section titles clip-reveal with GSAP ScrollTrigger scrub. Sticky on desktop, static below 860px. Not a third GPU identity.
+### Motion
+- GSAP owns hero and section entrances; Framer Motion owns Work, accordion, and Find state transitions; CSS owns control feedback. Never share transform ownership on an element.
+- Feedback: 180ms. State: 300ms. Desktop entrance: 750ms; mobile entrance: 400ms, once only. Use decelerating easing without bounce.
+- Coordinate portrait opacity, headline typesetting, and actions. Section titles remain sticky on desktop and static below 860px. Metrics count once as the measures enter view.
+- Work replaces the selected image, details, and URLs together immediately; no outgoing actionable card or queued selection. Index layout and selection rules explain the change.
+- Leadership animates height and opacity with a single open panel; closed content becomes inert immediately.
+- Credentials retain manual swipe/button navigation. Captions remain readable on touch and keyboard focus. No autoplay.
+- Find fades its backdrop and moves the dialog briefly. Focus remains in the search combobox, arrow keys select destinations, and dismissal returns focus to Find. Exiting content is inert; activation is immediate.
+- Live reduced motion shows final content, stops decorative movement, and uses immediate scrolling. Default content stays visible before animation setup.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** keep Liquid in the first viewport only, silver, with `rainbow={false}`, and keep the volume moving at rest.
+- **Do** keep the ASCII portrait in the first viewport only, in silver, with ambient motion when permitted.
 - **Do** set section titles in Fraunces and body in Public Sans.
 - **Do** restyle shadcn Button/Card to Silver Field before using them on Work or contact.
-- **Do** honor `prefers-reduced-motion`: no fluid stir, no pin-and-typeset transform.
+- **Do** honor `prefers-reduced-motion`: a static portrait and final section content.
 
 ### Don't:
-- **Don't** reintroduce Operator Console chrome, ASCII, box-drawing, or `>` prompt copy.
-- **Don't** add a second hue, rainbow fluid, or Liquid on Work images.
+- **Don't** reintroduce Operator Console chrome, ASCII rain, box-drawing, or `>` prompt copy.
+- **Don't** add a second hue, a second simulator, or effects on Work images.
 - **Don't** use kickers, section numbers as decoration, or dashboard-tile metrics as the hero template.
 - **Don't** add Skiper UI, 21st.dev, or a third motion library as a visual identity.

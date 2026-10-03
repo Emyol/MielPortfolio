@@ -12,11 +12,15 @@ export default function ScrollProgress() {
 
   useGSAP(() => {
     if (!barRef.current) return;
-    gsap.fromTo(barRef.current, { scaleX: 0 }, {
+    const media = gsap.matchMedia();
+    media.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.fromTo(barRef.current, { scaleX: 0 }, {
       scaleX: 1,
       ease: 'none',
       scrollTrigger: { start: 'top top', end: 'max', scrub: 0.2 },
+      });
     });
+    return () => media.revert();
   }, { scope: barRef });
 
   return <div className="scroll-progress" aria-hidden="true"><div ref={barRef} className="scroll-progress-bar" /></div>;

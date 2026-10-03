@@ -516,30 +516,6 @@ a {
   line-height: 1.5;
 }
 
-.stack-logo-toolbar button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  min-height: 44px;
-  padding-inline: 0.75rem;
-  border: 1px solid var(--field-line);
-  border-radius: 2px;
-  color: var(--field-ink);
-  font-size: 0.82rem;
-  cursor: pointer;
-  transition: background-color 160ms ease-out;
-}
-
-.stack-logo-toolbar button:hover {
-  background-color: var(--field-plate);
-}
-
-.stack-logo-toolbar button:focus-visible {
-  outline: 2px solid var(--field-ink);
-  outline-offset: 3px;
-}
-
 .stack-logo-mask {
   mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
 }
@@ -580,7 +556,6 @@ a {
 
 @media (prefers-reduced-motion: reduce) {
   .stack-logo-mask { mask-image: none; }
-  .stack-logo-toolbar button { display: none; }
   .infinite-slider-track { width: 100%; transform: none !important; }
   .infinite-slider-group { width: 100%; flex-wrap: wrap; gap: 1.5rem 2rem !important; }
   .infinite-slider-copy { display: none; }
@@ -980,7 +955,10 @@ a {
   .field-hero-visual {
     position: absolute;
     inset: 5.25rem var(--field-gutter) 1.35rem;
+    width: auto;
     height: auto;
+    max-height: none;
+    align-self: stretch;
     z-index: 0;
   }
 
@@ -1094,4 +1072,43 @@ a {
   .leadership-count svg {
     transition: none;
   }
+}
+
+/* Motion ownership: CSS feedback, Motion state, GSAP entrances. */
+:root {
+  --motion-feedback: 180ms;
+  --motion-state: 300ms;
+  --motion-ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+:where(.field-nav a, .command-trigger, .contact-row a, .field-colophon a, .work-index button, .leadership-summary, [data-slot="button"]) {
+  transition: color var(--motion-feedback), background-color var(--motion-feedback), border-color var(--motion-feedback), opacity var(--motion-feedback), transform var(--motion-feedback) var(--motion-ease);
+}
+:where(.command-trigger, .leadership-summary):hover { background-color: var(--field-plate); }
+:where(.field-nav a, .contact-row a, .field-colophon a):hover { color: var(--field-ink); }
+:where(.command-trigger, [data-slot="button"]):active { transform: scale(0.97); }
+.work-index button { position: relative; }
+.work-index button::after {
+  content: ''; position: absolute; inset: auto 0 -1px; height: 1px;
+  background: var(--field-ink); transform: scaleX(0); transform-origin: left;
+  transition: transform var(--motion-state) var(--motion-ease);
+}
+.work-index button.is-active::after { transform: scaleX(1); }
+.work-filters [data-slot="button"] { min-height: 44px; }
+.leadership-count svg { transition: transform var(--motion-state) var(--motion-ease); }
+.command-search input { min-width: 0; }
+.command-search:focus-within { border-color: var(--field-ink); }
+.command-backdrop { z-index: 300; }
+.command-dialog { max-height: 80dvh; overflow: auto; }
+.credentials-gallery figure:focus-visible { outline-offset: -3px; }
+@media (hover: none), (max-width: 560px) {
+  .credentials-gallery figcaption {
+    position: static; opacity: 1; background: var(--field-plate);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0s !important; transition-duration: 0s !important; scroll-behavior: auto !important; }
+  :where(.command-trigger, [data-slot="button"]):active { transform: none; }
+  .scroll-progress { display: none; }
+  [data-hero-item], [data-hero-visual] { opacity: 1 !important; transform: none !important; }
+  .work-media-glare { display: none; }
 }

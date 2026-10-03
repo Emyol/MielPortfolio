@@ -1,7 +1,8 @@
 "use client";
+import { useMotionPreference } from "@/lib/motion";
 
 import { useRef, useState, type ReactNode } from "react";
-import { motion, useAnimationFrame, useInView, useMotionValue, useReducedMotion } from "framer-motion";
+import { motion, useAnimationFrame, useInView, useMotionValue } from "framer-motion";
 import useMeasure from "react-use-measure";
 import { cn } from "@/lib/utils";
 
@@ -23,7 +24,7 @@ export function InfiniteSlider({
 }: InfiniteSliderProps) {
   const viewport = useRef<HTMLDivElement>(null);
   const visible = useInView(viewport);
-  const reduced = useReducedMotion();
+  const reduced = useMotionPreference();
   const [measure, { width, height }] = useMeasure();
   const [hovered, setHovered] = useState(false);
   const translation = useMotionValue(0);

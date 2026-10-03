@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { motionTiming, motionEase, useMotionPreference } from '@/lib/motion';
 import { ChevronDown } from 'lucide-react';
 import PinTitle from './PinTitle';
 
@@ -39,6 +41,7 @@ const ORGS = [
 ];
 
 export default function Leadership() {
+  const reduced = useMotionPreference();
   const [openIndex, setOpenIndex] = useState(0);
 
   return (
@@ -68,7 +71,10 @@ export default function Leadership() {
                       <ChevronDown aria-hidden="true" className={isOpen ? 'is-open' : ''} />
                     </span>
                   </button>
-                  <div id={`leadership-panel-${index}`} className="leadership-panel" hidden={!isOpen}>
+                  <motion.div key={String(reduced)} id={`leadership-panel-${index}`} inert={!isOpen} aria-hidden={!isOpen}
+                    initial={false} animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}
+                    transition={{ duration: reduced ? 0 : motionTiming.state, ease: motionEase }} style={{ overflow: 'hidden' }}>
+                  <div className="leadership-panel">
                     <p>{item.summary}</p>
                     <ol>
                       {item.roles.map((role) => (
@@ -79,6 +85,7 @@ export default function Leadership() {
                       ))}
                     </ol>
                   </div>
+                  </motion.div>
                 </article>
               );
             })}

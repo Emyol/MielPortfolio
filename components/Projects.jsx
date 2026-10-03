@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
+import { motionTiming, motionEase, useMotionPreference } from '@/lib/motion';
 import { ArrowUpRight } from 'lucide-react';
 import PinTitle from './PinTitle';
 import { Button } from '@/components/ui/button';
@@ -55,6 +57,7 @@ const PROJECTS = [
 const FILTERS = ['All', 'AI', 'Web', 'Languages', 'Geospatial', 'Operations', 'Mobile'];
 
 export default function Projects() {
+  const reduced = useMotionPreference();
   const [filter, setFilter] = useState('All');
   const [activeId, setActiveId] = useState(PROJECTS[0].id);
   const visibleProjects = useMemo(
@@ -94,7 +97,7 @@ export default function Projects() {
           <div className="work-layout">
             <div className="work-index" role="list" aria-label="Work">
               {visibleProjects.map((project) => (
-                <div key={project.id} role="listitem">
+                <motion.div key={`${project.id}-${reduced}`} role="listitem" layout={!reduced} initial={reduced ? false : { opacity: 0.5 }} animate={{ opacity: 1 }} transition={{ duration: reduced ? 0 : motionTiming.state, ease: motionEase }}>
                   <button
                     type="button"
                     className={activeProject.id === project.id ? 'is-active' : ''}
@@ -104,9 +107,10 @@ export default function Projects() {
                     <strong>{project.name}</strong>
                     <small>{project.year}</small>
                   </button>
-                </div>
+                </motion.div>
               ))}
             </div>
+            <motion.div key={`${activeProject.id}-${reduced}`} initial={reduced ? false : { opacity: 0.45, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: reduced ? 0 : motionTiming.state, ease: motionEase }}>
             <Card className="py-0 overflow-hidden work-card" aria-live="polite">
               <div className="work-media">
                 <img
@@ -146,6 +150,7 @@ export default function Projects() {
                 </Button>
               </CardFooter>
             </Card>
+            </motion.div>
           </div>
         </div>
       </div>

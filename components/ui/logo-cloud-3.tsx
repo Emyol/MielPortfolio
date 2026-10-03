@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, type ComponentProps } from "react";
-import { Pause, Play, type LucideIcon } from "lucide-react";
+import { type ComponentProps } from "react";
+import { type LucideIcon } from "lucide-react";
 import { InfiniteSlider } from "@/components/ui/infinite-slider";
 import { cn } from "@/lib/utils";
 
@@ -17,19 +17,13 @@ export type Logo = {
 type LogoCloudProps = ComponentProps<"div"> & { logos: Logo[] };
 
 export function LogoCloud({ className, logos, ...props }: LogoCloudProps) {
-  const [paused, setPaused] = useState(false);
-
   return (
     <div {...props} className={cn("stack-logo-cloud", className)}>
       <div className="stack-logo-toolbar">
         <h3>Languages, runtime, domains & delivery</h3>
-        <button type="button" onClick={() => setPaused(!paused)} aria-pressed={paused} aria-label="Pause technology marquee">
-          {paused ? <Play size={14} aria-hidden="true" /> : <Pause size={14} aria-hidden="true" />}
-          <span>{paused ? "Resume" : "Pause"}</span>
-        </button>
       </div>
       <div className="stack-logo-mask overflow-hidden py-4">
-        <InfiniteSlider gap={42} reverse speed={48} speedOnHover={14} paused={paused}>
+        <InfiniteSlider gap={42} reverse speed={48} speedOnHover={14}>
           {logos.map(({ src, alt, category, width = 28, height = 28, icon: Icon }) => (
             <div key={alt} className="stack-logo-item">
               {src ? (

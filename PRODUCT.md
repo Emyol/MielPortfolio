@@ -33,9 +33,9 @@ Voice: direct, specific, no terminal LARP. Name: Amiel Acuña. Location: Manila 
 
 ## Constraints
 
-- Product truth and factual copy stay. Visual World is Liquid Field (ADR-0001).
+- Product truth and factual copy stay. Visual World is Silver Field with an ASCII portrait (ADR-0002 supersedes ADR-0001).
 - Operator Console residue is discarded.
-- Signature Material: Canvas UI Liquid in the first viewport only.
+- Signature Material: the existing ASCII portrait in the first viewport only.
 - Signature Type: Fraunces + Public Sans, pin-and-typeset on section titles.
 - Silver Field ink: near-black, white/silver, no second hue.
 - Field Components: shadcn Button and Card on Work and contact, restyled to Silver Field.
@@ -43,4 +43,4 @@ Voice: direct, specific, no terminal LARP. Name: Amiel Acuña. Location: Manila 
 
 ## Accessibility
 
-Skip link, real headings, keyboard nav, visible focus, contrast on near-black. Reduced-motion disables Liquid-driven motion and pin-and-typeset, leaving content visible.
+Skip link, real headings, keyboard nav, visible focus, contrast on near-black. Reduced motion stops decorative movement and reveals final content immediately, including when the preference changes while the page is open.

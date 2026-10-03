@@ -1,4 +1,5 @@
 "use client";
+import { useMotionPreference } from "@/lib/motion";
 
 import {
   Boxes,
@@ -11,7 +12,7 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
-import { useReducedMotion } from "framer-motion";
+
 import { useSyncExternalStore } from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -111,7 +112,7 @@ function PracticeCard({ kind, title, body, Icon }: Practice) {
 }
 
 export default function DisciplineMarquee() {
-  const prefersReducedMotion = useReducedMotion();
+  const prefersReducedMotion = useMotionPreference();
   // Match the server tree during hydration, then use the visitor's preference.
   const hydrated = useSyncExternalStore(subscribeToHydration, clientSnapshot, serverSnapshot);
   const reduced = hydrated && prefersReducedMotion;

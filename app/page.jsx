@@ -13,9 +13,9 @@ export default function Home() {
     <>
       <a href="#main" className="skip-link">Skip to content</a>
       <ScrollProgress />
-      <PageMotion />
       <Navbar />
       <main id="main" className="field-page">
+        <PageMotion />
         <Hero />
         <About />
         <CertificatesAwards />

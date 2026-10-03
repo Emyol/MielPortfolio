@@ -1,6 +1,6 @@
 # Miel Portfolio
 
-The one-page site for Amiel Acuña. It exists so a visitor remembers the interface as an artifact, then discovers the Work. The destination World is Liquid Field with Silver Field ink. Signature Material runs in the first viewport. Signature Type is Fraunces (display) and Public Sans (body) with pin-and-typeset on section titles. Work and contact use Field Components. Operator Console residue is gone. The Surface still carries Work, leadership, metrics, CV, and contact.
+The one-page site for Amiel Acuña. It exists so a visitor remembers the interface as an artifact, then discovers the Work. The World is Silver Field with an ASCII portrait (ADR-0002). Signature Material runs in the first viewport. Signature Type is Fraunces (display) and Public Sans (body) with pin-and-typeset on section titles. Work and contact use Field Components. Operator Console residue is gone. The Surface still carries Work, leadership, metrics, CV, and contact.
 
 ## Language
 
@@ -20,13 +20,13 @@ _Avoid_: Theme, skin, aesthetic
 The discarded World: monochrome terminal chrome, box-drawing corners, prompt copy, stacked CRT effects.
 _Avoid_: Using this as the destination World
 
-**Liquid Field**:
-The destination World. The site is a volume of fluid. Canvas UI Liquid is the material a Visitor remembers.
-_Avoid_: Operator Console, rainbow fluid, stacking ASCII rain with Liquid
+**ASCII portrait**:
+The Signature Material: a monochrome portrait formed from living glyphs, with a local photographic reveal. It is a portrait, not terminal decoration.
+_Avoid_: ASCII rain, Operator Console, stacking the portrait with Liquid
 
 **Signature Material**:
-The Liquid effect as the first identity of the World. It runs in the first viewport (the hero as Field). Later sections inherit color and type, not a second simulator.
-_Avoid_: Whole-page Liquid, Liquid on every Work image, multiple GPU effects sharing the first viewport
+The ASCII portrait as the first identity of the World. It runs in the first viewport (the hero as Field). Later sections inherit color and type, not a second simulator.
+_Avoid_: Whole-page portrait effects, Liquid on Work images, multiple GPU effects sharing the first viewport
 
 **Signature Type**:
 The second identity: **Fraunces** as display, **Public Sans** as body, with pin-and-typeset on section titles as the Visitor enters. Not a second GPU effect.
@@ -41,7 +41,7 @@ ASCII rain, box-drawing corners, `operator.profile` window bar, `>` prompt copy,
 _Avoid_: Keeping any of these as “texture”
 
 **Silver Field**:
-Near-black ground. White/silver fluid and the same ink for type. No second accent hue.
+Near-black ground. White/silver portrait glyphs and the same ink for type. No second accent hue.
 _Avoid_: Rainbow fluid, ShaderGradient as a second identity, Operator Console grey as the Field, purple-on-white
 
 **Pin-and-typeset**:
