@@ -10,7 +10,18 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import {
+  MorphingDialog,
+  MorphingDialogTrigger,
+  MorphingDialogContainer,
+  MorphingDialogContent,
+  MorphingDialogImage,
+  MorphingDialogTitle,
+  MorphingDialogSubtitle,
+  MorphingDialogDescription,
+  MorphingDialogClose,
+} from "@/components/motion-primitives/morphing-dialog";
 
 export type CredentialSlide = {
   image?: string;
@@ -60,47 +71,72 @@ const CarouselCustomNavigation = ({ items }: CarouselCustomNavigationProps) => {
               key={`${item.name}-${index}`}
               className="basis-[92%] pl-3 sm:basis-[78%] md:basis-[62%] md:pl-5 lg:basis-[52%]"
             >
-              <figure
-                className="group relative overflow-hidden rounded-[2px] border border-border bg-card outline-none"
-                tabIndex={0}
-                aria-label={`${item.name}. ${item.detail}`}
-              >
-                {item.image ? (
-                  <img
-                    src={item.image}
-                    alt=""
-                    width={1600}
-                    height={1200}
-                    loading={index < 2 ? "eager" : "lazy"}
-                    className="aspect-4/3 w-full object-contain p-3 grayscale transition-transform duration-500 ease-out group-hover:scale-[1.015] group-focus-visible:scale-[1.015] motion-reduce:transform-none"
-                    style={{ objectPosition: item.imagePosition ?? "center" }}
-                  />
-                ) : (
-                  <div className="flex aspect-4/3 w-full items-start justify-end bg-[linear-gradient(135deg,#191919,#0b0b0b)] p-5 text-right">
-                    <span className="max-w-[12ch] font-serif text-3xl leading-none tracking-[-0.04em] text-white/20 sm:text-4xl">
-                      {item.issuer}
-                    </span>
-                  </div>
-                )}
-                <figcaption className="pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black from-25% via-black/70 to-transparent p-5 text-white opacity-100 transition-opacity duration-300 ease-out [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-visible:opacity-100">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h3 className="font-serif text-xl leading-[1.08] tracking-[-0.025em] sm:text-2xl">
+              <MorphingDialog transition={{ type: "spring", bounce: 0.05, duration: 0.35 }}>
+                <MorphingDialogTrigger
+                  ariaLabel={item.name}
+                  className="credential-card group block w-full overflow-hidden rounded-[2px] border border-border bg-card text-left text-white"
+                >
+                  {item.image ? (
+                    <MorphingDialogImage
+                      src={item.image}
+                      alt=""
+                      width={1600}
+                      height={1200}
+                      loading={index < 2 ? "eager" : "lazy"}
+                      className="aspect-4/3 w-full object-contain p-3 grayscale"
+                      style={{ objectPosition: item.imagePosition ?? "center" }}
+                    />
+                  ) : null}
+                  <span className="credential-card-summary">
+                    <span className="min-w-0">
+                      <MorphingDialogTitle className="block font-serif text-lg leading-[1.08] tracking-[-0.025em] sm:text-xl">
                         {item.name}
-                      </h3>
-                      <p className="mt-3 max-w-[46ch] text-sm leading-relaxed text-white/78">
-                        {item.detail}
-                      </p>
-                    </div>
-                    {item.year ? (
-                      <span className="shrink-0 text-xs tabular-nums text-white/60">
-                        {item.year}
-                      </span>
+                      </MorphingDialogTitle>
+                      <MorphingDialogSubtitle className="mt-1 block text-xs text-white/65">
+                        {item.issuer}
+                      </MorphingDialogSubtitle>
+                    </span>
+                    <Plus size={18} className="shrink-0 text-white/75" aria-hidden="true" />
+                  </span>
+                </MorphingDialogTrigger>
+                <MorphingDialogContainer>
+                  <MorphingDialogContent className="credential-dialog pointer-events-auto relative w-full max-w-[640px] rounded-[2px] border border-border bg-card text-white">
+                    {item.image ? (
+                      <MorphingDialogImage
+                        src={item.image}
+                        alt=""
+                        width={1600}
+                        height={1200}
+                        className="aspect-4/3 w-full object-contain p-3 grayscale"
+                        style={{ objectPosition: item.imagePosition ?? "center" }}
+                      />
                     ) : null}
-                  </div>
-                  <p className="mt-4 text-xs tracking-[0.04em] text-white/60">{item.issuer}</p>
-                </figcaption>
-              </figure>
+                    <div className="credential-dialog-copy">
+                      <div className="flex items-start justify-between gap-5">
+                        <MorphingDialogTitle className="font-serif text-2xl leading-[1.08] tracking-[-0.025em] sm:text-3xl">
+                          {item.name}
+                        </MorphingDialogTitle>
+                        {item.year ? <span className="shrink-0 text-xs tabular-nums text-white/60">{item.year}</span> : null}
+                      </div>
+                      <MorphingDialogSubtitle className="mt-2 text-xs tracking-[0.04em] text-white/60">
+                        {item.issuer}
+                      </MorphingDialogSubtitle>
+                      <MorphingDialogDescription
+                        disableLayoutAnimation
+                        className="mt-4 text-sm leading-relaxed text-white/80"
+                        variants={{
+                          initial: { opacity: 0, y: 8 },
+                          animate: { opacity: 1, y: 0 },
+                          exit: { opacity: 0, y: 8 },
+                        }}
+                      >
+                        {item.detail}
+                      </MorphingDialogDescription>
+                    </div>
+                    <MorphingDialogClose className="credential-dialog-close" />
+                  </MorphingDialogContent>
+                </MorphingDialogContainer>
+              </MorphingDialog>
             </CarouselItem>
           ))}
         </CarouselContent>

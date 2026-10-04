@@ -31,7 +31,9 @@ export default function PageMotion() {
       root.querySelectorAll('[data-pin-section]').forEach((section) => {
         if (entered.current.has(section)) return;
         const title = section.querySelectorAll('.field-pin-inner');
-        const content = section.querySelectorAll('.field-split > :not(.field-pin-col) > *');
+        const content = section.id === 'projects'
+          ? section.querySelectorAll('.field-lede, [data-work-gallery] > li')
+          : section.querySelectorAll('.field-split > :not(.field-pin-col) > *');
         const timeline = gsap.timeline({
           defaults: { ease: 'power3.out', duration: mobile ? 0.4 : motionTiming.entrance },
           scrollTrigger: { trigger: section, start: 'top 82%', once: true, onEnter: () => entered.current.add(section) },

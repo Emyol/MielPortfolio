@@ -23,17 +23,21 @@ test('Find contains focus, handles empty results and restores the trigger', asyn
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 
-test('Work rapid filtering and selection keep the latest image, details and links together', async ({ page }) => {
-  const filters = page.locator('.work-filters');
-  await filters.getByRole('button', { name: 'Web', exact: true }).click();
-  await filters.getByRole('button', { name: 'AI', exact: true }).click();
-  await filters.getByRole('button', { name: 'All', exact: true }).click();
-  await page.locator('.work-index').getByRole('button', { name: /BekiLang/ }).click();
-  await page.locator('.work-index').getByRole('button', { name: /CitySense/ }).click();
-  await expect(page.locator('.work-card')).toHaveCount(1);
-  await expect(page.locator('.work-card img')).toHaveAttribute('src', /citysense/);
-  await expect(page.locator('.work-card').getByRole('link', { name: /repository/ })).toHaveAttribute('href', 'https://github.com/Emyol/city-sense');
-  await expect(page.locator('.work-card')).toContainText('CitySense');
+test('Work cards expand on hover and focus, and each card links to its repository', async ({ page }) => {
+  const gallery = page.locator('[data-work-gallery]');
+  await expect(gallery.locator('li')).toHaveCount(4);
+  await expect(page.locator('.work-filters')).toHaveCount(0);
+  const cards = gallery.getByRole('link');
+  await cards.nth(2).hover();
+  await expect(gallery.locator('li').nth(2)).toHaveAttribute('data-active', 'true');
+  await cards.nth(3).focus();
+  await expect(gallery.locator('li').nth(3)).toHaveAttribute('data-active', 'true');
+  await expect(cards.nth(3)).toHaveAttribute('href', 'https://github.com/Emyol/city-sense');
+  await expect(cards.nth(3)).toHaveAttribute('target', '_blank');
+  await expect(gallery.locator('li').nth(2)).toContainText('BekiLang');
+  await expect(gallery.locator('li').nth(3)).toContainText('CitySense');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  expect(await gallery.evaluate(node => getComputedStyle(node).transitionDuration)).toBe('0s');
 });
 
 test('Leadership remains single-open and closed panels are inert during collapse', async ({ page }) => {
@@ -112,13 +116,40 @@ test('metrics wait for viewport entry and only count once', async ({ page }) => 
   expect(await page.evaluate(() => (window as any).metricUpdates.length)).toBe(updates);
 });
 
-test('credentials retain button navigation and readable touch captions', async ({ page }) => {
+test('credential cards morph into details and restore focus on dismissal', async ({ page }) => {
+  await page.locator('.credentials-gallery').scrollIntoViewIfNeeded();
+  const trigger = page.getByRole('button', { name: /PMI Project Management Ready/ });
+  await trigger.click();
+  const dialog = page.getByRole('dialog', { name: /PMI Project Management Ready/ });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText('Formally evaluated in project-management fundamentals');
+  await expect(dialog.locator('img')).toHaveAttribute('src', '/certificates/pmi.jpg');
+  await expect(page.getByRole('button', { name: 'Close dialog' })).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(page.getByRole('button', { name: 'Close dialog' })).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+});
+
+test('credential dialog dismisses from its backdrop and respects reduced motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  const trigger = page.getByRole('button', { name: /PMI Project Management Ready/ });
+  await trigger.click();
+  await expect(page.getByRole('dialog', { name: /PMI Project Management Ready/ })).toBeVisible();
+  await page.locator('[data-morph-backdrop]').click({ position: { x: 5, y: 5 } });
+  await expect(page.getByRole('dialog', { name: /PMI Project Management Ready/ })).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+});
+
+test('credentials retain carousel navigation and click-to-open details on touch widths', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 900 });
   await page.locator('.credentials-gallery').scrollIntoViewIfNeeded();
-  const caption = page.locator('.credentials-gallery figcaption').first();
-  expect(await caption.evaluate(node => getComputedStyle(node).position)).toBe('static');
   await page.getByRole('button', { name: 'Next slide' }).click();
   await expect(page.locator('.credentials-gallery')).toContainText('02 / 06');
+  await page.getByRole('button', { name: /Certified Project Manager/ }).click();
+  await expect(page.getByRole('dialog', { name: /Certified Project Manager/ })).toBeVisible();
+  await page.getByRole('button', { name: 'Close dialog' }).click();
   await page.getByRole('button', { name: 'Previous slide' }).click();
   await expect(page.locator('.credentials-gallery')).toContainText('01 / 06');
 });

@@ -120,7 +120,7 @@ Tracking floor is `-0.04em`. Display never exceeds `5.6rem`. Body measure stays 
 
 ## Layout
 
-Max width `1280px` with fluid gutters. Desktop hero is a two-column first viewport: typeset bottom-left, portrait plate right. Sections after the hero use a sticky pin column (title) plus a reading column. Work is a compact index rail plus one Field Card. Below `860px`, nav links hide (Find remains), pin titles go static, and most grids collapse; the hero layers its copy over the portrait so both remain in the first viewport.
+Max width `1280px` with fluid gutters. Desktop hero is a two-column first viewport: typeset bottom-left, portrait plate right. Sections after the hero use a sticky pin column (title) plus a reading column. Work shows four expanding project links: hover or focus opens a card, and activation opens its repository. Below `860px`, nav links hide (Find remains), pin titles go static, and the gallery stacks vertically; the hero layers its copy over the portrait so both remain in the first viewport.
 
 ## Elevation & Depth
 
@@ -143,7 +143,7 @@ Every interactive corner is `2px`. No pills. No circles standing in for photogra
 - **Corner Style:** 2px
 - **Background:** Plate (`oklch(0.16 0 0)`)
 - **Border:** Field line
-- **Use:** Work detail and contact only. Not a page scaffold of identical cards.
+- **Use:** Contact controls and any future structured detail that needs the existing restyled components.
 
 ### Navigation
 - Fixed top bar. Brand “Miel” in Fraunces. Links mute until active. On scroll, a 88% ground wash and hairline. Mobile: brand + Find.
@@ -157,12 +157,12 @@ Every interactive corner is `2px`. No pills. No circles standing in for photogra
 - Keep the portrait's assets, framing, inputs, and monochrome ink. Do not add Liquid or terminal decoration.
 
 ### Motion
-- GSAP owns hero and section entrances; Framer Motion owns Work, accordion, and Find state transitions; CSS owns control feedback. Never share transform ownership on an element.
+- GSAP owns hero and section entrances; Framer Motion owns accordion and Find state transitions; CSS owns Work gallery expansion and control feedback. Never share transform ownership on an element.
 - Feedback: 180ms. State: 300ms. Desktop entrance: 750ms; mobile entrance: 400ms, once only. Use decelerating easing without bounce.
 - Coordinate portrait opacity, headline typesetting, and actions. Section titles remain sticky on desktop and static below 860px. Metrics count once as the measures enter view.
-- Work replaces the selected image, details, and URLs together immediately; no outgoing actionable card or queued selection. Index layout and selection rules explain the change.
+- Work reveals a card on hover or keyboard focus; every project is a direct repository link. The gallery has no filters or delayed navigation.
 - Leadership animates height and opacity with a single open panel; closed content becomes inert immediately.
-- Credentials retain manual swipe/button navigation. Captions remain readable on touch and keyboard focus. No autoplay.
+- Credentials retain manual swipe/button navigation. Each card shows its name and issuer; click or keyboard activation morphs it into a larger card with details. Escape, backdrop, and Close dismiss it and restore focus. No autoplay.
 - Find fades its backdrop and moves the dialog briefly. Focus remains in the search combobox, arrow keys select destinations, and dismissal returns focus to Find. Exiting content is inert; activation is immediate.
 - Live reduced motion shows final content, stops decorative movement, and uses immediate scrolling. Default content stays visible before animation setup.
 
@@ -171,11 +171,11 @@ Every interactive corner is `2px`. No pills. No circles standing in for photogra
 ### Do:
 - **Do** keep the ASCII portrait in the first viewport only, in silver, with ambient motion when permitted.
 - **Do** set section titles in Fraunces and body in Public Sans.
-- **Do** restyle shadcn Button/Card to Silver Field before using them on Work or contact.
+- **Do** restyle shadcn Button/Card to Silver Field before using them in the portfolio.
 - **Do** honor `prefers-reduced-motion`: a static portrait and final section content.
 
 ### Don't:
 - **Don't** reintroduce Operator Console chrome, ASCII rain, box-drawing, or `>` prompt copy.
-- **Don't** add a second hue, a second simulator, or effects on Work images.
+- **Don't** add a second hue, a second simulator, or shader effects on Work images.
 - **Don't** use kickers, section numbers as decoration, or dashboard-tile metrics as the hero template.
 - **Don't** add Skiper UI, 21st.dev, or a third motion library as a visual identity.

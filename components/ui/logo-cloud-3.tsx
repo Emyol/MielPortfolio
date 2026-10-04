@@ -24,13 +24,12 @@ export function LogoCloud({ className, logos, ...props }: LogoCloudProps) {
       </div>
       <div className="stack-logo-mask overflow-hidden py-4">
         <InfiniteSlider gap={42} reverse speed={48} speedOnHover={14}>
-          {logos.map(({ src, alt, category, width = 28, height = 28, icon: Icon }) => (
+          {logos.map(({ src, alt, width = 28, height = 28, icon: Icon }) => (
             <div key={alt} className="stack-logo-item">
               {src ? (
                 <img src={src} alt="" width={width} height={height} loading="lazy" decoding="async" className="stack-brand-logo pointer-events-none select-none" />
               ) : Icon ? <Icon size={28} strokeWidth={1.5} aria-hidden="true" /> : null}
               <span className="stack-logo-copy">
-                {category && <span className="stack-logo-category">{category}</span>}
                 <span className="stack-logo-name">{alt}</span>
               </span>
             </div>

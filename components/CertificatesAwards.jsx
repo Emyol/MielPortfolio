@@ -82,7 +82,7 @@ export default function CertificatesAwards() {
 
           <div className="credentials-gallery">
             <h3>Certificates</h3>
-            <p>Hover or focus a credential to read its name and details.</p>
+            <p>Select a certificate to see its details.</p>
             <CarouselCustomNavigation items={CREDENTIALS} />
           </div>
         </div>
