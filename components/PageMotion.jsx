@@ -1,82 +1,56 @@
 "use client";
-
+import { useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-
+import { motionTiming } from '@/lib/motion';
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-function formatMetric(value, pad, suffix) {
-  return `${String(Math.round(value)).padStart(pad, '0')}${suffix}`;
-}
-
 export default function PageMotion() {
+  const anchor = useRef(null);
+  const entered = useRef(new WeakSet());
+  const heroEntered = useRef(false);
   useGSAP(() => {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (reduced) {
-      gsap.set('.field-title-word, [data-hero-item], [data-hero-visual], .field-pin-inner', {
-        opacity: 1,
-        yPercent: 0,
-        clearProps: 'transform,clipPath,filter',
+    const root = anchor.current?.closest('main');
+    if (!root) return;
+    const media = gsap.matchMedia();
+    media.add({ reduced: '(prefers-reduced-motion: reduce)', mobile: '(max-width: 860px)', desktop: '(min-width: 861px)' }, ({ conditions }) => {
+      const { reduced, mobile } = conditions;
+      const metrics = [...root.querySelectorAll('[data-count]')];
+      const finalize = () => metrics.forEach((node) => {
+        node.textContent = `${String(node.dataset.count).padStart(Number(node.dataset.pad), '0')}${node.dataset.suffix}`;
       });
-      return;
-    }
-
-    gsap.set('.field-title-word', { yPercent: 112 });
-    gsap.set('.field-pin-inner', { yPercent: 108 });
-    gsap.set('[data-hero-visual]', { opacity: 0.4 });
-
-    const heroTimeline = gsap.timeline({ defaults: { ease: 'power4.out' } });
-    heroTimeline
-      .to('.field-title-word', {
-        yPercent: 0,
-        duration: 1.15,
-        stagger: 0.14,
-      })
-      .fromTo(
-        '[data-hero-item]',
-        { opacity: 0, y: 18 },
-        { opacity: 1, y: 0, duration: 0.8, stagger: 0.1 },
-        0.35,
-      )
-      .to('[data-hero-visual]', {
-        opacity: 1,
-        duration: 1.05,
-      }, 0.18);
-
-    document.querySelectorAll('[data-count]').forEach((node) => {
-      const target = Number(node.getAttribute('data-count') || 0);
-      const pad = Number(node.getAttribute('data-pad') || 0);
-      const suffix = node.getAttribute('data-suffix') || '';
-      const state = { value: 0 };
-      gsap.to(state, {
-        value: target,
-        duration: 1.2,
-        delay: 0.55,
-        ease: 'power2.out',
-        onUpdate: () => {
-          node.textContent = formatMetric(state.value, pad, suffix);
-        },
+      if (reduced) { finalize(); return; }
+      if (!heroEntered.current) {
+        heroEntered.current = true;
+        gsap.timeline({ defaults: { ease: 'power4.out' } })
+          .from(root.querySelectorAll('.field-title-word'), { yPercent: 105, duration: mobile ? 0.5 : motionTiming.entrance, stagger: 0.07 })
+          .from(root.querySelectorAll('[data-hero-visual]'), { opacity: 0.35, duration: 0.75 }, 0.08)
+          .from(root.querySelectorAll('[data-hero-item]'), { opacity: 0.25, y: mobile ? 8 : 16, duration: 0.6, stagger: 0.08 }, 0.2);
+      }
+      root.querySelectorAll('[data-pin-section]').forEach((section) => {
+        if (entered.current.has(section)) return;
+        const title = section.querySelectorAll('.field-pin-inner');
+        const content = section.querySelectorAll('.field-split > :not(.field-pin-col) > *');
+        const timeline = gsap.timeline({
+          defaults: { ease: 'power3.out', duration: mobile ? 0.4 : motionTiming.entrance },
+          scrollTrigger: { trigger: section, start: 'top 82%', once: true, onEnter: () => entered.current.add(section) },
+        });
+        if (!mobile) timeline.from(title, { yPercent: 105, stagger: 0.06 }, 0);
+        timeline.from(content, { opacity: 0.35, y: mobile ? 8 : 18, stagger: { amount: mobile ? 0.08 : 0.16 } }, mobile ? 0 : 0.1);
       });
-    });
-
-    gsap.utils.toArray('[data-pin-section]').forEach((section) => {
-      const inner = section.querySelectorAll('.field-pin-inner');
-      if (!inner.length) return;
-      gsap.to(inner, {
-        yPercent: 0,
-        ease: 'none',
-        stagger: 0.08,
-        scrollTrigger: {
-          trigger: section,
-          start: 'top 78%',
-          end: 'top 32%',
-          scrub: 0.65,
-        },
+      metrics.forEach((node) => {
+        if (entered.current.has(node)) return;
+        const state = { value: 0 };
+        gsap.to(state, {
+          value: Number(node.dataset.count), duration: mobile ? 0.6 : 0.9, ease: 'power2.out',
+          scrollTrigger: { trigger: node.closest('.field-measures'), start: 'top 88%', once: true, onEnter: () => entered.current.add(node) },
+          onUpdate: () => { node.textContent = `${String(Math.round(state.value)).padStart(Number(node.dataset.pad), '0')}${node.dataset.suffix}`; },
+        });
       });
-    });
-  });
-
-  return null;
+      return finalize;
+    }, root);
+    return () => media.revert();
+  }, { scope: anchor });
+  return <span ref={anchor} hidden aria-hidden="true" />;
 }

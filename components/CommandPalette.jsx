@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { AnimatePresence, motion, useIsPresent } from 'framer-motion';
+import { motionTiming, motionEase, useMotionPreference } from '@/lib/motion';
 import {
   Compass,
   Award,
@@ -34,11 +37,19 @@ const GROUPS = [
   },
 ];
 
+function FindBackdrop(props) {
+  const present = useIsPresent();
+  return <motion.div {...props} inert={!present} aria-hidden={!present} style={{ pointerEvents: present ? 'auto' : 'none' }} />;
+}
+
 export default function CommandPalette() {
+  const reduced = useMotionPreference();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(0);
   const inputRef = useRef(null);
+  const backdropRef = useRef(null);
+  const triggerRef = useRef(null);
   const groups = useMemo(
     () => GROUPS.map((group) => ({
       ...group,
@@ -63,11 +74,21 @@ export default function CommandPalette() {
     if (!open) return undefined;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    const background = [...document.body.children].filter((node) => node !== backdropRef.current && !node.classList.contains('command-backdrop'));
+    const previousInert = background.map((node) => node.inert);
+    background.forEach((node) => { node.inert = true; });
+    const containFocus = (event) => {
+      if (!backdropRef.current?.contains(event.target)) inputRef.current?.focus();
+    };
+    document.addEventListener('focusin', containFocus);
     setActive(0);
     const timer = window.setTimeout(() => inputRef.current?.focus(), 0);
     return () => {
       window.clearTimeout(timer);
       document.body.style.overflow = previousOverflow;
+      document.removeEventListener('focusin', containFocus);
+      background.forEach((node, index) => { node.inert = previousInert[index]; });
+      triggerRef.current?.focus({ preventScroll: true });
       setQuery('');
       setActive(0);
     };
@@ -76,6 +97,10 @@ export default function CommandPalette() {
   useEffect(() => {
     setActive(0);
   }, [query]);
+
+  useEffect(() => {
+    if (open) document.getElementById(`destination-${active}`)?.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+  }, [active, open]);
 
   const execute = (command) => {
     if (!command) return;
@@ -88,6 +113,11 @@ export default function CommandPalette() {
   };
 
   const onDialogKey = (event) => {
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      inputRef.current?.focus();
+      return;
+    }
     if (event.key === 'Escape') {
       event.preventDefault();
       setOpen(false);
@@ -109,21 +139,32 @@ export default function CommandPalette() {
 
   return (
     <>
-      <button type="button" className="command-trigger" onClick={() => setOpen(true)} aria-haspopup="dialog">
+      <button ref={triggerRef} type="button" className="command-trigger" onClick={() => setOpen(true)} aria-haspopup="dialog" aria-expanded={open}>
         <Search aria-hidden="true" />
         <span>Find</span>
         <kbd>Ctrl K</kbd>
       </button>
 
+      {typeof document !== 'undefined' && createPortal(<AnimatePresence key={String(reduced)} initial={false}>
       {open && (
-        <div
+        <FindBackdrop
+          key="find"
+          ref={backdropRef}
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+          transition={{ duration: reduced ? 0 : motionTiming.feedback }}
           className="command-backdrop"
           role="presentation"
           onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setOpen(false);
+            if (event.target === event.currentTarget) {
+              // Prevent the backdrop's default mousedown from stealing restored focus.
+              event.preventDefault();
+              setOpen(false);
+            }
           }}
         >
-          <div
+          <motion.div
+            initial={reduced ? false : { y: -10, scale: 0.98 }} animate={{ y: 0, scale: 1 }} exit={reduced ? {} : { y: -6, scale: 0.99 }}
+            transition={{ duration: reduced ? 0 : motionTiming.state, ease: motionEase }}
             className="command-dialog"
             role="dialog"
             aria-modal="true"
@@ -135,13 +176,19 @@ export default function CommandPalette() {
               <span className="visually-hidden">Search</span>
               <input
                 ref={inputRef}
+                autoFocus
+                role="combobox"
+                aria-expanded="true"
+                aria-autocomplete="list"
+                aria-controls="find-destinations"
+                aria-activedescendant={flat.length ? `destination-${active}` : undefined}
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search the Field"
               />
               <kbd>Esc</kbd>
             </label>
-            <div className="command-results" role="listbox" aria-label="Destinations">
+            <div id="find-destinations" className="command-results" role="listbox" aria-label="Destinations">
               {groups.map((group) => (
                 <div key={group.heading} className="command-group" role="group" aria-label={group.heading}>
                   <p className="command-heading">{group.heading}</p>
@@ -152,6 +199,9 @@ export default function CommandPalette() {
                       <button
                         key={command.label}
                         type="button"
+                        id={`destination-${index}`}
+                        tabIndex={-1}
+                        onMouseDown={(event) => event.preventDefault()}
                         role="option"
                         aria-selected={index === active}
                         className={index === active ? 'is-active' : ''}
@@ -170,9 +220,10 @@ export default function CommandPalette() {
               ))}
               {flat.length === 0 && <p>Nothing matches.</p>}
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </FindBackdrop>
       )}
+      </AnimatePresence>, document.body)}
     </>
   );
 }

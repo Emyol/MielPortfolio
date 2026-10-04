@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ComponentPropsWithoutRef, useRef } from "react";
+import React, { ComponentPropsWithoutRef, useEffect, useRef } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -30,6 +30,21 @@ export function Marquee({
   ...props
 }: MarqueeProps) {
   const marqueeRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const node = marqueeRef.current;
+    if (!node) return;
+    let visible = false;
+    const update = () => {
+      node.querySelectorAll<HTMLElement>('.animate-marquee, .animate-marquee-vertical').forEach((track) => {
+        track.style.animationPlayState = visible && !document.hidden ? '' : 'paused';
+      });
+    };
+    const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; update(); });
+    observer.observe(node);
+    document.addEventListener('visibilitychange', update);
+    update();
+    return () => { observer.disconnect(); document.removeEventListener('visibilitychange', update); };
+  }, []);
 
   return (
     <div

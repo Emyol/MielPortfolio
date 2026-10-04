@@ -541,9 +541,20 @@ function __OriginkitBase_AsciiImage(props: AsciiImageProps) {
             ctx.drawImage(photo, 0, 0);
         }
 
-        const reduceMotion = window.matchMedia(
+        const motionPreference = window.matchMedia(
             "(prefers-reduced-motion: reduce)"
-        ).matches;
+        );
+        let reduceMotion = motionPreference.matches;
+        const onMotionChange = () => {
+            reduceMotion = motionPreference.matches;
+            if (reduceMotion) {
+                stopLoop();
+                onLeave();
+                buildAscii(0);
+                paint();
+            } else startLoop();
+        };
+        motionPreference.addEventListener('change', onMotionChange);
 
         let visible = true;
 
@@ -554,7 +565,7 @@ function __OriginkitBase_AsciiImage(props: AsciiImageProps) {
         }
 
         function loop(now: number) {
-            if (!alive || !visible) {
+            if (!alive || !visible || reduceMotion || document.hidden) {
                 raf = 0;
                 return;
             }
@@ -573,6 +584,7 @@ function __OriginkitBase_AsciiImage(props: AsciiImageProps) {
         }
 
         function onMove(event: PointerEvent) {
+            if (reduceMotion || event.pointerType === 'touch') return;
             const rect = canvas.getBoundingClientRect();
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
@@ -635,6 +647,7 @@ function __OriginkitBase_AsciiImage(props: AsciiImageProps) {
             stopLoop();
             ro?.disconnect();
             io?.disconnect();
+            motionPreference.removeEventListener('change', onMotionChange);
             document.removeEventListener("visibilitychange", onVisibility);
             canvas.removeEventListener("pointermove", onMove);
             canvas.removeEventListener("pointerleave", onLeave);

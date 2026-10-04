@@ -46,3 +46,7 @@ Thumbs.db
 # Turbo
 .turbo
 .originkit/
+artifacts/
+test-results/
+playwright-report/
+.superpowers/

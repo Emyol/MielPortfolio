@@ -1,7 +1,8 @@
 "use client";
+import { useMotionPreference } from "@/lib/motion";
 
 import { FC } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 
 import { cn } from "@/lib/utils";
 
@@ -14,13 +15,13 @@ const container = {
   hidden: {},
   visible: {
     transition: {
-      staggerChildren: 0.045,
+      staggerChildren: 0.012,
     },
   },
 };
 
 const word = {
-  hidden: { opacity: 0.2 },
+  hidden: { opacity: 0.65 },
   visible: {
     opacity: 1,
     transition: { duration: 0.35, ease: "easeOut" as const },
@@ -28,7 +29,7 @@ const word = {
 };
 
 const TextRevealByWord: FC<TextRevealByWordProps> = ({ text, className }) => {
-  const reduced = useReducedMotion();
+  const reduced = useMotionPreference();
   const words = text.split(" ").filter(Boolean);
 
   if (reduced) {
@@ -39,7 +40,7 @@ const TextRevealByWord: FC<TextRevealByWordProps> = ({ text, className }) => {
     <motion.p
       className={cn("field-lede", className)}
       variants={container}
-      initial="hidden"
+      initial={false}
       whileInView="visible"
       viewport={{ once: true, amount: 0.65 }}
     >

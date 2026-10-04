@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { motionTiming, useMotionPreference } from "@/lib/motion";
 import { Button } from "@/components/ui/button";
 import {
   Carousel,
@@ -24,6 +26,7 @@ type CarouselCustomNavigationProps = {
 };
 
 const CarouselCustomNavigation = ({ items }: CarouselCustomNavigationProps) => {
+  const reduced = useMotionPreference();
   const [api, setApi] = useState<CarouselApi>();
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
@@ -50,7 +53,7 @@ const CarouselCustomNavigation = ({ items }: CarouselCustomNavigationProps) => {
 
   return (
     <div className="relative min-w-0 w-full overflow-hidden" aria-label="Certificates gallery">
-      <Carousel setApi={setApi} opts={{ align: "start" }} className="w-full">
+      <Carousel setApi={setApi} opts={{ align: "start", duration: reduced ? 0 : 25 }} className="w-full">
         <CarouselContent className="-ml-3 md:-ml-5">
           {items.map((item, index) => (
             <CarouselItem
@@ -108,7 +111,7 @@ const CarouselCustomNavigation = ({ items }: CarouselCustomNavigationProps) => {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => api?.scrollPrev()}
+            onClick={() => api?.scrollPrev(reduced)}
             disabled={!canScrollPrev}
             className="h-10 w-10 rounded-[2px] bg-background transition-transform hover:scale-[1.03] active:scale-[0.97] motion-reduce:transform-none"
           >
@@ -118,7 +121,7 @@ const CarouselCustomNavigation = ({ items }: CarouselCustomNavigationProps) => {
           <Button
             variant="outline"
             size="icon"
-            onClick={() => api?.scrollNext()}
+            onClick={() => api?.scrollNext(reduced)}
             disabled={!canScrollNext}
             className="h-10 w-10 rounded-[2px] bg-background transition-transform hover:scale-[1.03] active:scale-[0.97] motion-reduce:transform-none"
           >
@@ -126,9 +129,9 @@ const CarouselCustomNavigation = ({ items }: CarouselCustomNavigationProps) => {
             <span className="sr-only">Next slide</span>
           </Button>
         </div>
-        <p className="text-sm tabular-nums text-muted-foreground" aria-live="polite">
+        <motion.p key={`${selected}-${reduced}`} initial={reduced ? false : { opacity: 0.45 }} animate={{ opacity: 1 }} transition={{ duration: reduced ? 0 : motionTiming.state }} className="text-sm tabular-nums text-muted-foreground" aria-live="polite">
           {String(selected + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
-        </p>
+        </motion.p>
       </div>
     </div>
   );
