@@ -18,7 +18,8 @@ export default function PageMotion() {
       const { reduced, mobile } = conditions;
       const metrics = [...root.querySelectorAll('[data-count]')];
       const finalize = () => metrics.forEach((node) => {
-        node.textContent = `${String(node.dataset.count).padStart(Number(node.dataset.pad), '0')}${node.dataset.suffix}`;
+        const finalValue = `${String(node.dataset.count).padStart(Number(node.dataset.pad), '0')}${node.dataset.suffix}`;
+        if (node.textContent !== finalValue) node.textContent = finalValue;
       });
       if (reduced) { finalize(); return; }
       if (!heroEntered.current) {
@@ -47,7 +48,9 @@ export default function PageMotion() {
         gsap.to(state, {
           value: Number(node.dataset.count), duration: mobile ? 0.6 : 0.9, ease: 'power2.out',
           scrollTrigger: { trigger: node.closest('.field-measures'), start: 'top 88%', once: true, onEnter: () => entered.current.add(node) },
-          onUpdate: () => { node.textContent = `${String(Math.round(state.value)).padStart(Number(node.dataset.pad), '0')}${node.dataset.suffix}`; },
+          onUpdate: () => {
+            if (entered.current.has(node)) node.textContent = `${String(Math.round(state.value)).padStart(Number(node.dataset.pad), '0')}${node.dataset.suffix}`;
+          },
         });
       });
       return finalize;

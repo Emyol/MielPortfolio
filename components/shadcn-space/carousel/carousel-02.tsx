@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
-import { motionTiming, useMotionPreference } from "@/lib/motion";
+import { useMotionPreference } from "@/lib/motion";
 import { Button } from "@/components/ui/button";
 import {
   Carousel,
@@ -149,7 +148,7 @@ const CarouselCustomNavigation = ({ items }: CarouselCustomNavigationProps) => {
             size="icon"
             onClick={() => api?.scrollPrev(reduced)}
             disabled={!canScrollPrev}
-            className="h-10 w-10 rounded-[2px] bg-background transition-transform hover:scale-[1.03] active:scale-[0.97] motion-reduce:transform-none"
+            className="h-10 w-10 rounded-[2px] bg-background transition-transform active:scale-[0.97] motion-reduce:transform-none [@media(hover:hover)_and_(pointer:fine)]:hover:scale-[1.03]"
           >
             <ChevronLeft className="h-5 w-5" />
             <span className="sr-only">Previous slide</span>
@@ -159,15 +158,15 @@ const CarouselCustomNavigation = ({ items }: CarouselCustomNavigationProps) => {
             size="icon"
             onClick={() => api?.scrollNext(reduced)}
             disabled={!canScrollNext}
-            className="h-10 w-10 rounded-[2px] bg-background transition-transform hover:scale-[1.03] active:scale-[0.97] motion-reduce:transform-none"
+            className="h-10 w-10 rounded-[2px] bg-background transition-transform active:scale-[0.97] motion-reduce:transform-none [@media(hover:hover)_and_(pointer:fine)]:hover:scale-[1.03]"
           >
             <ChevronRight className="h-5 w-5" />
             <span className="sr-only">Next slide</span>
           </Button>
         </div>
-        <motion.p key={`${selected}-${reduced}`} initial={reduced ? false : { opacity: 0.45 }} animate={{ opacity: 1 }} transition={{ duration: reduced ? 0 : motionTiming.state }} className="text-sm tabular-nums text-muted-foreground" aria-live="polite">
+        <p className="text-sm tabular-nums text-muted-foreground" aria-live="polite">
           {String(selected + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
-        </motion.p>
+        </p>
       </div>
     </div>
   );

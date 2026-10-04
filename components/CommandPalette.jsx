@@ -2,8 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { AnimatePresence, motion, useIsPresent } from 'framer-motion';
-import { motionTiming, motionEase, useMotionPreference } from '@/lib/motion';
 import {
   Compass,
   Award,
@@ -37,13 +35,7 @@ const GROUPS = [
   },
 ];
 
-function FindBackdrop(props) {
-  const present = useIsPresent();
-  return <motion.div {...props} inert={!present} aria-hidden={!present} style={{ pointerEvents: present ? 'auto' : 'none' }} />;
-}
-
 export default function CommandPalette() {
-  const reduced = useMotionPreference();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(0);
@@ -145,13 +137,10 @@ export default function CommandPalette() {
         <kbd>Ctrl K</kbd>
       </button>
 
-      {typeof document !== 'undefined' && createPortal(<AnimatePresence key={String(reduced)} initial={false}>
+      {typeof document !== 'undefined' && createPortal(<>
       {open && (
-        <FindBackdrop
-          key="find"
+        <div
           ref={backdropRef}
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          transition={{ duration: reduced ? 0 : motionTiming.feedback }}
           className="command-backdrop"
           role="presentation"
           onMouseDown={(event) => {
@@ -162,9 +151,7 @@ export default function CommandPalette() {
             }
           }}
         >
-          <motion.div
-            initial={reduced ? false : { y: -10, scale: 0.98 }} animate={{ y: 0, scale: 1 }} exit={reduced ? {} : { y: -6, scale: 0.99 }}
-            transition={{ duration: reduced ? 0 : motionTiming.state, ease: motionEase }}
+          <div
             className="command-dialog"
             role="dialog"
             aria-modal="true"
@@ -220,10 +207,10 @@ export default function CommandPalette() {
               ))}
               {flat.length === 0 && <p>Nothing matches.</p>}
             </div>
-          </motion.div>
-        </FindBackdrop>
+          </div>
+        </div>
       )}
-      </AnimatePresence>, document.body)}
+      </>, document.body)}
     </>
   );
 }

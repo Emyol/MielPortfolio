@@ -3,7 +3,6 @@
 import PinTitle from './PinTitle';
 import DisciplineMarquee from './DisciplineMarquee';
 import StackMarquee from './StackMarquee';
-import { TextRevealByWord } from '@/components/ui/text-reveal';
 
 const DISCIPLINE_LEDE =
   'I work where constrained computing meets human coordination: private AI on-device, expressive developer tools, map-based decision systems, and delivery operations.';
@@ -25,7 +24,7 @@ export default function About() {
       <div className="field-shell field-split">
         <PinTitle id="about-title">Discipline</PinTitle>
         <div className="discipline-intro">
-          <TextRevealByWord text={DISCIPLINE_LEDE} />
+          <p className="field-lede">{DISCIPLINE_LEDE}</p>
           <div className="discipline-grid">
             <div className="capability-statement">
               <blockquote>Build the system clearly. Make the handoff reliable.</blockquote>

@@ -90,6 +90,8 @@ for (const width of [390, 768, 1440]) {
 test('Find survives rapid shortcut reopen and backdrop dismissal', async ({ page }) => {
   await page.keyboard.press('Control+k');
   await expect(page.getByRole('combobox')).toBeFocused();
+  expect(await page.locator('.command-dialog').evaluate(node => getComputedStyle(node).transform)).toBe('none');
+  expect(await page.locator('.command-dialog').evaluate(node => getComputedStyle(node).transitionDuration)).toBe('0s');
   await page.keyboard.press('Escape');
   await page.keyboard.press('Control+k');
   await expect(page.getByRole('combobox')).toBeFocused();
@@ -130,6 +132,28 @@ test('credential cards morph into details and restore focus on dismissal', async
   await page.keyboard.press('Escape');
   await expect(dialog).toHaveCount(0);
   await expect(trigger).toBeFocused();
+});
+
+test('Work selection responds promptly without animating its image filter', async ({ page }) => {
+  const gallery = page.locator('[data-work-gallery]');
+  await gallery.scrollIntoViewIfNeeded();
+  const cards = gallery.getByRole('link');
+  await cards.nth(1).hover();
+  await expect(gallery.locator('li').nth(1)).toHaveAttribute('data-active', 'true');
+  const transition = await gallery.evaluate(node => getComputedStyle(node).transitionDuration);
+  expect(transition).toBe('0.24s');
+  const imageProperties = await gallery.locator('.work-gallery-image').first().evaluate(node => getComputedStyle(node).transitionProperty);
+  expect(imageProperties).not.toContain('filter');
+});
+
+test('stack marquee pauses offscreen and stops for reduced motion', async ({ page }) => {
+  const track = page.locator('.infinite-slider-track');
+  await track.scrollIntoViewIfNeeded();
+  await expect.poll(() => track.evaluate(node => node.getAnimations()[0]?.playState)).toBe('running');
+  await page.evaluate(() => document.getElementById('projects')!.scrollIntoView({ behavior: 'instant' }));
+  await expect.poll(() => track.evaluate(node => node.getAnimations()[0]?.playState)).toBe('paused');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect.poll(() => track.evaluate(node => node.getAnimations().length)).toBe(0);
 });
 
 test('credential dialog dismisses from its backdrop and respects reduced motion', async ({ page }) => {

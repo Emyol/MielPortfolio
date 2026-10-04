@@ -808,7 +808,7 @@ a {
   margin: 0;
   padding: 0;
   list-style: none;
-  transition: grid-template-columns 420ms var(--motion-ease);
+  transition: grid-template-columns 240ms var(--motion-ease);
 }
 
 .work-gallery-item {
@@ -849,7 +849,7 @@ a {
   object-position: top center;
   filter: grayscale(1);
   transform: scale(1.06);
-  transition: filter 420ms var(--motion-ease), transform 420ms var(--motion-ease);
+  transition: transform 240ms var(--motion-ease);
 }
 
 .work-gallery-item[data-active="true"] .work-gallery-image {
@@ -885,7 +885,7 @@ a {
   opacity: 0;
   transform: translateY(12px);
   pointer-events: none;
-  transition: opacity 250ms ease, transform 350ms var(--motion-ease);
+  transition: opacity 180ms ease, transform 240ms var(--motion-ease);
 }
 
 .work-gallery-item[data-active="true"] .work-gallery-content {
@@ -908,8 +908,10 @@ a {
 .work-gallery-description { max-width: 34ch; font-size: .875rem; line-height: 1.45; color: rgba(255,255,255,.82); }
 .work-gallery-action { margin-top: .35rem; font-weight: 600; text-transform: uppercase; }
 .work-gallery-action svg { transition: transform var(--motion-feedback) ease; }
-.work-gallery-link:hover .work-gallery-action svg,
 .work-gallery-link:focus-visible .work-gallery-action svg { transform: translate(2px, -2px); }
+@media (hover: hover) and (pointer: fine) {
+  .work-gallery-link:hover .work-gallery-action svg { transform: translate(2px, -2px); }
+}
 
 .leadership-list {
   display: grid;
@@ -1136,7 +1138,7 @@ a {
     grid-template-rows: var(--work-tracks);
     height: min(42rem, 84svh);
     min-height: 32rem;
-    transition: grid-template-rows 420ms var(--motion-ease);
+    transition: grid-template-rows 240ms var(--motion-ease);
   }
   .work-gallery-compact {
     left: 1rem;
@@ -1183,7 +1185,7 @@ a {
 :where(.command-trigger, .leadership-summary):hover { background-color: var(--field-plate); }
 :where(.field-nav a, .contact-row a, .field-colophon a):hover { color: var(--field-ink); }
 :where(.command-trigger, [data-slot="button"]):active { transform: scale(0.97); }
-.leadership-count svg { transition: transform var(--motion-state) var(--motion-ease); }
+.leadership-count svg { transition: transform var(--motion-feedback) var(--motion-ease); }
 .command-search input { min-width: 0; }
 .command-search:focus-within { border-color: var(--field-ink); }
 .command-backdrop { z-index: 300; }

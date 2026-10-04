@@ -73,7 +73,7 @@ export default function Leadership() {
                   </button>
                   <motion.div key={String(reduced)} id={`leadership-panel-${index}`} inert={!isOpen} aria-hidden={!isOpen}
                     initial={false} animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}
-                    transition={{ duration: reduced ? 0 : motionTiming.state, ease: motionEase }} style={{ overflow: 'hidden' }}>
+                    transition={{ duration: reduced ? 0 : motionTiming.feedback, ease: motionEase }} style={{ overflow: 'hidden' }}>
                   <div className="leadership-panel">
                     <p>{item.summary}</p>
                     <ol>
