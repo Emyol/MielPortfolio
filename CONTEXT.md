@@ -1,6 +1,6 @@
 # Miel Portfolio
 
-The one-page site for Amiel Acuña. It exists so a visitor remembers the interface as an artifact, then discovers the Work. The World is Silver Field with an ASCII portrait (ADR-0002). Signature Material runs in the first viewport. Signature Type is Fraunces (display) and Public Sans (body) with pin-and-typeset on section titles. Work and contact use Field Components. Operator Console residue is gone. The Surface still carries Work, leadership, metrics, CV, and contact.
+The one-page site for Amiel Acuña. It exists so a visitor remembers the interface as an artifact, then discovers the Work. The World is Silver Field with an ASCII portrait (ADR-0002). Signature Material runs in the first viewport. Signature Type is Fraunces (display) and Public Sans (body) with pin-and-typeset on section titles. Field Components support controls without defining the layout. Operator Console residue is gone. The Surface still carries Work, leadership, metrics, CV, and contact.
 
 ## Language
 
@@ -33,7 +33,7 @@ The second identity: **Fraunces** as display, **Public Sans** as body, with pin-
 _Avoid_: Inter, Space Grotesk, IBM Plex as display, all-mono costume, fade-up-only reveals, magnetic cursor, preloader spectacle
 
 **Field Components**:
-shadcn Button and Card on Work and contact, restyled to Silver Field. They are furniture in this World, not a Nova World of their own.
+shadcn Button and Card where their structure helps, restyled to Silver Field. They are furniture in this World, not a Nova World of their own.
 _Avoid_: Unstyled Nova look, Skiper/21st as a third identity, shadcn as the thing a Visitor remembers
 
 **Operator Console residue**:
@@ -45,7 +45,7 @@ Near-black ground. White/silver portrait glyphs and the same ink for type. No se
 _Avoid_: Rainbow fluid, ShaderGradient as a second identity, Operator Console grey as the Field, purple-on-white
 
 **Pin-and-typeset**:
-Section titles lock and set (line-by-line or clip-reveal) on enter. Work stays a normal vertical scroll.
+Section titles set line-by-line or through a clip-reveal on enter. Discipline and Leadership retain sticky titles; Credentials and Work use full-width editorial mastheads. Work stays a normal vertical scroll.
 _Avoid_: Horizontal Work strip, bounce-in, template fade-ups as the signature
 
 **Work**:

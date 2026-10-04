@@ -1,5 +1,5 @@
 ---
-name: Miel — Liquid Field
+name: Miel — Silver Field
 description: Silver Field craft showcase for Amiel Acuña
 colors:
   field-bg: "#070707"
@@ -91,7 +91,7 @@ components:
 
 The Surface is a dark-and-silver Craft Showcase anchored by a living ASCII portrait. Near-black ground, white and silver ink, Fraunces display with Public Sans body, and 2px metal corners. The ASCII portrait lives only in the first viewport (ADR-0002 supersedes ADR-0001?s Liquid requirement). After that, the page is typeset evidence: Work, leadership, CV, and a way to write.
 
-Operator Console is discarded, not kept as texture. No terminal chrome, box-drawing, prompt copy, ASCII rain, custom cursor, or spinning preloader. No second hue. No rainbow fluid. No whole-page shader. shadcn Button and Card may appear on Work and contact only after they are restyled to Silver Field.
+Operator Console is discarded, not kept as texture. No terminal chrome, box-drawing, prompt copy, ASCII rain, custom cursor, or spinning preloader. No second hue. No rainbow fluid. No whole-page shader. shadcn Button and Card may support individual controls or content only after they are restyled to Silver Field; they do not define the page composition.
 
 **Key Characteristics:**
 - One material (ASCII portrait) in the first viewport; one type voice (Fraunces + Public Sans) everywhere else
@@ -120,7 +120,7 @@ Tracking floor is `-0.04em`. Display never exceeds `5.6rem`. Body measure stays 
 
 ## Layout
 
-Max width `1280px` with fluid gutters. Desktop hero is a two-column first viewport: typeset bottom-left, portrait plate right. Sections after the hero use a sticky pin column (title) plus a reading column. Work shows four expanding project links: hover or focus opens a card, and activation opens its repository. Below `860px`, nav links hide (Find remains), pin titles go static, and the gallery stacks vertically; the hero layers its copy over the portrait so both remain in the first viewport.
+Max width `1280px` with fluid gutters. Desktop hero is an asymmetric first viewport: typeset bottom-left, ASCII portrait right. Discipline and Leadership use a sticky title and reading column. Credentials opens into a full-width typographic masthead, with awards in a narrow rail beside the certificate gallery. Work has its own full-width masthead and an expansive four-link gallery; hover or focus expands a card, and activation opens its repository. Contact closes as an open editorial composition rather than a boxed card. Below `860px`, nav links hide (Find remains), titles go static, and the gallery stacks vertically; the hero layers its copy over the portrait so both remain in the first viewport.
 
 ## Elevation & Depth
 
@@ -143,7 +143,7 @@ Every interactive corner is `2px`. No pills. No circles standing in for photogra
 - **Corner Style:** 2px
 - **Background:** Plate (`oklch(0.16 0 0)`)
 - **Border:** Field line
-- **Use:** Contact controls and any future structured detail that needs the existing restyled components.
+- **Use:** Structured details that need a contained surface, such as the Discipline practice cards; the Contact composition stays open.
 
 ### Navigation
 - Fixed top bar. Brand “Miel” in Fraunces. Links mute until active. On scroll, a 88% ground wash and hairline. Mobile: brand + Find.
@@ -157,13 +157,13 @@ Every interactive corner is `2px`. No pills. No circles standing in for photogra
 - Keep the portrait's assets, framing, inputs, and monochrome ink. Do not add Liquid or terminal decoration.
 
 ### Motion
-- GSAP owns hero and section entrances; Framer Motion owns accordion and Find state transitions; CSS owns Work gallery expansion and control feedback. Never share transform ownership on an element.
+- GSAP owns hero and section entrances; Framer Motion owns certificate dialog state transitions; CSS owns Work gallery expansion and control feedback. Find opens immediately. Never share transform ownership on an element.
 - Feedback: 180ms. State: 300ms. Desktop entrance: 750ms; mobile entrance: 400ms, once only. Use decelerating easing without bounce.
-- Coordinate portrait opacity, headline typesetting, and actions. Section titles remain sticky on desktop and static below 860px. Metrics count once as the measures enter view.
+- Coordinate portrait opacity, headline typesetting, and actions. Discipline and Leadership titles remain sticky on desktop; full-width mastheads use the same typeset reveal. All titles go static below 860px. Metrics count once as the measures enter view.
 - Work reveals a card on hover or keyboard focus; every project is a direct repository link. The gallery has no filters or delayed navigation.
-- Leadership animates height and opacity with a single open panel; closed content becomes inert immediately.
+- Leadership is an always-visible timeline grouped by the year roles began (2023, 2024, 2025). Full role dates communicate overlapping responsibilities. Each year enters once with opacity and 12px movement over 600ms on desktop, or 8px over 400ms on mobile; the rail stays static. Reduced motion reveals final content immediately.
 - Credentials retain manual swipe/button navigation. Each card shows its name and issuer; click or keyboard activation morphs it into a larger card with details. Escape, backdrop, and Close dismiss it and restore focus. No autoplay.
-- Find fades its backdrop and moves the dialog briefly. Focus remains in the search combobox, arrow keys select destinations, and dismissal returns focus to Find. Exiting content is inert; activation is immediate.
+- Find opens immediately from its keyboard shortcut. Focus remains in the search combobox, arrow keys select destinations, and dismissal returns focus to Find; activation is immediate.
 - Live reduced motion shows final content, stops decorative movement, and uses immediate scrolling. Default content stays visible before animation setup.
 
 ## Do's and Don'ts
@@ -179,3 +179,7 @@ Every interactive corner is `2px`. No pills. No circles standing in for photogra
 - **Don't** add a second hue, a second simulator, or shader effects on Work images.
 - **Don't** use kickers, section numbers as decoration, or dashboard-tile metrics as the hero template.
 - **Don't** add Skiper UI, 21st.dev, or a third motion library as a visual identity.
+
+## Voice
+
+The hero introduces Miel personally, with curiosity, adaptability, and working with people in plain language. Discipline supports that introduction through learning and practical software work. Leadership names real roles and contributions without inflating them into broad claims; organization-wide contributions are distinguished from individual role achievements.

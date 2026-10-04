@@ -40,14 +40,28 @@ test('Work cards expand on hover and focus, and each card links to its repositor
   expect(await gallery.evaluate(node => getComputedStyle(node).transitionDuration)).toBe('0s');
 });
 
-test('Leadership remains single-open and closed panels are inert during collapse', async ({ page }) => {
-  const buttons = page.locator('.leadership-summary');
-  await buttons.nth(1).click();
-  await expect(buttons.nth(1)).toHaveAttribute('aria-expanded', 'true');
-  await expect(buttons.nth(0)).toHaveAttribute('aria-expanded', 'false');
-  await expect(page.locator('#leadership-panel-0')).toHaveAttribute('inert', '');
-  await buttons.nth(1).click();
-  await expect(page.locator('.leadership-summary[aria-expanded="true"]')).toHaveCount(0);
+test('Leadership shows all seven roles grouped by start year without controls', async ({ page }) => {
+  const section = page.locator('#leadership');
+  await expect(section.locator('h3')).toHaveText(['2023', '2024', '2025']);
+  await expect(section.locator('.leadership-role')).toHaveCount(7);
+  await expect(section.locator('.leadership-dates')).toHaveText([
+    'Aug 2023 \u2014 Aug 2024', 'Aug 2023 \u2014 Aug 2024', 'Aug 2023 \u2014 Aug 2024',
+    'Sep 2023 \u2014 Present', 'Aug 2024 \u2014 Aug 2025', 'Aug 2024 \u2014 Aug 2025', 'Aug 2025 \u2014 Aug 2026',
+  ]);
+  for (const role of await section.locator('.leadership-role').all()) await expect(role).toBeVisible();
+  await expect(section.locator('button, [tabindex], [inert], [aria-expanded]')).toHaveCount(0);
+  await expect(section.getByText(/Across my SCC roles/)).toHaveCount(1);
+  await expect(section.getByText(/Across my ACM roles/)).toHaveCount(1);
+});
+
+test('Leadership content is readable without JavaScript', async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.goto(process.env.PREVIEW_URL || 'http://127.0.0.1:3108');
+  await expect(page.locator('.leadership-role')).toHaveCount(7);
+  for (const role of await page.locator('.leadership-role').all()) await expect(role).toBeVisible();
+  await expect(page.locator('#hero-title')).toContainText('Hi, I');
+  await context.close();
 });
 
 test('live reduced motion stops portrait rendering and finalizes metrics', async ({ page }) => {
@@ -210,12 +224,23 @@ test('initial reduced motion hydrates without errors and can change live', async
   expect(errors).toEqual([]);
 });
 
-test('enabling reduced motion finishes an active accordion transition immediately', async ({ page }) => {
-  await page.locator('.leadership-summary').nth(1).scrollIntoViewIfNeeded();
-  await page.locator('.leadership-summary').nth(1).click();
+test('live reduced motion finishes timeline entrances and they do not replay', async ({ page }) => {
+  const group = page.locator('[data-leadership-year]').nth(1);
+  await page.evaluate(() => document.documentElement.style.scrollBehavior = 'auto');
+  await group.scrollIntoViewIfNeeded();
+  await page.waitForFunction(() => {
+    const node = document.querySelectorAll('[data-leadership-year]')[1];
+    const opacity = Number(getComputedStyle(node).opacity);
+    return opacity > 0.35 && opacity < 1;
+  }, { }, { polling: 'raf' });
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  // Wait for the preference subscription, not for the 300ms animation.
-  await page.waitForFunction(() => !!document.querySelector('.discipline-practice-grid'));
-  expect(await page.locator('#leadership-panel-1').evaluate(node => (node as HTMLElement).style.height)).toBe('auto');
-  expect(await page.locator('#leadership-panel-1').evaluate(node => (node as HTMLElement).style.opacity)).toBe('1');
+  await expect(group).toHaveCSS('opacity', '1');
+  await expect(group).toHaveCSS('transform', 'none');
+  // Allow matchMedia cleanup to run before restoring the preference.
+  await page.waitForFunction(() => !document.querySelectorAll('[data-leadership-year]')[1].getAttribute('style'));
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.locator('#hero').scrollIntoViewIfNeeded();
+  await group.scrollIntoViewIfNeeded();
+  await expect(group).toHaveCSS('opacity', '1');
+  await expect(group).toHaveCSS('transform', 'none');
 });

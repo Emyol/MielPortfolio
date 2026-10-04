@@ -2,31 +2,18 @@ import { Button } from '@/components/ui/button';
 import { ArrowUpRight } from 'lucide-react';
 import AsciiImage from '@/components/originkit/ui/ascii-reveal-custom-style';
 
-const TITLE = [
-  { text: 'Architecting', italic: false },
-  { text: 'intelligent', italic: false },
-  { text: 'systems.', italic: false },
-  { text: 'Leading teams.', italic: true },
-];
-
 export default function Hero() {
   return (
     <section id="hero" className="field-hero" aria-labelledby="hero-title">
       <div className="field-shell field-hero-inner">
         <div className="field-hero-copy">
           <h1 id="hero-title" className="field-hero-title">
-            {TITLE.map((line) => (
-              <span
-                key={line.text}
-                className={line.italic ? 'field-title-line field-title-line--accent' : 'field-title-line'}
-              >
-                <span className="field-title-word">{line.text}</span>
-              </span>
-            ))}
+            <span className="field-title-line"><span className="field-title-word">Hi, I’m Miel.</span></span>
+            <span className="field-title-line field-title-introduction"><span className="field-title-word">I build software and enjoy working with people.</span></span>
           </h1>
           <p className="field-hero-summary" data-hero-item>
-            I build private, practical software across edge AI, language tooling,
-            and geospatial intelligence, then organize the people and systems that ship it.
+            I like learning new tools, figuring out unfamiliar problems, and sharing what I learn.
+            Alongside coding, I’ve spent time tutoring students and helping organize campus events.
           </p>
           <div className="field-hero-actions" data-hero-item>
             <Button asChild>

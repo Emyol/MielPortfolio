@@ -5,7 +5,7 @@ import DisciplineMarquee from './DisciplineMarquee';
 import StackMarquee from './StackMarquee';
 
 const DISCIPLINE_LEDE =
-  'I work where constrained computing meets human coordination: private AI on-device, expressive developer tools, map-based decision systems, and delivery operations.';
+  'I enjoy working on different kinds of software—from developer tools to map-based applications—and learning what each problem needs.';
 
 const METRICS = [
   { value: 2, pad: 2, suffix: '', label: "Batch '27 rank" },
@@ -27,7 +27,7 @@ export default function About() {
           <p className="field-lede">{DISCIPLINE_LEDE}</p>
           <div className="discipline-grid">
             <div className="capability-statement">
-              <blockquote>Build the system clearly. Make the handoff reliable.</blockquote>
+              <blockquote>Learn something new. Make something useful. Share what helps.</blockquote>
             </div>
             <dl className="field-measures">
               {METRICS.map((metric) => (

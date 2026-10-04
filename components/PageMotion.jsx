@@ -34,13 +34,20 @@ export default function PageMotion() {
         const title = section.querySelectorAll('.field-pin-inner');
         const content = section.id === 'projects'
           ? section.querySelectorAll('.field-lede, [data-work-gallery] > li')
-          : section.querySelectorAll('.field-split > :not(.field-pin-col) > *');
+          : section.querySelectorAll('.field-split > :not(.field-pin-col) > :not(.leadership-timeline)');
         const timeline = gsap.timeline({
           defaults: { ease: 'power3.out', duration: mobile ? 0.4 : motionTiming.entrance },
           scrollTrigger: { trigger: section, start: 'top 82%', once: true, onEnter: () => entered.current.add(section) },
         });
         if (!mobile) timeline.from(title, { yPercent: 105, stagger: 0.06 }, 0);
         timeline.from(content, { opacity: 0.35, y: mobile ? 8 : 18, stagger: { amount: mobile ? 0.08 : 0.16 } }, mobile ? 0 : 0.1);
+      });
+      root.querySelectorAll('[data-leadership-year]').forEach((group) => {
+        if (entered.current.has(group)) return;
+        gsap.from(group, {
+          opacity: 0.35, y: mobile ? 8 : 12, duration: mobile ? 0.4 : 0.6, ease: 'power3.out',
+          scrollTrigger: { trigger: group, start: 'top 88%', once: true, onEnter: () => entered.current.add(group) },
+        });
       });
       metrics.forEach((node) => {
         if (entered.current.has(node)) return;
