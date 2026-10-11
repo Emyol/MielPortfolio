@@ -144,6 +144,7 @@ Every interactive corner is `2px`. No pills. No circles standing in for photogra
 - **Background:** Plate (`oklch(0.16 0 0)`)
 - **Border:** Field line
 - **Use:** Structured details that need a contained surface, such as the Discipline practice cards; the Contact composition stays open.
+- **Mobile reading:** Below 860px, all eight Discipline practices become a static list with hairline separators. Work shows each image, description, and repository link in full; it never requires hover to read. Certificate captions sit below the image on a quiet plate.
 
 ### Navigation
 - Fixed top bar. Brand “Miel” in Fraunces. Links mute until active. On scroll, a 88% ground wash and hairline. Mobile: brand + Find.
@@ -160,6 +161,7 @@ Every interactive corner is `2px`. No pills. No circles standing in for photogra
 - GSAP owns hero and section entrances; Framer Motion owns certificate dialog state transitions; CSS owns Work gallery expansion and control feedback. Find opens immediately. Never share transform ownership on an element.
 - Feedback: 180ms. State: 300ms. Desktop entrance: 750ms; mobile entrance: 400ms, once only. Use decelerating easing without bounce.
 - Coordinate portrait opacity, headline typesetting, and actions. Discipline and Leadership titles remain sticky on desktop; full-width mastheads use the same typeset reveal. All titles go static below 860px. Metrics count once as the measures enter view.
+- Section reading content stays visible and stationary; only the titles typeset on entry. Keep the existing once-only Leadership timeline entrances. Work images and social feedback stay monochrome in every state.
 - Work reveals a card on hover or keyboard focus; every project is a direct repository link. The gallery has no filters or delayed navigation.
 - Leadership is an always-visible timeline grouped by the year roles began (2023, 2024, 2025). Full role dates communicate overlapping responsibilities. Each year enters once with opacity and 12px movement over 600ms on desktop, or 8px over 400ms on mobile; the rail stays static. Reduced motion reveals final content immediately.
 - Credentials retain manual swipe/button navigation. Each card shows its name and issuer; click or keyboard activation morphs it into a larger card with details. Escape, backdrop, and Close dismiss it and restore focus. No autoplay.

@@ -30,17 +30,14 @@ export default function PageMotion() {
           .from(root.querySelectorAll('[data-hero-item]'), { opacity: 0.25, y: mobile ? 8 : 16, duration: 0.6, stagger: 0.08 }, 0.2);
       }
       root.querySelectorAll('[data-pin-section]').forEach((section) => {
-        if (entered.current.has(section)) return;
+        if (mobile || entered.current.has(section)) return;
         const title = section.querySelectorAll('.field-pin-inner');
-        const content = section.id === 'projects'
-          ? section.querySelectorAll('.field-lede, [data-work-gallery] > li')
-          : section.querySelectorAll('.field-split > :not(.field-pin-col) > :not(.leadership-timeline)');
+        // Typeset the chapter title; reading content stays in place.
         const timeline = gsap.timeline({
-          defaults: { ease: 'power3.out', duration: mobile ? 0.4 : motionTiming.entrance },
+          defaults: { ease: 'power3.out', duration: motionTiming.entrance },
           scrollTrigger: { trigger: section, start: 'top 82%', once: true, onEnter: () => entered.current.add(section) },
         });
-        if (!mobile) timeline.from(title, { yPercent: 105, stagger: 0.06 }, 0);
-        timeline.from(content, { opacity: 0.35, y: mobile ? 8 : 18, stagger: { amount: mobile ? 0.08 : 0.16 } }, mobile ? 0 : 0.1);
+        timeline.from(title, { yPercent: 105, stagger: 0.06 }, 0);
       });
       root.querySelectorAll('[data-leadership-year]').forEach((group) => {
         if (entered.current.has(group)) return;

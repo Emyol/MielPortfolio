@@ -82,7 +82,7 @@ const CarouselCustomNavigation = ({ items }: CarouselCustomNavigationProps) => {
                       width={1600}
                       height={1200}
                       loading={index < 2 ? "eager" : "lazy"}
-                      className="aspect-4/3 w-full object-contain p-3 grayscale"
+                      className="credential-card-image aspect-4/3 w-full object-contain p-3 grayscale"
                       style={{ objectPosition: item.imagePosition ?? "center" }}
                     />
                   ) : null}
@@ -141,14 +141,14 @@ const CarouselCustomNavigation = ({ items }: CarouselCustomNavigationProps) => {
         </CarouselContent>
       </Carousel>
 
-      <div className="mt-4 flex flex-col items-center gap-3">
+      <div className="credential-gallery-controls">
         <div className="flex justify-center gap-3">
           <Button
             variant="outline"
             size="icon"
             onClick={() => api?.scrollPrev(reduced)}
             disabled={!canScrollPrev}
-            className="h-10 w-10 rounded-[2px] bg-background transition-transform active:scale-[0.97] motion-reduce:transform-none [@media(hover:hover)_and_(pointer:fine)]:hover:scale-[1.03]"
+            className="h-11 w-11 rounded-[2px] bg-background"
           >
             <ChevronLeft className="h-5 w-5" />
             <span className="sr-only">Previous slide</span>
@@ -158,7 +158,7 @@ const CarouselCustomNavigation = ({ items }: CarouselCustomNavigationProps) => {
             size="icon"
             onClick={() => api?.scrollNext(reduced)}
             disabled={!canScrollNext}
-            className="h-10 w-10 rounded-[2px] bg-background transition-transform active:scale-[0.97] motion-reduce:transform-none [@media(hover:hover)_and_(pointer:fine)]:hover:scale-[1.03]"
+            className="h-11 w-11 rounded-[2px] bg-background"
           >
             <ChevronRight className="h-5 w-5" />
             <span className="sr-only">Next slide</span>

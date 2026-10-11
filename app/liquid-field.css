@@ -6,9 +6,10 @@
   --field-ink: #ececec;
   --field-mute: #9c9c9c;
   --field-line: rgba(236, 236, 236, 0.14);
+  --field-plate: #141414;
   --field-gutter: clamp(1.25rem, 4vw, 4.5rem);
   --field-max: 1280px;
-  --field-section: clamp(5.5rem, 12vw, 9rem);
+  --field-section: clamp(4.5rem, 9vw, 7rem);
   --font-display: var(--font-display-loaded, Fraunces), ui-serif, serif;
   --font-body: var(--font-body-loaded, "Public Sans"), ui-sans-serif, sans-serif;
 }
@@ -99,7 +100,7 @@ a {
   align-items: center;
   gap: 1.25rem;
   min-height: 4.5rem;
-  padding: 0 var(--field-gutter);
+  padding: 0 max(var(--field-gutter), calc((100% - var(--field-max)) / 2 + var(--field-gutter)));
   color: var(--field-ink);
   transition: background-color 240ms ease, border-color 240ms ease;
 }
@@ -126,6 +127,9 @@ a {
 }
 
 .field-nav-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
   color: var(--field-mute);
   text-decoration: none;
   font-size: 0.82rem;
@@ -149,6 +153,7 @@ a {
   font: inherit;
   font-size: 0.75rem;
   cursor: pointer;
+  min-height: 2.75rem;
 }
 
 .command-trigger svg,
@@ -665,6 +670,10 @@ a {
   width: 100%;
 }
 
+.discipline-practice-grid--mobile {
+  display: none;
+}
+
 .stack-matrix {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -758,15 +767,29 @@ a {
 }
 
 .credential-card-summary {
-  position: absolute;
-  inset: auto 0 0;
+  position: relative;
   display: flex;
-  align-items: end;
+  align-items: start;
   justify-content: space-between;
   gap: 1rem;
   width: 100%;
-  padding: 3rem 1.25rem 1.25rem;
-  background: linear-gradient(to top, #000 5%, rgba(0, 0, 0, .8) 50%, transparent);
+  min-height: 8.5rem;
+  padding: 1.25rem;
+  border-top: 1px solid var(--field-line);
+  background: var(--field-plate);
+}
+
+.credential-card-image {
+  background: var(--field-plate);
+}
+
+.credential-gallery-controls {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1rem;
 }
 
 .credential-dialog {
@@ -851,7 +874,6 @@ a {
 }
 
 .work-gallery-item[data-active="true"] .work-gallery-image {
-  filter: grayscale(0);
   transform: scale(1);
 }
 
@@ -904,7 +926,7 @@ a {
 .work-gallery-meta svg { width: 17px; height: 17px; flex: none; }
 .work-gallery-title { font-family: var(--font-display); font-size: clamp(1.6rem, 3vw, 2.35rem); line-height: 1.05; }
 .work-gallery-description { max-width: 34ch; font-size: .875rem; line-height: 1.45; color: rgba(255,255,255,.82); }
-.work-gallery-action { margin-top: .35rem; font-weight: 600; text-transform: uppercase; }
+.work-gallery-action { margin-top: .35rem; font-size: .8rem; font-weight: 500; letter-spacing: normal; }
 .work-gallery-action svg { transition: transform var(--motion-feedback) ease; }
 .work-gallery-link:focus-visible .work-gallery-action svg { transform: translate(2px, -2px); }
 @media (hover: hover) and (pointer: fine) {
@@ -1026,8 +1048,84 @@ a {
     grid-column: auto;
   }
 
-  .discipline-marquee {
-    height: min(36rem, 74vh);
+  .discipline-marquee,
+  .discipline-practice-accessible {
+    display: none;
+  }
+
+  .discipline-practice-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .discipline-practice-grid .discipline-practice-card {
+    width: 100%;
+    padding-block: 1.5rem;
+    border: 0;
+    border-bottom: 1px solid var(--field-line);
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .discipline-practice-grid [data-slot="card-content"] {
+    padding-inline: 0;
+  }
+
+  .field-pin-title {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.16em;
+  }
+
+  .credentials-awards-list li {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+  }
+
+  .credentials-awards-list span {
+    max-width: none;
+    text-align: left;
+  }
+
+  .work-gallery {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    gap: 1.75rem;
+    height: auto;
+    transition: none;
+  }
+
+  .work-gallery-link {
+    position: relative;
+    display: grid;
+  }
+
+  .work-gallery-image {
+    position: relative;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    transform: none;
+  }
+
+  .work-gallery-shade,
+  .work-gallery-compact {
+    display: none;
+  }
+
+  .work-gallery-content {
+    position: relative;
+    opacity: 1;
+    transform: none;
+    gap: 0.75rem;
+    padding: 1.25rem;
+    border-top: 1px solid var(--field-line);
+  }
+
+  .work-gallery-description {
+    max-width: 52ch;
+    font-size: 0.95rem;
+    line-height: 1.55;
   }
 
   .discipline-marquee-col--sm,
@@ -1048,10 +1146,6 @@ a {
 
   .credentials-awards-list li {
     align-items: start;
-  }
-
-  .credentials-awards-list span {
-    max-width: min(70%, 24rem);
   }
 
   .field-measures {
@@ -1076,22 +1170,9 @@ a {
     padding-top: 5rem;
   }
 
-  .work-gallery {
-    grid-template-columns: 1fr;
-    grid-template-rows: var(--work-tracks);
-    height: min(42rem, 84svh);
-    min-height: 32rem;
-    transition: grid-template-rows 240ms var(--motion-ease);
-  }
-  .work-gallery-compact {
-    left: 1rem;
-    bottom: 50%;
-    writing-mode: initial;
-    transform: translateY(50%);
-  }
-  .work-gallery-content { gap: .4rem; }
   .work-gallery-title { font-size: clamp(1.4rem, 5vw, 2rem); }
-  .work-gallery-description { font-size: .8rem; }
+
+  .command-trigger kbd { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1160,7 +1241,7 @@ a {
   .field-credentials-section .field-pin-col,
   #projects .field-pin-col {
     position: static;
-    margin-bottom: clamp(2.25rem, 5vw, 4.75rem);
+    margin-bottom: clamp(2rem, 4vw, 3rem);
   }
 
   .field-credentials-section .field-pin-title,
@@ -1168,7 +1249,7 @@ a {
     display: flex;
     flex-wrap: wrap;
     column-gap: 0.16em;
-    font-size: clamp(3.5rem, 7.2vw, 7.25rem);
+    font-size: clamp(3.5rem, 6vw, 5.6rem);
     line-height: 1;
     text-wrap: balance;
   }
@@ -1212,17 +1293,17 @@ a {
   }
 
   #projects .field-pin-title {
-    font-size: clamp(4rem, 8vw, 8rem);
+    font-size: clamp(3.5rem, 6vw, 5.6rem);
   }
 
   #projects .field-lede {
-    max-width: 32ch;
-    margin: 0 0 2.25rem auto;
+    max-width: 52ch;
+    margin: 0 0 2.25rem;
     font-size: 1.12rem;
   }
 
   #projects .work-gallery {
-    height: clamp(29rem, 43vw, 38rem);
+    height: clamp(27rem, 36vw, 32rem);
   }
 }
 
@@ -1238,9 +1319,9 @@ a {
   max-width: 11ch;
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(2.8rem, 5.2vw, 5.75rem);
+  font-size: clamp(2.8rem, 5.2vw, 5.6rem);
   font-weight: 500;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.04em;
   line-height: 0.98;
   text-wrap: balance;
 }
@@ -1317,8 +1398,8 @@ a {
   touch-action: manipulation;
 }
 .social-icon-link > svg {
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   transition: transform 200ms var(--motion-ease), color 200ms ease;
 }
 .social-icon-tooltip {
@@ -1327,12 +1408,12 @@ a {
   left: 50%;
   z-index: 20;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  background: #fff;
-  color: #111827;
+  border: 1px solid var(--field-line);
+  border-radius: 2px;
+  background: var(--field-plate);
+  color: var(--field-ink);
   font-size: 0.875rem;
-  font-weight: 700;
+  font-weight: 400;
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
@@ -1347,12 +1428,12 @@ a {
   height: 10px;
 }
 .social-icon-link:focus-visible { outline: 2px solid var(--field-ink); outline-offset: 4px; }
-.social-icon-link:focus-visible > svg { color: #3b82f6; transform: scale(1.25); }
+.social-icon-link:focus-visible { background: var(--field-plate); }
 .social-icon-link:focus-visible:not([data-tooltip-dismissed="true"]) .social-icon-tooltip {
   opacity: 1; visibility: visible; transform: translateX(-50%) scale(1);
 }
 @media (hover: hover) and (pointer: fine) {
-  .social-icon-link:hover > svg { color: #3b82f6; transform: scale(1.25); }
+  .social-icon-link:hover { background: var(--field-plate); }
   .social-icon-link:hover:not([data-tooltip-dismissed="true"]) .social-icon-tooltip {
     opacity: 1; visibility: visible; transform: translateX(-50%) scale(1);
   }

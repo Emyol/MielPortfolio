@@ -119,15 +119,14 @@ export default function DisciplineMarquee() {
 
   return (
     <div className="discipline-marquee-block">
-      {reduced ? (
-        <div className="discipline-practice-grid">
-          {PRACTICES.map((practice) => (
-            <PracticeCard key={practice.title} {...practice} />
-          ))}
-        </div>
-      ) : (
+      <div className={`discipline-practice-grid${reduced ? '' : ' discipline-practice-grid--mobile'}`}>
+        {PRACTICES.map((practice) => (
+          <PracticeCard key={practice.title} {...practice} />
+        ))}
+      </div>
+      {!reduced && (
         <>
-          <ul className="visually-hidden">
+          <ul className="visually-hidden discipline-practice-accessible">
             {PRACTICES.map((practice) => (
               <li key={practice.title}>
                 {practice.kind}: {practice.title}. {practice.body}
