@@ -1,5 +1,6 @@
 /* Liquid Field — Silver Field world. Operator Console is discarded. */
 
+/* Shared color and spacing tokens for the portfolio surface. */
 :root {
   --field-bg: #070707;
   --field-ink: #ececec;
