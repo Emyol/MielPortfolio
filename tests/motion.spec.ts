@@ -18,7 +18,7 @@ test('Find contains focus, handles empty results and restores the trigger', asyn
   await trigger.click();
   await expect(input).toHaveValue('');
   await page.keyboard.press('ArrowDown');
-  await expect(page.getByRole('option', { name: /Certificates/ })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('option', { name: /Credentials/ })).toHaveAttribute('aria-selected', 'true');
   await page.keyboard.press('Enter');
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });
@@ -226,8 +226,10 @@ test('initial reduced motion hydrates without errors and can change live', async
 
 test('live reduced motion finishes timeline entrances and they do not replay', async ({ page }) => {
   const group = page.locator('[data-leadership-year]').nth(1);
+  await expect(group).toHaveCSS('opacity', '0.35');
   await page.evaluate(() => document.documentElement.style.scrollBehavior = 'auto');
-  await group.scrollIntoViewIfNeeded();
+  // Do not wait for layout stability: that can consume the entire entrance tween.
+  await group.evaluate(node => node.scrollIntoView({ block: 'center', behavior: 'instant' }));
   await page.waitForFunction(() => {
     const node = document.querySelectorAll('[data-leadership-year]')[1];
     const opacity = Number(getComputedStyle(node).opacity);

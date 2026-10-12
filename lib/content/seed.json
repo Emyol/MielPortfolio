@@ -1,0 +1,595 @@
+{
+  "profile": {
+    "fullName": "Amiel Josiah Acuña",
+    "shortName": "Miel",
+    "alternateName": "Amiel Josiah Acuna",
+    "portrait": "/hero-profile.png",
+    "portraitAlt": "Portrait of Amiel Acuña",
+    "cv": "/Amiel_Acuna_CV.pdf",
+    "jobTitle": "Software Engineer",
+    "school": "FEU Institute of Technology"
+  },
+  "hero": {
+    "title": "Hi, I’m Miel.",
+    "subtitle": "I build software and enjoy working with people.",
+    "summary": "I’m Amiel Josiah Acuña. I like learning new tools, figuring out unfamiliar problems, and sharing what I learn. Alongside coding, I’ve spent time tutoring students and helping organize campus events.",
+    "availability": "Available for collaboration",
+    "location": "Manila / Remote",
+    "primaryLabel": "Explore work",
+    "primaryHref": "#projects",
+    "cvLabel": "Open CV"
+  },
+  "about": {
+    "title": "Discipline",
+    "lede": "I enjoy working on different kinds of software—from developer tools to map-based applications—and learning what each problem needs.",
+    "quote": "Learn something new. Make something useful. Share what helps.",
+    "metrics": [
+      {
+        "id": "entry-1",
+        "archived": false,
+        "value": 2,
+        "pad": 2,
+        "suffix": "",
+        "label": "Batch '27 rank",
+        "source": "manual"
+      },
+      {
+        "id": "entry-2",
+        "archived": false,
+        "value": 700,
+        "pad": 0,
+        "suffix": "+",
+        "label": "Students supported",
+        "source": "manual"
+      },
+      {
+        "id": "entry-3",
+        "archived": false,
+        "value": 4,
+        "pad": 2,
+        "suffix": "",
+        "label": "Selected systems",
+        "source": "work"
+      },
+      {
+        "id": "entry-4",
+        "archived": false,
+        "value": 6,
+        "pad": 2,
+        "suffix": "",
+        "label": "Credentials",
+        "source": "credentials"
+      }
+    ]
+  },
+  "practices": {
+    "items": [
+      {
+        "id": "entry-1",
+        "archived": false,
+        "kind": "Discipline",
+        "title": "Edge intelligence",
+        "body": "Local inference and retrieval without server dependency.",
+        "icon": "Cpu"
+      },
+      {
+        "id": "entry-2",
+        "archived": false,
+        "kind": "Interest",
+        "title": "Peer teaching",
+        "body": "The moment a hard concept finally holds in a room, not only on a slide.",
+        "icon": "GraduationCap"
+      },
+      {
+        "id": "entry-3",
+        "archived": false,
+        "kind": "Discipline",
+        "title": "Language systems",
+        "body": "Lexers, parsers, ASTs, interpreters, and tooling people can actually use.",
+        "icon": "Code2"
+      },
+      {
+        "id": "entry-4",
+        "archived": false,
+        "kind": "Interest",
+        "title": "Music",
+        "body": "Tempo, arrangement, and the cut. Another way to think about parts that have to arrive on time.",
+        "icon": "Music"
+      },
+      {
+        "id": "entry-5",
+        "archived": false,
+        "kind": "Discipline",
+        "title": "Geospatial products",
+        "body": "Complex environmental data made legible for decisions.",
+        "icon": "Map"
+      },
+      {
+        "id": "entry-6",
+        "archived": false,
+        "kind": "Interest",
+        "title": "On-device AI",
+        "body": "Private models that stay useful when the network does not.",
+        "icon": "Smartphone"
+      },
+      {
+        "id": "entry-7",
+        "archived": false,
+        "kind": "Discipline",
+        "title": "Operational leadership",
+        "body": "Plans, resources, and teams aligned around delivery.",
+        "icon": "Users"
+      },
+      {
+        "id": "entry-8",
+        "archived": false,
+        "kind": "Interest",
+        "title": "Campus logistics",
+        "body": "Getting people, rooms, and supplies in place before anything starts.",
+        "icon": "Boxes"
+      }
+    ]
+  },
+  "stack": {
+    "items": [
+      {
+        "id": "entry-1",
+        "archived": false,
+        "alt": "Python",
+        "category": "Languages",
+        "src": "/logos/python.svg",
+        "icon": "Braces"
+      },
+      {
+        "id": "entry-2",
+        "archived": false,
+        "alt": "TypeScript",
+        "category": "Languages",
+        "src": "/logos/typescript.svg",
+        "icon": "Braces"
+      },
+      {
+        "id": "entry-3",
+        "archived": false,
+        "alt": "Dart",
+        "category": "Languages",
+        "src": "/logos/dart.svg",
+        "icon": "Braces"
+      },
+      {
+        "id": "entry-4",
+        "archived": false,
+        "alt": "Kotlin",
+        "category": "Languages",
+        "src": "/logos/kotlin.svg",
+        "icon": "Braces"
+      },
+      {
+        "id": "entry-5",
+        "archived": false,
+        "alt": "C / C++",
+        "category": "Languages",
+        "src": "/logos/cplusplus.svg",
+        "icon": "Braces"
+      },
+      {
+        "id": "entry-6",
+        "archived": false,
+        "alt": "Flutter",
+        "category": "Runtime",
+        "src": "/logos/flutter.svg",
+        "icon": "Braces"
+      },
+      {
+        "id": "entry-7",
+        "archived": false,
+        "alt": "Next.js",
+        "category": "Runtime",
+        "src": "/logos/nextdotjs.svg",
+        "icon": "Braces"
+      },
+      {
+        "id": "entry-8",
+        "archived": false,
+        "alt": "ONNX Runtime",
+        "category": "Runtime",
+        "src": "/logos/onnx.svg",
+        "icon": "Braces"
+      },
+      {
+        "id": "entry-9",
+        "archived": false,
+        "alt": "REST APIs",
+        "category": "Runtime",
+        "src": "",
+        "icon": "Network"
+      },
+      {
+        "id": "entry-10",
+        "archived": false,
+        "alt": "On-device ML",
+        "category": "Domains",
+        "src": "",
+        "icon": "Cpu"
+      },
+      {
+        "id": "entry-11",
+        "archived": false,
+        "alt": "Vector retrieval",
+        "category": "Domains",
+        "src": "",
+        "icon": "Database"
+      },
+      {
+        "id": "entry-12",
+        "archived": false,
+        "alt": "Geospatial",
+        "category": "Domains",
+        "src": "",
+        "icon": "Globe2"
+      },
+      {
+        "id": "entry-13",
+        "archived": false,
+        "alt": "Compilers",
+        "category": "Domains",
+        "src": "",
+        "icon": "Braces"
+      },
+      {
+        "id": "entry-14",
+        "archived": false,
+        "alt": "Git",
+        "category": "Delivery",
+        "src": "/logos/git.svg",
+        "icon": "Braces"
+      },
+      {
+        "id": "entry-15",
+        "archived": false,
+        "alt": "SAP Activate",
+        "category": "Delivery",
+        "src": "/logos/sap.svg",
+        "icon": "Braces"
+      },
+      {
+        "id": "entry-16",
+        "archived": false,
+        "alt": "Agile / Scrum",
+        "category": "Delivery",
+        "src": "",
+        "icon": "Workflow"
+      },
+      {
+        "id": "entry-17",
+        "archived": false,
+        "alt": "Claude Code",
+        "category": "Delivery",
+        "src": "/logos/claude.svg",
+        "icon": "Braces"
+      }
+    ],
+    "title": "Languages, runtime, domains & delivery"
+  },
+  "credentials": {
+    "title": "Certificates & Awards",
+    "lede": "Formal credentials and distinctions that support the engineering and delivery work shown across the Field.",
+    "galleryTitle": "Certificates",
+    "galleryDescription": "Select a certificate to see its details.",
+    "items": [
+      {
+        "id": "entry-1",
+        "archived": false,
+        "issuer": "Project Management Institute",
+        "name": "PMI Project Management Ready®",
+        "detail": "Formally evaluated in project-management fundamentals, plan-based methods, agile practice, and business analysis.",
+        "year": "2026",
+        "image": "/certificates/pmi.jpg",
+        "verificationUrl": "",
+        "category": "Certification",
+        "issueDate": "",
+        "expiryDate": ""
+      },
+      {
+        "id": "entry-2",
+        "archived": false,
+        "issuer": "SAP",
+        "name": "Certified Project Manager — SAP Activate",
+        "detail": "Verifies delivery skills in SAP Activate, including stakeholders, change, testing, and project transitions.",
+        "year": "2026",
+        "image": "/certificates/sap-activate.jpg",
+        "verificationUrl": "",
+        "category": "Certification",
+        "issueDate": "",
+        "expiryDate": ""
+      },
+      {
+        "id": "entry-3",
+        "archived": false,
+        "issuer": "Certiport",
+        "name": "IT Specialist — Python",
+        "detail": "Information Technology Specialist credential covering Python fundamentals, program flow, and problem solving.",
+        "year": "2025",
+        "image": "/certificates/python.jpg",
+        "verificationUrl": "",
+        "category": "Certification",
+        "issueDate": "",
+        "expiryDate": ""
+      },
+      {
+        "id": "entry-4",
+        "archived": false,
+        "issuer": "Anthropic",
+        "name": "Claude Code in Action",
+        "detail": "Certificate of Completion for using Claude Code across software development and codebase work.",
+        "year": "",
+        "image": "/certificates/claude-code.png",
+        "verificationUrl": "",
+        "category": "Course completion",
+        "issueDate": "",
+        "expiryDate": ""
+      },
+      {
+        "id": "entry-5",
+        "archived": false,
+        "issuer": "Google for Education",
+        "name": "Gemini Certified Student",
+        "detail": "Demonstrated the knowledge and basic competencies needed to use Google AI in university work.",
+        "year": "2025",
+        "image": "/certificates/gemini.jpg",
+        "verificationUrl": "",
+        "category": "Course completion",
+        "issueDate": "",
+        "expiryDate": ""
+      },
+      {
+        "id": "entry-6",
+        "archived": false,
+        "issuer": "MathWorks",
+        "name": "MATLAB Onramp",
+        "detail": "Completed 100% of the self-paced MATLAB Onramp course in data analysis, visualization, and scripting.",
+        "year": "2025",
+        "image": "/certificates/matlab-onramp.png",
+        "verificationUrl": "",
+        "category": "Course completion",
+        "issueDate": "",
+        "expiryDate": ""
+      }
+    ]
+  },
+  "awards": {
+    "title": "Awards & distinctions",
+    "items": [
+      {
+        "id": "entry-1",
+        "archived": false,
+        "year": "2026",
+        "title": "Rank 2, Batch ’27 and Rank 5, BSCSSE",
+        "organization": "",
+        "description": ""
+      },
+      {
+        "id": "entry-2",
+        "archived": false,
+        "year": "2025",
+        "title": "Active Student Leader, FEU Institute of Technology",
+        "organization": "",
+        "description": ""
+      },
+      {
+        "id": "entry-3",
+        "archived": false,
+        "year": "2024",
+        "title": "4th Place, Code Green for Campuses",
+        "organization": "",
+        "description": ""
+      },
+      {
+        "id": "entry-4",
+        "archived": false,
+        "year": "2024",
+        "title": "Rank 2, Batch ’27 and Rank 7, BSCSSE",
+        "organization": "",
+        "description": ""
+      }
+    ]
+  },
+  "experience": {
+    "title": "Leadership",
+    "lede": "Where I’ve helped out, taken responsibility, and learned to work with others.",
+    "items": [
+      {
+        "id": "entry-1",
+        "archived": false,
+        "title": "Junior Officer for Logistics",
+        "org": "FEU Tech Student Coordinating Council",
+        "startDate": "2023-08",
+        "endDate": "2024-08",
+        "current": false,
+        "category": "Campus leadership",
+        "contribution": ""
+      },
+      {
+        "id": "entry-2",
+        "archived": false,
+        "title": "Junior Officer for Logistics",
+        "org": "FEU Tech ACM Student Chapter",
+        "startDate": "2023-08",
+        "endDate": "2024-08",
+        "current": false,
+        "category": "Campus leadership",
+        "contribution": ""
+      },
+      {
+        "id": "entry-3",
+        "archived": false,
+        "title": "Junior Officer for Logistics",
+        "org": "FEU Tech Junior Philippine Computer Society",
+        "startDate": "2023-08",
+        "endDate": "2024-08",
+        "current": false,
+        "category": "Campus leadership",
+        "contribution": "Helped with check-in, supply distribution, and venue preparation for departmental technology events."
+      },
+      {
+        "id": "entry-4",
+        "archived": false,
+        "title": "Student Assistant",
+        "org": "iCARE, FEU Institute of Technology",
+        "startDate": "2023-09",
+        "endDate": "",
+        "current": true,
+        "category": "Campus leadership",
+        "contribution": "Help facilitate peer tutoring and faculty-led review sessions supporting more than 700 STEM students."
+      },
+      {
+        "id": "entry-5",
+        "archived": false,
+        "title": "Director for Logistics",
+        "org": "FEU Tech Student Coordinating Council",
+        "startDate": "2024-08",
+        "endDate": "2025-08",
+        "current": false,
+        "category": "Campus leadership",
+        "contribution": "Across my SCC roles, I planned logistics, allocated resources, and helped run campus-wide events for thousands of students."
+      },
+      {
+        "id": "entry-6",
+        "archived": false,
+        "title": "Associate Director for Logistics",
+        "org": "FEU Tech ACM Student Chapter",
+        "startDate": "2024-08",
+        "endDate": "2025-08",
+        "current": false,
+        "category": "Campus leadership",
+        "contribution": ""
+      },
+      {
+        "id": "entry-7",
+        "archived": false,
+        "title": "SCC Representative",
+        "org": "FEU Tech ACM Student Chapter",
+        "startDate": "2025-08",
+        "endDate": "2026-08",
+        "current": false,
+        "category": "Campus leadership",
+        "contribution": "Across my ACM roles, I helped build logistics capability, then worked as the institutional liaison to align chapter activities with university policy."
+      }
+    ]
+  },
+  "work": {
+    "title": "Selected systems",
+    "lede": "Explore each system, then open its repository.",
+    "items": [
+      {
+        "id": "kitako",
+        "archived": false,
+        "title": "KitaKo",
+        "meta": "Undergraduate thesis · 2026",
+        "description": "Private semantic image search that understands Taglish queries and runs entirely on-device.",
+        "imgSrc": "/projects/kitako.jpg?v=7",
+        "icon": "ScanSearch",
+        "linkHref": "https://github.com/Emyol/KitaKo_Codebase",
+        "demoUrl": ""
+      },
+      {
+        "id": "icare",
+        "archived": false,
+        "title": "iCARE Reservation",
+        "meta": "Internal tooling · 2026",
+        "description": "A shared-facility portal that reduces booking friction and catches room conflicts before submission.",
+        "imgSrc": "/projects/icare.jpg?v=6",
+        "icon": "CalendarDays",
+        "linkHref": "https://github.com/Emyol/iCARE-Reservation",
+        "demoUrl": ""
+      },
+      {
+        "id": "bekilang",
+        "archived": false,
+        "title": "BekiLang",
+        "meta": "Domain-specific language · 2026",
+        "description": "A working programming language and web playground built around Philippine Swardspeak.",
+        "imgSrc": "/projects/bekilang.jpg?v=6",
+        "icon": "Braces",
+        "linkHref": "https://github.com/Emyol/BekiLang",
+        "demoUrl": ""
+      },
+      {
+        "id": "citysense",
+        "archived": false,
+        "title": "CitySense",
+        "meta": "NASA Space Apps Challenge · 2025",
+        "description": "A planning cockpit that combines live environmental layers with an AI-assisted policy workflow.",
+        "imgSrc": "/projects/citysense.jpg?v=6",
+        "icon": "MapPinned",
+        "linkHref": "https://github.com/Emyol/city-sense",
+        "demoUrl": ""
+      }
+    ]
+  },
+  "contact": {
+    "title": "Contact",
+    "headline": "Have a system worth building?",
+    "description": "Send the context, constraint, or opportunity. I will respond with a clear next step.",
+    "location": "Manila, Philippines · Available globally",
+    "email": "acunaamieljosiah@gmail.com",
+    "phone": "+63 961 045 9227",
+    "emailLabel": "Email Amiel",
+    "cvLabel": "Curriculum vitae",
+    "copyright": "© 2026 Amiel Acuña",
+    "backLabel": "Back to the Field",
+    "socials": [
+      {
+        "id": "entry-1",
+        "archived": false,
+        "name": "GitHub",
+        "href": "https://github.com/Emyol"
+      },
+      {
+        "id": "entry-2",
+        "archived": false,
+        "name": "LinkedIn",
+        "href": "https://www.linkedin.com/in/amiel-josiah-acu%C3%B1a-4786a515a"
+      }
+    ]
+  },
+  "navigation": {
+    "items": [
+      {
+        "id": "about",
+        "archived": false,
+        "section": "about",
+        "label": "Discipline"
+      },
+      {
+        "id": "credentials",
+        "archived": false,
+        "section": "credentials",
+        "label": "Credentials"
+      },
+      {
+        "id": "projects",
+        "archived": false,
+        "section": "projects",
+        "label": "Work"
+      },
+      {
+        "id": "leadership",
+        "archived": false,
+        "section": "leadership",
+        "label": "Leadership"
+      },
+      {
+        "id": "contact",
+        "archived": false,
+        "section": "contact",
+        "label": "Contact"
+      }
+    ]
+  },
+  "seo": {
+    "title": "Amiel Josiah Acuña | Software Engineer Portfolio",
+    "description": "Explore the software projects, experience, and leadership of Amiel Josiah Acuña (Amiel Josiah Acuna), a software engineering student at FEU Tech in Manila.",
+    "image": "/hero-profile.png"
+  }
+}

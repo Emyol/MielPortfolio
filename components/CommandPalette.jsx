@@ -14,28 +14,8 @@ import {
   Users,
 } from 'lucide-react';
 
-const GROUPS = [
-  {
-    heading: 'On this page',
-    items: [
-      { label: 'Discipline', hint: 'About', href: '#about', Icon: Compass },
-      { label: 'Certificates & awards', hint: 'Credentials', href: '#credentials', Icon: Award },
-      { label: 'Selected systems', hint: 'Work', href: '#projects', Icon: SquareStack },
-      { label: 'Leadership', hint: 'Record', href: '#leadership', Icon: Users },
-      { label: 'Contact', hint: 'Write', href: '#contact', Icon: Mail },
-    ],
-  },
-  {
-    heading: 'Elsewhere',
-    items: [
-      { label: 'Curriculum vitae', hint: 'PDF', href: '/Amiel_Acuna_CV.pdf', external: true, Icon: FileText },
-      { label: 'GitHub', hint: 'Code', href: 'https://github.com/Emyol', external: true, Icon: FolderGit2 },
-      { label: 'LinkedIn', hint: 'Network', href: 'https://www.linkedin.com/in/amiel-josiah-acu%C3%B1a-4786a515a', external: true, Icon: Network },
-    ],
-  },
-];
-
-export default function CommandPalette() {
+export default function CommandPalette({ content }) {
+ const GROUPS=[{heading:'On this page',items:content.navigation.items.filter(item=>!item.archived).map(item=>({label:item.label,hint:'Section',href:'#'+item.section,Icon:Compass}))},{heading:'Elsewhere',items:[{label:content.contact.cvLabel,hint:'PDF',href:content.profile.cv,external:true,Icon:FileText},...content.contact.socials.filter(item=>!item.archived).map(item=>({label:item.name,hint:'Link',href:item.href,external:true,Icon:Network}))].filter(item=>item.href)}];
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [active, setActive] = useState(0);
@@ -47,7 +27,7 @@ export default function CommandPalette() {
       ...group,
       items: group.items.filter((item) => item.label.toLowerCase().includes(query.toLowerCase())),
     })).filter((group) => group.items.length > 0),
-    [query],
+    [query, content],
   );
   const flat = groups.flatMap((group) => group.items);
 

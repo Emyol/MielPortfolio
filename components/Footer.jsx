@@ -5,35 +5,35 @@ import PinTitle from './PinTitle';
 import { Button } from '@/components/ui/button';
 import SocialLinks from '@/components/ui/social-links';
 
-export default function Footer() {
+export default function Footer({ content }) {
   return (
     <footer id="contact" className="field-section" aria-labelledby="contact-title" data-pin-section>
       <div className="field-shell field-split">
-        <PinTitle id="contact-title">Contact</PinTitle>
+        <PinTitle id="contact-title">{content.contact.title}</PinTitle>
         <div className="field-contact">
           <div className="contact-editorial">
             <div className="contact-intro">
-              <h3>Have a system worth building?</h3>
-              <p>Send the context, constraint, or opportunity. I will respond with a clear next step.</p>
+              <h3>{content.contact.headline}</h3>
+              <p>{content.contact.description}</p>
             </div>
             <div className="contact-details">
-              <p>Manila, Philippines · Available globally</p>
-              <a href="mailto:acunaamieljosiah@gmail.com">acunaamieljosiah@gmail.com</a>
-              <a href="tel:+639610459227">+63 961 045 9227</a>
+              <p>{content.contact.location}</p>
+              <a href={`mailto:${content.contact.email}`}>{content.contact.email}</a>
+              <a href={`tel:${content.contact.phone.replace(/[^+0-9]/g, "")}`}>{content.contact.phone}</a>
             </div>
             <div className="contact-actions">
               <Button asChild>
-                <a href="mailto:acunaamieljosiah@gmail.com">Email Amiel <ArrowUpRight /></a>
+                <a href={`mailto:${content.contact.email}`}>{content.contact.emailLabel} <ArrowUpRight /></a>
               </Button>
-              <a href="/Amiel_Acuna_CV.pdf" target="_blank" rel="noopener noreferrer">
-                Curriculum vitae <ArrowUpRight aria-hidden="true" />
+              <a href={content.profile.cv} target="_blank" rel="noopener noreferrer">
+                {content.contact.cvLabel} <ArrowUpRight aria-hidden="true" />
               </a>
-              <SocialLinks />
+              <SocialLinks items={content.contact.socials} />
             </div>
           </div>
           <div className="field-colophon">
-            <p>© 2026 Amiel Acuña</p>
-            <a href="#hero">Back to the Field</a>
+            <p>{content.contact.copyright}</p>
+            <a href="#hero">{content.contact.backLabel}</a>
           </div>
         </div>
       </div>

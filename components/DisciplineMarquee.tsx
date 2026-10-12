@@ -25,67 +25,6 @@ type Practice = {
   Icon: LucideIcon;
 };
 
-const COLUMNS: Practice[][] = [
-  [
-    {
-      kind: "Discipline",
-      title: "Edge intelligence",
-      body: "Local inference and retrieval without server dependency.",
-      Icon: Cpu,
-    },
-    {
-      kind: "Interest",
-      title: "Peer teaching",
-      body: "The moment a hard concept finally holds in a room, not only on a slide.",
-      Icon: GraduationCap,
-    },
-  ],
-  [
-    {
-      kind: "Discipline",
-      title: "Language systems",
-      body: "Lexers, parsers, ASTs, interpreters, and tooling people can actually use.",
-      Icon: Code2,
-    },
-    {
-      kind: "Interest",
-      title: "Music",
-      body: "Tempo, arrangement, and the cut. Another way to think about parts that have to arrive on time.",
-      Icon: Music,
-    },
-  ],
-  [
-    {
-      kind: "Discipline",
-      title: "Geospatial products",
-      body: "Complex environmental data made legible for decisions.",
-      Icon: Map,
-    },
-    {
-      kind: "Interest",
-      title: "On-device AI",
-      body: "Private models that stay useful when the network does not.",
-      Icon: Smartphone,
-    },
-  ],
-  [
-    {
-      kind: "Discipline",
-      title: "Operational leadership",
-      body: "Plans, resources, and teams aligned around delivery.",
-      Icon: Users,
-    },
-    {
-      kind: "Interest",
-      title: "Campus logistics",
-      body: "Getting people, rooms, and supplies in place before anything starts.",
-      Icon: Boxes,
-    },
-  ],
-];
-
-const PRACTICES = COLUMNS.flat();
-
 const subscribeToHydration = () => () => {};
 const clientSnapshot = () => true;
 const serverSnapshot = () => false;
@@ -111,7 +50,10 @@ function PracticeCard({ kind, title, body, Icon }: Practice) {
   );
 }
 
-export default function DisciplineMarquee() {
+export default function DisciplineMarquee({ items }: { items: {id:string; archived:boolean;kind:string;title:string;body:string;icon:string}[] }) {
+ const icons: Record<string,LucideIcon>={Boxes,Code2,Cpu,GraduationCap,Map,Music,Smartphone,Users};
+ const PRACTICES=items.filter(item=>!item.archived).map(item=>({...item,kind:item.kind as Practice['kind'],Icon:icons[item.icon] || Code2}));
+ const COLUMNS: Practice[][] = Array.from({length: Math.min(4,PRACTICES.length)},(_,index)=>PRACTICES.filter((_,i)=>i%Math.min(4,PRACTICES.length)===index));
   const prefersReducedMotion = useMotionPreference();
   // Match the server tree during hydration, then use the visitor's preference.
   const hydrated = useSyncExternalStore(subscribeToHydration, clientSnapshot, serverSnapshot);

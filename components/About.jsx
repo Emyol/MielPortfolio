@@ -1,33 +1,20 @@
-"use client";
+import { getMetrics } from "@/lib/content/model";
 
 import PinTitle from './PinTitle';
 import DisciplineMarquee from './DisciplineMarquee';
 import StackMarquee from './StackMarquee';
 
-const DISCIPLINE_LEDE =
-  'I enjoy working on different kinds of software—from developer tools to map-based applications—and learning what each problem needs.';
-
-const METRICS = [
-  { value: 2, pad: 2, suffix: '', label: "Batch '27 rank" },
-  { value: 700, pad: 0, suffix: '+', label: 'Students supported' },
-  { value: 4, pad: 2, suffix: '', label: 'Selected systems' },
-  { value: 6, pad: 2, suffix: '', label: 'Credentials' },
-];
-
-function formatMetric(value, pad, suffix) {
-  return `${String(value).padStart(pad, '0')}${suffix}`;
-}
-
-export default function About() {
+export default function About({ content }) {
+ const METRICS=getMetrics(content);
   return (
     <section id="about" className="field-section" aria-labelledby="about-title" data-pin-section>
       <div className="field-shell field-split">
-        <PinTitle id="about-title">Discipline</PinTitle>
+        <PinTitle id="about-title">{content.about.title}</PinTitle>
         <div className="discipline-intro">
-          <p className="field-lede">{DISCIPLINE_LEDE}</p>
+          <p className="field-lede">{content.about.lede}</p>
           <div className="discipline-grid">
             <div className="capability-statement">
-              <blockquote>Learn something new. Make something useful. Share what helps.</blockquote>
+              <blockquote>{content.about.quote}</blockquote>
             </div>
             <dl className="field-measures">
               {METRICS.map((metric) => (
@@ -39,7 +26,7 @@ export default function About() {
                       data-pad={metric.pad}
                       data-suffix={metric.suffix}
                     >
-                      {formatMetric(metric.value, metric.pad, metric.suffix)}
+                      {String(metric.value).padStart(metric.pad,'0')+metric.suffix}
                     </span>
                   </dd>
                 </div>
@@ -48,9 +35,9 @@ export default function About() {
           </div>
         </div>
       </div>
-      <DisciplineMarquee />
+      <DisciplineMarquee items={content.practices.items} />
       <div className="field-shell">
-        <StackMarquee />
+        <StackMarquee items={content.stack.items} title={content.stack.title} />
       </div>
     </section>
   );

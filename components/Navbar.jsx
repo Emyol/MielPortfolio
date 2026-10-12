@@ -8,15 +8,8 @@ import CommandPalette from './CommandPalette';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-const LINKS = [
-  { id: 'about', label: 'Discipline' },
-  { id: 'credentials', label: 'Credentials' },
-  { id: 'projects', label: 'Work' },
-  { id: 'leadership', label: 'Leadership' },
-  { id: 'contact', label: 'Contact' },
-];
-
-export default function Navbar() {
+export default function Navbar({ content }) {
+ const LINKS=content.navigation.items.filter(item=>!item.archived).map(item=>({...item,id:item.section}));
   const [active, setActive] = useState('');
   const navRef = useRef(null);
 
@@ -44,7 +37,7 @@ export default function Navbar() {
 
   return (
     <nav ref={navRef} className="field-nav" aria-label="Primary navigation">
-      <a href="#hero" className="field-brand" aria-label="Go to introduction">Miel</a>
+      <a href="#hero" className="field-brand" aria-label="Go to introduction">{content.profile.shortName}</a>
       <div className="field-nav-links">
         {LINKS.map(({ id, label }) => (
           <a
@@ -57,7 +50,7 @@ export default function Navbar() {
           </a>
         ))}
       </div>
-      <CommandPalette />
+      <CommandPalette content={content} />
     </nav>
   );
 }

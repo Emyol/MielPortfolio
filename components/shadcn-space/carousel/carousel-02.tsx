@@ -29,6 +29,10 @@ export type CredentialSlide = {
   issuer: string;
   year: string;
   imagePosition?: string;
+  verificationUrl?: string;
+  category?: string;
+  issueDate?: string;
+  expiryDate?: string;
 };
 
 type CarouselCustomNavigationProps = {
@@ -131,6 +135,8 @@ const CarouselCustomNavigation = ({ items }: CarouselCustomNavigationProps) => {
                       >
                         {item.detail}
                       </MorphingDialogDescription>
+                      {(item.issueDate || item.expiryDate) && <p>{item.issueDate ? `Issued ${item.issueDate}` : ''}{item.issueDate && item.expiryDate ? ' · ' : ''}{item.expiryDate ? `Expires ${item.expiryDate}` : ''}</p>}
+                      {item.verificationUrl && <a href={item.verificationUrl} target="_blank" rel="noopener noreferrer">Verify credential</a>}
                     </div>
                     <MorphingDialogClose className="credential-dialog-close" />
                   </MorphingDialogContent>
@@ -165,7 +171,7 @@ const CarouselCustomNavigation = ({ items }: CarouselCustomNavigationProps) => {
           </Button>
         </div>
         <p className="text-sm tabular-nums text-muted-foreground" aria-live="polite">
-          {String(selected + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
+          {String(items.length ? selected + 1 : 0).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
         </p>
       </div>
     </div>

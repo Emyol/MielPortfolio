@@ -14,23 +14,23 @@ export type Logo = {
   icon?: LucideIcon;
 };
 
-type LogoCloudProps = ComponentProps<"div"> & { logos: Logo[] };
+type LogoCloudProps = ComponentProps<"div"> & { logos: Logo[]; title?: string };
 
-export function LogoCloud({ className, logos, ...props }: LogoCloudProps) {
+export function LogoCloud({ className, logos, title, ...props }: LogoCloudProps) {
   return (
     <div {...props} className={cn("stack-logo-cloud", className)}>
       <div className="stack-logo-toolbar">
-        <h3>Languages, runtime, domains & delivery</h3>
+        <h3>{title}</h3>
       </div>
       <div className="stack-logo-mask overflow-hidden py-4">
         <InfiniteSlider gap={42} reverse speed={48} speedOnHover={14}>
-          {logos.map(({ src, alt, width = 28, height = 28, icon: Icon }) => (
+          {logos.map(({ src, alt, category, width = 28, height = 28, icon: Icon }) => (
             <div key={alt} className="stack-logo-item">
               {src ? (
                 <img src={src} alt="" width={width} height={height} loading="lazy" decoding="async" className="stack-brand-logo pointer-events-none select-none" />
               ) : Icon ? <Icon size={28} strokeWidth={1.5} aria-hidden="true" /> : null}
               <span className="stack-logo-copy">
-                <span className="stack-logo-name">{alt}</span>
+                <span className="stack-logo-name">{alt}</span><small>{category}</small>
               </span>
             </div>
           ))}
