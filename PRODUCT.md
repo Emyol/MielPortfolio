@@ -20,7 +20,7 @@ The interface itself is the artifact. Work (KitaKo, iCARE Reservation, BekiLang,
 
 ## Brand
 
-Voice: direct, specific, no terminal LARP. Name: Amiel Acuña. Location: Manila / remote. Site: miel.dev.
+Voice: direct, specific, no terminal LARP. Name: Amiel Acuña. Location: Manila / remote. Site: project-miel.vercel.app.
 
 ## Evidence
 

@@ -12,7 +12,7 @@ export default function Hero() {
             <span className="field-title-line field-title-introduction"><span className="field-title-word">I build software and enjoy working with people.</span></span>
           </h1>
           <p className="field-hero-summary" data-hero-item>
-            I like learning new tools, figuring out unfamiliar problems, and sharing what I learn.
+            I’m Amiel Josiah Acuña. I like learning new tools, figuring out unfamiliar problems, and sharing what I learn.
             Alongside coding, I’ve spent time tutoring students and helping organize campus events.
           </p>
           <div className="field-hero-actions" data-hero-item>

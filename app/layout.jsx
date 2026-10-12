@@ -15,25 +15,27 @@ const body = Public_Sans({
   display: 'swap',
 });
 
-const SITE_URL = 'https://miel.dev';
-const TITLE = 'Amiel Acuña — Software Engineer & Student Leader';
-const DESCRIPTION = 'Software Engineering student and certified project manager at FEU Tech. Rank 2 in Batch ’27, specializing in on-device edge AI, vector retrieval, and geospatial intelligence.';
+const SITE_URL = 'https://project-miel.vercel.app';
+const FULL_NAME = 'Amiel Josiah Acuña';
+const TITLE = `${FULL_NAME} | Software Engineer Portfolio`;
+const DESCRIPTION = 'Explore the software projects, experience, and leadership of Amiel Josiah Acuña (Amiel Josiah Acuna), a software engineering student at FEU Tech in Manila.';
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
   title: TITLE,
   description: DESCRIPTION,
-  keywords: ['Amiel Acuña', 'Software Engineer', 'Edge AI', 'Flutter', 'ONNX', 'Next.js', 'FEU Tech', 'Project Manager', 'Manila', 'Portfolio'],
-  authors: [{ name: 'Amiel Acuña' }],
-  creator: 'Amiel Acuña',
+  alternates: { canonical: '/' },
+  keywords: [FULL_NAME, 'Amiel Josiah Acuna', 'Amiel Acuña', 'Miel Acuña', 'Software Engineer', 'FEU Tech', 'Manila', 'Portfolio'],
+  authors: [{ name: FULL_NAME }],
+  creator: FULL_NAME,
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: SITE_URL,
     title: TITLE,
     description: DESCRIPTION,
-    siteName: 'Amiel Acuña',
-    images: [{ url: '/hero-profile.png', width: 1200, height: 1200, alt: 'Amiel Acuña' }],
+    siteName: FULL_NAME,
+    images: [{ url: '/hero-profile.png', width: 1200, height: 1200, alt: FULL_NAME }],
   },
   twitter: {
     card: 'summary_large_image',
@@ -55,7 +57,10 @@ export const viewport = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
-  name: 'Amiel Acuña',
+  name: FULL_NAME,
+  alternateName: ['Amiel Josiah Acuna', 'Amiel Acuña', 'Miel'],
+  image: `${SITE_URL}/hero-profile.png`,
+  description: DESCRIPTION,
   jobTitle: 'Software Engineer',
   url: SITE_URL,
   email: 'acunaamieljosiah@gmail.com',
