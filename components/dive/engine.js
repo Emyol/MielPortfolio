@@ -388,6 +388,12 @@ export function startDive(host, data) {
       const w = line.scrollWidth;
       if (w) f.style.fontSize = (100 * room / w * 0.995).toFixed(2) + 'px';
     });
+    // A section title on a glass panel shrinks only when it would run past the panel's edge.
+    $$('.pane .big').forEach((h) => {
+      h.style.fontSize = '';
+      const pane = h.closest('.pane'), cs = getComputedStyle(pane), room = pane.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), w = h.scrollWidth;
+      if (room > 0 && w > room) h.style.fontSize = (parseFloat(getComputedStyle(h).fontSize) * room / w * 0.98).toFixed(2) + 'px';
+    });
   }
   const DEPTH = 40, gauge = $('.gauge'), secs = ['work', 'experience', 'recognition', 'about', 'contact'].map((id) => document.getElementById(id)).filter(Boolean);
   function placeMarks() {
