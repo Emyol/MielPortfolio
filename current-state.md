@@ -4,7 +4,7 @@
 > Keep it **true and short**: rewrite stale sections instead of appending to them. History goes in the Session Log, not in the sections above it.
 
 **Last updated:** 2026-11-18 (UTC+8): by Claude Code (Opus 5.5)
-**Branch:** `feat/dive-redesign` (from `main` at `979710f`), nothing committed · **Last commit:** `979710f`
+**Branch:** `feat/dive-redesign` (from `main` at `979710f`), pushed to origin, no PR yet · **Last commit:** `2cbd7fe` docs: add project agent docs
 **Overall status:** 🟡 the Dive redesign is implemented on the branch and builds; not committed, not deployed; `tests/motion.spec.ts` still targets the old page and fails
 
 ---
@@ -104,6 +104,7 @@ One-page portfolio ("Surface") for Amiel Acuña, built as a Craft Showcase: a vi
 - 2026-11-18, later: glass extended to every text block and the certificate cards; image files published with the page. Playwright at 1360 and 390 px: no errors, no overflow. Same limits as above.
 - 2026-11-18, version 3: About left card recomposed (owner said it looked off): profile row with cropped portrait, name, school and Manila time; bio; hairline; motto; no stretched gaps. Playwright at 1360 and 390 px clean.
 - 2026-11-18, implementation: owner said "implement this". Built Dive in the app on branch `feat/dive-redesign` (see §4); build, typecheck, new frontend and admin tests pass; nothing committed. Opened no discussion thread; open questions are in §5 item 00.
+- 2026-11-18, later: committed 0d36651 (Dive), 102f066 (DESIGN.md, ADR-0003), 2cbd7fe (agent docs) and pushed `feat/dive-redesign`. Left uncommitted on purpose: the earlier motion edits, `tests/motion.spec.ts`, `docs/superpowers/`.
 - Left open: the owner's review of the plan and its decisions table; how to execute it.
 - Next session should: read the owner's pick, then design the full page in that language before writing the design doc.
 
