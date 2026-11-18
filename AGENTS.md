@@ -21,3 +21,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Project docs
+
+- `current-state.md`: read first every session; update after each unit of work and before ending.
+- `security.md`: apply Part B and the checklist to every change touching auth, data, input, deps, config, or deploys.
+- `agent-to-agent-discussion.md`: check for open threads at session start; open a thread for trade-off decisions, conflicts, handoffs, risky reviews, or unverified assumptions.
