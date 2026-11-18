@@ -1,187 +1,142 @@
 ---
-name: Miel — Silver Field
-description: Silver Field craft showcase for Amiel Acuña
+name: Miel — Dive
+description: One ocean of characters behind the page, scroll scenes and liquid-glass panels, for Amiel Acuña's portfolio
 colors:
-  field-bg: "#070707"
-  field-ink: "#ececec"
-  field-mute: "#9c9c9c"
-  field-line: "rgba(236, 236, 236, 0.14)"
-  field-plate: "#141414"
-  shadcn-bg: "oklch(0.12 0 0)"
-  shadcn-fg: "oklch(0.93 0 0)"
-  shadcn-card: "oklch(0.16 0 0)"
-  shadcn-muted-fg: "oklch(0.72 0 0)"
-  shadcn-border: "oklch(1 0 0 / 14%)"
-  shadcn-ring: "oklch(0.86 0 0)"
+  bg: "#070707"
+  ink: "#ececec"
+  mute: "#9d9d9d"
+  line: "rgba(236, 236, 236, 0.16)"
+  rule: "#474747"
+  surface: "#0e0e0e"
+  accent: "#2997ff"
+  case-bg: "#d9d9d5"
+  case-ink: "#0b0b0b"
+  case-accent: "#0058b8"
+  case-surface: "#e6e6e2"
+  case-mute: "#4f4f4a"
+  case-rule: "#8c8c88"
+  case-line: "rgba(11, 11, 11, 0.2)"
+  glass-label: "#a9a9a9"
+  glass-tint-top: "rgba(255, 255, 255, 0.075)"
+  glass-tint-bottom: "rgba(255, 255, 255, 0.025)"
+  glass-edge: "rgba(255, 255, 255, 0.05)"
+  glass-divider: "rgba(255, 255, 255, 0.06)"
+  glass-hairline: "rgba(255, 255, 255, 0.08)"
+  glass-glow: "rgba(255, 255, 255, 0.12)"
+  glass-inner-top: "rgba(255, 255, 255, 0.16)"
+  glass-rim-soft: "rgba(255, 255, 255, 0.36)"
+  glass-rim: "rgba(255, 255, 255, 0.7)"
+  glass-rim-clear: "rgba(255, 255, 255, 0)"
+  glass-fallback: "rgba(20, 20, 20, 0.82)"
+  glass-inset: "rgba(0, 0, 0, 0.35)"
+  profile-inset: "rgba(0, 0, 0, 0.28)"
+  shadow-deep: "rgba(0, 0, 0, 0.95)"
+  shadow-window: "rgba(0, 0, 0, 0.9)"
+  shadow-case: "rgba(0, 0, 0, 0.22)"
+  shadow-cert: "rgba(0, 0, 0, 0.18)"
+  clash: "#e5484d"
+  white: "#fff"
+  black: "#000"
 typography:
   display:
-    fontFamily: "Fraunces, ui-serif, serif"
-    fontSize: "clamp(2.8rem, 8vw, 5.6rem)"
-    fontWeight: 500
-    lineHeight: 0.92
-    letterSpacing: "-0.04em"
-    fontVariation: "\"SOFT\" 40, \"WONK\" 1, \"opsz\" 144"
-  headline:
-    fontFamily: "Fraunces, ui-serif, serif"
-    fontSize: "clamp(2.2rem, 5vw, 4rem)"
-    fontWeight: 500
-    lineHeight: 0.95
-    letterSpacing: "-0.04em"
-    fontVariation: "\"SOFT\" 35, \"WONK\" 1"
-  title:
-    fontFamily: "Fraunces, ui-serif, serif"
-    fontSize: "1.35rem"
-    fontWeight: 500
-    lineHeight: 1.15
-    letterSpacing: "-0.02em"
+    fontFamily: "Fraunces, Georgia, serif"
+    fontSize: "clamp(3rem, 7.5vw, 7.5rem)"
+    fontWeight: 800
+    lineHeight: 0.88
+    letterSpacing: "-0.045em"
+    fontVariation: "\"SOFT\" 0, \"WONK\" 1, \"opsz\" 144"
+  fitted:
+    fontFamily: "Fraunces, Georgia, serif"
+    fontSize: "fitted by script to the line width"
+    fontWeight: 800
+    lineHeight: 0.88
   body:
-    fontFamily: "Public Sans, ui-sans-serif, sans-serif"
-    fontSize: "1.05rem"
+    fontFamily: "Geist, system-ui, sans-serif"
+    fontSize: "1rem"
     fontWeight: 400
     lineHeight: 1.55
-    letterSpacing: "normal"
   label:
-    fontFamily: "Public Sans, ui-sans-serif, sans-serif"
-    fontSize: "0.82rem"
-    fontWeight: 400
-    lineHeight: 1.4
-    letterSpacing: "0.04em"
+    fontFamily: "Geist Mono, ui-monospace, monospace"
+    fontSize: "0.68rem"
+    fontWeight: 500
+    letterSpacing: "0.12em"
+    textTransform: uppercase
+  label-small:
+    fontFamily: "Geist Mono, ui-monospace, monospace"
+    fontSize: "0.6rem"
+  label-large:
+    fontFamily: "Geist Mono, ui-monospace, monospace"
+    fontSize: "0.75rem"
+  # The rest of the ramp, smallest to largest, as used in app/dive.css
+  small: { fontSize: "0.84rem" }
+  small-plus: { fontSize: "0.86rem" }
+  secondary: { fontSize: "0.88rem" }
+  secondary-plus: { fontSize: "0.9rem" }
+  caption: { fontSize: "0.92rem" }
+  compact: { fontSize: "0.95rem" }
+  base: { fontSize: "1rem" }
+  button-large: { fontSize: "1.02rem" }
+  lead: { fontSize: "1.1rem" }
+  cert-title: { fontSize: "1.2rem" }
+  verdict: { fontSize: "1.6rem" }
+  brand-mark: { fontSize: "1.7rem" }
+  bio: { fontSize: "clamp(1.15rem, 1.5vw, 1.35rem)" }
+  case-lede: { fontSize: "clamp(1.05rem, 1.6vw, 1.35rem)" }
+  work-header: { fontSize: "clamp(1.4rem, 2vw, 1.8rem)" }
+  piece-title: { fontSize: "clamp(1.4rem, 2.4vw, 2rem)" }
+  motto: { fontSize: "clamp(1.5rem, 2.3vw, 2.1rem)" }
+  discipline: { fontSize: "clamp(1.9rem, 3.4vw, 3.1rem)" }
+  project-phone: { fontSize: "clamp(2.6rem, 11vw, 4rem)" }
+  project: { fontSize: "clamp(2.6rem, 5.2vw, 5.4rem)" }
+  figure: { fontSize: "clamp(3rem, 6.4vw, 6rem)" }
+  case-title: { fontSize: "clamp(3rem, 10vw, 9rem)" }
 rounded:
-  hairline: "2px"
-  none: "0px"
+  pill: "999px"
+  glass: "30px"
+  card: "24px"
+  inset: "16px"
+  frame: "6px"
 spacing:
-  gutter: "clamp(1.25rem, 4vw, 4.5rem)"
-  section: "clamp(5.5rem, 12vw, 9rem)"
-  cluster: "1.5rem"
-  tight: "0.75rem"
-components:
-  button-primary:
-    backgroundColor: "{colors.field-ink}"
-    textColor: "{colors.field-bg}"
-    rounded: "{rounded.hairline}"
-    padding: "0 1.25rem"
-    height: "2.75rem"
-  button-primary-hover:
-    backgroundColor: "#d4d4d4"
-    textColor: "{colors.field-bg}"
-  button-outline:
-    backgroundColor: "transparent"
-    textColor: "{colors.field-ink}"
-    rounded: "{rounded.hairline}"
-    padding: "0 1.25rem"
-    height: "2.75rem"
-  button-ghost:
-    backgroundColor: "transparent"
-    textColor: "{colors.field-ink}"
-    rounded: "{rounded.hairline}"
-    padding: "0 1.25rem"
-    height: "2.75rem"
-  card-field:
-    backgroundColor: "{colors.shadcn-card}"
-    textColor: "{colors.field-ink}"
-    rounded: "{rounded.hairline}"
-    padding: "1.5rem"
+  gutter: "clamp(1.25rem, 5vw, 5rem)"
+  pane: "clamp(1.25rem, 2.6vw, 2.4rem)"
+  section: "18svh"
+  frame-margin: "clamp(5px, 0.55vw, 8px)"
+motion:
+  ease-out: "cubic-bezier(0.23, 1, 0.32, 1)"
+  press: "scale(0.97), 140ms ease-out"
 ---
 
-# Design System: Silver Field
+# Dive
+
+Approved by the owner on 2026-11-18 from the published prototype; see `docs/adr/0003-dive.md`. Source: `app/dive.css`, `components/dive/`.
 
 ## Overview
 
-**Creative North Star: "Silver Field"**
-
-The Surface is a dark-and-silver Craft Showcase anchored by a living ASCII portrait. Near-black ground, white and silver ink, Fraunces display with Public Sans body, and 2px metal corners. The ASCII portrait lives only in the first viewport (ADR-0002 supersedes ADR-0001?s Liquid requirement). After that, the page is typeset evidence: Work, leadership, CV, and a way to write.
-
-Operator Console is discarded, not kept as texture. No terminal chrome, box-drawing, prompt copy, ASCII rain, custom cursor, or spinning preloader. No second hue. No rainbow fluid. No whole-page shader. shadcn Button and Card may support individual controls or content only after they are restyled to Silver Field; they do not define the page composition.
-
-**Key Characteristics:**
-- One material (ASCII portrait) in the first viewport; one type voice (Fraunces + Public Sans) everywhere else
-- Monochrome silver on near-black; hairline 2px corners
-- Pin-and-typeset section titles; Work stays ordinary vertical scroll
-- Field Components are metal plates, not Nova cards
+The page is one dive from the surface to the floor. A single fixed canvas of characters (`.:-=+*#%@`) sits behind everything and drifts with scroll; specks rise past the reader; a whale shark, drawn from the same characters, swims the whole page and darts from a click. A thin ink frame and a depth gauge on the right edge (40 m) hold the page. Each section is a scene rather than a box: the headline is written in the water and breaks into bubbles, the work stage is pinned while projects change, the timeline draws itself, certificates slide past sideways.
 
 ## Colors
 
-Silver Field is a two-ink system. Ground is near-black. Everything a visitor reads or stirs is white or silver. shadcn tokens map onto the same grayscale; they must not introduce a second hue.
-
-### Primary
-- **Field Ink** (`#ececec`): Display type, primary buttons, portrait glyphs, focus rings, scroll progress.
-- **Field Ground** (`#070707`): Page, nav, overlay, and portrait container.
-
-### Neutral
-- **Field Mute** (`#9c9c9c`): Body supporting copy, labels, years, secondary nav.
-- **Field Line** (`rgba(236, 236, 236, 0.14)`): Hairline rules, outlines, command chrome.
-- **Field Plate** (`#141414`): Quiet lift behind the portrait and shadcn cards (`oklch(0.16 0 0)`).
+Near-black ground, off-white ink, one grey for secondary text. The water is ink at 0.34 alpha; the headline and shark are full ink; ripple crests are the blue accent. Case pages flip to the silver side (`case-*`).
 
 ## Typography
 
-Two loaded faces. Fraunces is Signature Type for display, brand, pin titles, and card titles. Public Sans is body, UI, and measures. Do not substitute Inter, Space Grotesk, IBM Plex, Geist, or a system display face.
+Fraunces 800 at poster scale for section titles and fitted lines; Geist for reading; Geist Mono for every small label, date and stack line. Titles rise word by word; fitted lines fill their width exactly.
 
-Tracking floor is `-0.04em`. Display never exceeds `5.6rem`. Body measure stays near `42–52ch` for ledes.
+## Liquid glass
 
-## Layout
-
-Max width `1280px` with fluid gutters. Desktop hero is an asymmetric first viewport: typeset bottom-left, ASCII portrait right. Discipline and Leadership use a sticky title and reading column. Credentials opens into a full-width typographic masthead, with awards in a narrow rail beside the certificate gallery. Work has its own full-width masthead and an expansive four-link gallery; hover or focus expands a card, and activation opens its repository. Contact closes as an open editorial composition rather than a boxed card. Below `860px`, nav links hide (Find remains), titles go static, and the gallery stacks vertically; the hero layers its copy over the portrait so both remain in the first viewport.
-
-## Elevation & Depth
-
-The world is tonal, not shadowed. Separation comes from hairline borders, a slightly lifted plate, and the portrait. Do not add drop shadows, glass blur as decoration, or hard offset blocks.
+Every block of text sits on a glass panel instead of cutting a hole in the water. The canvas does the lensing: under each `[data-glass]` rect it samples the water through a convex-squircle bezel with Snell refraction at n = 1.5 (after kube.io's web recreation of Apple's Liquid Glass), bright and bent at the edge, frosted and dim in the middle. CSS adds a 1.4px blur, a white tint and a specular rim (`--spec`) that turns toward the pointer. Apple's guidance reserves the material for controls; using it on content panels is the owner's choice.
 
 ## Shapes
 
-Every interactive corner is `2px`. No pills. No circles standing in for photographs. The portrait is a rectangular metal plate with a grayscale cut-out, not an organic mask.
+Pills for buttons and chips; 30px glass panels; 24px certificate cards with a 16px inset; 6px window frames around screenshots.
 
-## Components
+## Motion
 
-### Buttons
-- **Shape:** 2px corners; height 44px default, 36px small.
-- **Primary:** Field ink fill, ground text.
-- **Outline:** Transparent fill, hairline border; inverts to ink fill on hover.
-- **Ghost:** Text only; 8% ink wash on hover.
-- **Focus:** 2px field-ink ring, 3px offset.
-
-### Cards / Containers
-- **Corner Style:** 2px
-- **Background:** Plate (`oklch(0.16 0 0)`)
-- **Border:** Field line
-- **Use:** Structured details that need a contained surface, such as the Discipline practice cards; the Contact composition stays open.
-- **Mobile reading:** Below 860px, all eight Discipline practices become a static list with hairline separators. Work shows each image, description, and repository link in full; it never requires hover to read. Certificate captions sit below the image on a quiet plate.
-
-### Navigation
-- Fixed top bar. Brand “Miel” in Fraunces. Links mute until active. On scroll, a 88% ground wash and hairline. Mobile: brand + Find.
-
-### Command palette
-- Find / Ctrl K. Near-black dialog, hairline border, 2px corners. Destinations, not terminal commands.
-
-### Signature: ASCII portrait
-- The existing canvas portrait is the sole hero effect. Ambient glyph movement works without hover; desktop pointers reveal the photograph locally.
-- Pause offscreen and in background tabs. Reduced motion renders a static frame and responds to changes while the page is open.
-- Keep the portrait's assets, framing, inputs, and monochrome ink. Do not add Liquid or terminal decoration.
-
-### Motion
-- GSAP owns hero and section entrances; Framer Motion owns certificate dialog state transitions; CSS owns Work gallery expansion and control feedback. Find opens immediately. Never share transform ownership on an element.
-- Feedback: 180ms. State: 300ms. Desktop entrance: 750ms; mobile entrance: 400ms, once only. Use decelerating easing without bounce.
-- Coordinate portrait opacity, headline typesetting, and actions. Discipline and Leadership titles remain sticky on desktop; full-width mastheads use the same typeset reveal. All titles go static below 860px. Metrics count once as the measures enter view.
-- Section reading content stays visible and stationary; only the titles typeset on entry. Keep the existing once-only Leadership timeline entrances. Work images and social feedback stay monochrome in every state.
-- Work reveals a card on hover or keyboard focus; every project is a direct repository link. The gallery has no filters or delayed navigation.
-- Leadership is an always-visible timeline grouped by the year roles began (2023, 2024, 2025). Full role dates communicate overlapping responsibilities. Each year enters once with opacity and 12px movement over 600ms on desktop, or 8px over 400ms on mobile; the rail stays static. Reduced motion reveals final content immediately.
-- Credentials retain manual swipe/button navigation. Each card shows its name and issuer; click or keyboard activation morphs it into a larger card with details. Escape, backdrop, and Close dismiss it and restore focus. No autoplay.
-- Find opens immediately from its keyboard shortcut. Focus remains in the search combobox, arrow keys select destinations, and dismissal returns focus to Find; activation is immediate.
-- Live reduced motion shows final content, stops decorative movement, and uses immediate scrolling. Default content stays visible before animation setup.
+Strong ease-out for entrances; press feedback `scale(0.97)`; hover effects only under `(hover: hover) and (pointer: fine)`. Reduced motion stops the canvas, shows every scene finished, and turns the certificate strip into a scrollable row.
 
 ## Do's and Don'ts
 
-### Do:
-- **Do** keep the ASCII portrait in the first viewport only, in silver, with ambient motion when permitted.
-- **Do** set section titles in Fraunces and body in Public Sans.
-- **Do** restyle shadcn Button/Card to Silver Field before using them in the portfolio.
-- **Do** honor `prefers-reduced-motion`: a static portrait and final section content.
-
-### Don't:
-- **Don't** reintroduce Operator Console chrome, ASCII rain, box-drawing, or `>` prompt copy.
-- **Don't** add a second hue, a second simulator, or shader effects on Work images.
-- **Don't** use kickers, section numbers as decoration, or dashboard-tile metrics as the hero template.
-- **Don't** add Skiper UI, 21st.dev, or a third motion library as a visual identity.
-
-## Voice
-
-The hero introduces Miel personally, with curiosity, adaptability, and working with people in plain language. Discipline supports that introduction through learning and practical software work. Leadership names real roles and contributions without inflating them into broad claims; organization-wide contributions are distinguished from individual role achievements.
+- Do attach each skill to the project that proves it (About index); don't list chips without evidence.
+- Do keep one sentence per project on the home page; detail belongs on the case page.
+- Don't cut rectangles out of the water; put text on glass.
+- Don't animate keyboard-driven actions; arrow keys step case pages instantly apart from a short cross-fade.
