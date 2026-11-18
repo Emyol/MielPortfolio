@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "design-system-font-size",
+        "value": "100px",
+        "createdAt": "2026-11-18T05:08:15.693Z",
+        "reason": "Claude: 100px is a measuring baseline in fitAll (engine.js) that is immediately replaced by the fitted size, not a rendered type step"
+      }
+    ]
+  }
+}

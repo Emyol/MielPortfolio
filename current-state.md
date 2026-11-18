@@ -4,8 +4,8 @@
 > Keep it **true and short**: rewrite stale sections instead of appending to them. History goes in the Session Log, not in the sections above it.
 
 **Last updated:** 2026-11-18 (UTC+8): by Claude Code (Opus 5.5)
-**Branch:** `feat/dive-redesign` (from `main` at `979710f`), pushed to origin, no PR yet · **Last commit:** `2cbd7fe` docs: add project agent docs
-**Overall status:** 🟡 the Dive redesign is implemented on the branch and builds; not committed, not deployed; `tests/motion.spec.ts` still targets the old page and fails
+**Branch:** `main` (fast-forwarded to the Dive work and pushed 2026-11-18; `feat/dive-redesign` points at the same commit) · **Last commit:** `8556d4e`
+**Overall status:** 🟡 Dive is on `main` and pushed; whether Vercel deployed it was not checked; `tests/motion.spec.ts` still targets the old page and fails
 
 ---
 
@@ -105,6 +105,8 @@ One-page portfolio ("Surface") for Amiel Acuña, built as a Craft Showcase: a vi
 - 2026-11-18, version 3: About left card recomposed (owner said it looked off): profile row with cropped portrait, name, school and Manila time; bio; hairline; motto; no stretched gaps. Playwright at 1360 and 390 px clean.
 - 2026-11-18, implementation: owner said "implement this". Built Dive in the app on branch `feat/dive-redesign` (see §4); build, typecheck, new frontend and admin tests pass; nothing committed. Opened no discussion thread; open questions are in §5 item 00.
 - 2026-11-18, later: committed 0d36651 (Dive), 102f066 (DESIGN.md, ADR-0003), 2cbd7fe (agent docs) and pushed `feat/dive-redesign`. Left uncommitted on purpose: the earlier motion edits, `tests/motion.spec.ts`, `docs/superpowers/`.
+- 2026-11-18, latest: owner said "commit to main". Fast-forwarded `main` from 979710f to 8556d4e and pushed. The motion edits and `docs/superpowers/` remain uncommitted.
+- 2026-11-18, after the push: replaced the four screenshots in `public/projects/` with fresh 1600×900 captures of the live sites (kitako-stochastic4.vercel.app, icare-reservation.vercel.app/availability, beki-lang.vercel.app, stochastics-city-sense.netlify.app); the CitySense map shows "API key required" watermarks from its CARTO basemap on the live site itself. Section titles on glass panels now shrink only when they would overflow (`fitAll` in engine.js), fixing "Experience" running past its panel; checked at 390 to 1920 px. Frontend and admin tests pass (11). Not committed.
 - Left open: the owner's review of the plan and its decisions table; how to execute it.
 - Next session should: read the owner's pick, then design the full page in that language before writing the design doc.
 
