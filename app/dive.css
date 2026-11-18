@@ -1,0 +1,368 @@
+/* Dive: one ocean behind the page, scroll scenes and liquid glass. Scoped under .dive so /admin is untouched.
+   Ported from the approved prototype (current-state.md §5). */
+
+/* One ocean behind the whole page. The headline is written in it, the whale shark swims through it, and every section is a scene you scroll through rather than a box you read. */
+.dive {
+  color-scheme: dark;
+  --bg: #070707; --ink: #ececec; --mute: #9d9d9d; --line: rgba(236, 236, 236, 0.16); --rule: #474747; --surface: #0e0e0e; --accent: #2997ff; --on-accent: #070707;
+  --display: var(--font-display-loaded), "Iowan Old Style", Georgia, serif;
+  --display-weight: 800; --display-case: none; --display-track: -0.045em; --display-var: "SOFT" 0, "WONK" 1, "opsz" 144;
+  --sans: var(--font-geist), "Helvetica Neue", "Segoe UI", system-ui, sans-serif;
+  --mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --body: var(--sans); --label: var(--mono);
+  --radius: 4px;
+  --m: clamp(5px, 0.55vw, 8px);
+  --hd: 4rem;
+  --gx: clamp(1.25rem, 5vw, 5rem);
+  --ease: cubic-bezier(0.23, 1, 0.32, 1);
+}
+.dive .side-b { --bg: #d9d9d5; --ink: #0b0b0b; --mute: #4f4f4a; --surface: #e6e6e2; --line: rgba(11, 11, 11, 0.2); --rule: #8c8c88; --accent: #0058b8; --on-accent: #fff; background: var(--bg); color: var(--ink); }
+
+.dive *, .dive *::before, .dive *::after { box-sizing: border-box; }
+html.dive-page { background: #070707; scroll-behavior: smooth; }
+.dive { min-height: 100vh; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 1rem; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+.dive .skip-link { position: fixed; left: 1rem; top: 1rem; z-index: 100; padding: 0.6rem 1rem; border-radius: 999px; background: var(--ink); color: var(--bg); transform: translateY(-200%); }
+.dive .skip-link:focus { transform: none; }
+html.dive-locked { overflow: hidden; }
+html.dive-page body { margin: 0; overflow-x: clip; background: #070707; }
+.dive h1, .dive h2, .dive h3, .dive h4, .dive p, .dive ul, .dive ol, .dive dl, .dive dd, .dive figure, .dive blockquote { margin: 0; }
+.dive ul, .dive ol { padding: 0; list-style: none; }
+.dive a { color: inherit; }
+.dive button { font: inherit; color: inherit; }
+.dive img { display: block; max-width: 100%; }
+.dive :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.dive .shell { padding-left: max(16px, var(--gx), env(safe-area-inset-left, 0px)); padding-right: max(16px, var(--gx), env(safe-area-inset-right, 0px)); }
+.dive .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.dive .label { font-family: var(--label); font-size: 0.68rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; }
+.dive .display, .dive .big { font-family: var(--display); font-weight: var(--display-weight); font-variation-settings: var(--display-var); letter-spacing: var(--display-track); }
+.dive .big { font-size: clamp(3rem, 7.5vw, 7.5rem); line-height: 0.88; }
+.dive .mute { color: var(--mute); }
+.dive .seg { display: flex; gap: 0.3rem; }
+.dive .note { color: var(--mute); font-size: 0.84rem; }
+.dive .panel { display: grid; gap: 0.8rem; padding: clamp(0.8rem, 2vw, 1.25rem); }
+
+/* Buttons: pills that answer on press */
+.dive .chip { display: inline-flex; align-items: center; gap: 0.45rem; min-height: 2.4rem; padding: 0 1.1rem; border: 1px solid var(--line); border-radius: 980px; background: transparent; font-family: var(--body); font-size: 0.86rem; font-weight: 500; white-space: nowrap; text-decoration: none; cursor: pointer; transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease, filter 160ms ease, transform 140ms ease-out; }
+.dive .chip svg { width: 0.95rem; height: 0.95rem; }
+.dive .chip:active { transform: scale(0.97); }
+.dive .chip:disabled { opacity: 0.4; cursor: default; }
+.dive .chip[aria-pressed="true"], .dive .chip.fill { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+.dive .btn-lg { min-height: 3rem; padding: 0 1.6rem; font-size: 1.02rem; }
+.dive .link { display: inline-flex; align-items: center; gap: 0.3rem; min-height: 3rem; font-size: 1.02rem; font-weight: 500; text-decoration: none; }
+.dive .link::after { content: "›"; font-size: 1.25em; line-height: 1; transition: transform 200ms var(--ease); }
+@media (hover: hover) and (pointer: fine) {
+  .dive .chip:hover { border-color: var(--ink); }
+  .dive .chip.fill:hover { filter: brightness(0.86); }
+  .dive .link:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .dive .link:hover::after { transform: translateX(3px); }
+}
+
+/* ---------- The ocean and the frame ---------- */
+.dive #ocean { position: fixed; top: 0; left: 0; z-index: 0; width: 100vw; height: 100lvh; pointer-events: none; }
+.dive .edge { position: fixed; inset: 0; z-index: 60; border: var(--m) solid var(--ink); pointer-events: none; }
+.dive .page { position: relative; z-index: 1; }
+.dive .hd { position: fixed; top: var(--m); left: var(--m); right: var(--m); z-index: 50; display: flex; align-items: center; justify-content: space-between; gap: 1rem; height: var(--hd); padding: 0 calc(var(--gx) - var(--m)); background: linear-gradient(var(--bg) 35%, transparent); }
+.dive .brand { display: inline-flex; align-items: center; gap: 0.8rem; font-weight: 600; letter-spacing: -0.01em; text-decoration: none; white-space: nowrap; }
+.dive .brand i { font-family: var(--display); font-size: 1.7rem; font-style: normal; font-weight: var(--display-weight); font-variation-settings: var(--display-var); line-height: 1; }
+.dive .hd nav { display: flex; align-items: center; gap: 1.6rem; padding: 0.3rem 0.3rem 0.3rem 1.5rem; border-radius: 999px; }
+.dive .hd nav a { color: var(--mute); font-family: var(--label); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; text-decoration: none; transition: color 160ms ease; }
+.dive .hd nav a[aria-current="true"] { color: var(--ink); }
+@media (hover: hover) and (pointer: fine) { .dive .hd nav a:hover { color: var(--ink); } }
+
+/* Depth gauge on the right edge */
+.dive .gauge { display: none; }
+@media (min-width: 961px) {
+  .dive .page, .dive .hd { margin-right: 3rem; }
+  .dive .hd { right: calc(var(--m) + 3rem); margin-right: 0; }
+  .dive .gauge { position: fixed; top: var(--m); right: var(--m); bottom: var(--m); z-index: 55; display: block; width: 3rem; border-left: 1px solid var(--rule); background: var(--bg); color: var(--mute); font-family: var(--mono); }
+  .dive .gauge::before { content: ""; position: absolute; inset: 0.6rem 0 0.6rem auto; width: 0.6rem; background: repeating-linear-gradient(to bottom, var(--rule) 0 1px, transparent 1px 1.25%); }
+  .dive .gauge a { position: absolute; right: 0.95rem; transform: translateY(-50%); font-size: 0.6rem; letter-spacing: 0.08em; text-decoration: none; writing-mode: vertical-rl; transition: color 160ms ease; }
+  .dive .gauge a[aria-current="true"] { color: var(--ink); }
+  .dive .gauge-now { position: absolute; top: 0; right: 0; left: -1px; height: 0; border-top: 1px solid var(--accent); will-change: transform; }
+  .dive .gauge-now span { position: absolute; top: 0; right: 0; left: 0; z-index: 1; padding: 0.3rem 0 0.35rem; border-bottom: 1px solid var(--rule); background: var(--bg); color: var(--ink); font-size: 0.6rem; text-align: center; font-variant-numeric: tabular-nums; white-space: nowrap; }
+}
+
+/* ---------- Things that arrive as you scroll ---------- */
+html.dive-js .dive .rv { opacity: 0; transform: translateY(1.6rem); }
+html.dive-js .dive .rv.in { opacity: 1; transform: none; transition: opacity 700ms var(--ease) calc(var(--i, 0) * 70ms), transform 900ms var(--ease) calc(var(--i, 0) * 70ms); }
+.dive .split .w { display: inline-block; overflow: hidden; padding-bottom: 0.14em; margin-bottom: -0.14em; vertical-align: top; }
+html.dive-js .dive .split .w > span { display: inline-block; transform: translateY(108%); }
+html.dive-js .dive .split.in .w > span { transform: none; transition: transform 1000ms var(--ease) calc(var(--i, 0) * 70ms); }
+
+/* ---------- Scene 1: the headline in the water ---------- */
+.dive .hero { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; min-height: 100svh; padding: calc(var(--hd) + var(--m) + 1rem) var(--gx) clamp(1.5rem, 4svh, 3rem); }
+.dive .hero-water { min-height: 16rem; }
+.dive .fit { display: block; padding-bottom: 0.27em; font-family: var(--display); font-size: 9vw; font-weight: var(--display-weight); font-variation-settings: var(--display-var); line-height: 0.88; letter-spacing: var(--display-track); white-space: nowrap; }
+.dive .fit > span { display: inline-block; }
+.dive .say { display: block; overflow: hidden; }
+.dive .hero h1 { font-size: 1rem; font-weight: inherit; color: var(--mute); }
+html.dive-js .dive .hero .fit > span { transform: translateY(110%); }
+html.dive-js .dive .hero.in .fit > span { transform: none; transition: transform 1200ms var(--ease) 900ms; }
+.dive .hero-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem 2rem; margin-top: 1.4rem; }
+.dive .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 1.4rem; }
+.dive .cue { display: inline-flex; align-items: center; gap: 0.8rem; color: var(--mute); font-family: var(--label); font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; }
+.dive .cue i { position: relative; width: 1px; height: 2.6rem; overflow: hidden; background: var(--line); }
+.dive .cue i::after { content: ""; position: absolute; left: 0; top: -40%; width: 1px; height: 40%; background: var(--ink); animation: drop 1.8s cubic-bezier(0.77, 0, 0.175, 1) infinite; }
+@keyframes drop { to { transform: translateY(350%); } }
+
+/* ---------- Figures that count up ---------- */
+.dive .figs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2rem; margin: 14svh var(--gx) 16svh; }
+.dive .figs li { display: grid; gap: 0.6rem; align-content: start; }
+.dive .figs b { font-family: var(--display); font-size: clamp(3rem, 6.4vw, 6rem); font-weight: var(--display-weight); font-variation-settings: var(--display-var); line-height: 0.85; letter-spacing: var(--display-track); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.dive .figs li > span { color: var(--mute); font-size: 0.88rem; }
+
+/* ---------- Scene 2: the work, one screen that changes as you scroll ---------- */
+.dive .work { position: relative; height: calc(100svh * 4.6); }
+.dive .w-stage { position: sticky; top: 0; display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.3fr); grid-template-rows: auto minmax(0, 1fr); gap: 1.5rem clamp(2rem, 4vw, 4.5rem); height: 100svh; padding: calc(var(--hd) + var(--m) + 1.2rem) var(--gx) clamp(1.5rem, 5svh, 3.5rem); }
+.dive .w-top { grid-column: 1 / -1; padding: 0.7rem 0.8rem 0.7rem 1.4rem; border-radius: 999px; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.dive .w-top h2 { font-size: clamp(1.4rem, 2vw, 1.8rem); line-height: 1; }
+.dive .w-ticks { display: flex; align-items: center; gap: 0.4rem; color: var(--mute); }
+.dive .w-ticks i { width: 2.2rem; height: 2px; background: var(--line); transition: background-color 300ms ease; }
+.dive .w-ticks i.on { background: var(--ink); }
+.dive .w-ticks span { min-width: 4.5ch; margin-left: 0.6rem; font-variant-numeric: tabular-nums; }
+.dive .w-items { display: grid; align-self: center; padding: clamp(1.4rem, 2.6vw, 2.4rem); }
+.dive .w-item { grid-area: 1 / 1; display: grid; gap: 1rem; align-content: center; opacity: 0; transform: translateY(2.5rem); visibility: hidden; transition: opacity 260ms ease, transform 500ms var(--ease), visibility 0s 500ms; }
+.dive .w-item.past { transform: translateY(-2.5rem); }
+.dive .w-item.on { opacity: 1; transform: none; visibility: visible; transition: opacity 500ms ease 120ms, transform 800ms var(--ease) 80ms, visibility 0s; }
+.dive .w-item .label { color: var(--mute); }
+.dive .w-item h3 { font-family: var(--display); font-size: clamp(2.6rem, 5.2vw, 5.4rem); font-weight: var(--display-weight); font-variation-settings: var(--display-var); line-height: 0.86; letter-spacing: var(--display-track); }
+.dive .w-item p { max-width: 34ch; color: var(--mute); font-size: 1.02rem; }
+.dive .tags { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.dive .tags span { padding: 0.15rem 0.55rem; border: 1px solid var(--line); border-radius: 999px; color: var(--mute); font-family: var(--mono); font-size: 0.68rem; }
+.dive .w-screen { align-self: center; width: 100%; min-width: 0; padding: 0; border: 0; background: none; text-align: left; cursor: pointer; }
+.dive .win { display: grid; grid-template-rows: auto minmax(0, 1fr); min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); box-shadow: 0 30px 70px -30px rgba(0, 0, 0, 0.9); }
+.dive .win-bar { display: grid; grid-template-columns: 3rem minmax(0, 1fr) 3rem; align-items: center; min-height: 1.9rem; padding: 0 0.7rem; border-bottom: 1px solid var(--line); color: var(--mute); font-family: var(--mono); font-size: 0.68rem; }
+.dive .win-bar i { display: flex; gap: 0.3rem; }
+.dive .win-bar i::before, .dive .win-bar i::after, .dive .win-bar i b { content: ""; width: 0.5rem; height: 0.5rem; border: 1px solid var(--mute); border-radius: 50%; opacity: 0.7; }
+.dive .win-bar span { overflow: hidden; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+.dive .win-bar em { justify-self: end; font-style: normal; white-space: nowrap; }
+.dive .win > img { align-self: start; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; object-position: 50% 0; }
+.dive .w-shots { position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; }
+.dive .w-shots img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; }
+.dive .w-shots canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.dive .w-screen .win { transition: transform 500ms var(--ease); }
+@media (hover: hover) and (pointer: fine) { .dive .w-screen:hover .win { transform: translateY(-4px); } }
+
+/* ---------- Scene 3: experience, a line that draws itself ---------- */
+.dive .xp { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 2rem clamp(2rem, 5vw, 5rem); padding: 18svh var(--gx); }
+.dive .xp-h { position: sticky; top: calc(var(--hd) + 3rem); align-self: start; }
+.dive .tl { position: relative; padding: 1.2rem clamp(1.2rem, 2.4vw, 2.2rem) 1.2rem 4.2rem; }
+.dive .tl::before, .dive .tl-line { content: ""; position: absolute; top: 2.6rem; bottom: 2.6rem; left: 2.3rem; width: 1px; background: var(--line); }
+.dive .tl-line { background: var(--ink); transform: scaleY(0); transform-origin: top; will-change: transform; }
+.dive .tl li { position: relative; display: grid; grid-template-columns: 9rem minmax(0, 1fr); gap: 0.2rem 1.5rem; padding: 1.15rem 0; }
+.dive .tl li::before { content: ""; position: absolute; top: 1.5rem; left: -2.2rem; width: 0.62rem; height: 0.62rem; border: 1px solid var(--ink); border-radius: 50%; background: var(--bg); }
+.dive .when { padding-top: 0.25rem; color: var(--mute); font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
+.dive .tl b { display: block; font-size: 1.1rem; font-weight: 600; letter-spacing: -0.01em; }
+.dive .tl .org { color: var(--mute); }
+.dive .tl li + li { border-top: 1px solid rgba(255, 255, 255, 0.06); }
+
+/* ---------- Scene 4: recognition, a strip that slides past ---------- */
+.dive .rec { position: relative; height: 280svh; }
+.dive .rec-stage { position: sticky; top: 0; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 2rem; height: 100svh; padding: calc(var(--hd) + var(--m) + 2rem) 0 clamp(2rem, 6svh, 4rem); overflow: hidden; }
+.dive .rec-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1.5rem 3rem; margin-inline: var(--gx); }
+.dive .awards { display: grid; gap: 0.35rem; }
+.dive .awards li { display: flex; gap: 1rem; font-size: 0.95rem; }
+.dive .awards .when { min-width: 3rem; }
+.dive .strip { display: flex; align-items: center; gap: clamp(1rem, 2vw, 1.75rem); width: max-content; padding-inline: var(--gx); will-change: transform; }
+.dive .cert { display: grid; flex: none; width: clamp(15rem, 26vw, 23rem); padding: 0; border: 0; border-radius: 24px; color: var(--ink); text-align: left; cursor: pointer; transform: rotate(var(--r, 0deg)); transition: transform 400ms var(--ease), border-color 200ms ease; }
+.dive .cert:nth-child(odd) { --r: -1.6deg; }
+.dive .cert:nth-child(even) { --r: 1.2deg; margin-top: 3rem; }
+.dive .cert-img { display: block; aspect-ratio: 4 / 3; margin: 0.7rem 0.7rem 0; padding: 0.8rem; border-radius: 16px; background: rgba(0, 0, 0, 0.35); }
+.dive .cert-img img { width: 100%; height: 100%; object-fit: contain; filter: grayscale(1); transition: filter 300ms ease; }
+.dive .cert-meta { display: grid; gap: 0.3rem; padding: 0.8rem 1rem 1rem; }
+.dive .cert-meta .label { color: var(--mute); font-size: 0.6rem; }
+.dive .cert-meta b { font-family: var(--display); font-size: 1.2rem; font-weight: var(--display-weight); font-variation-settings: var(--display-var); line-height: 1.02; letter-spacing: var(--display-track); }
+.dive .cert:active { transform: rotate(var(--r, 0deg)) scale(0.98); }
+@media (hover: hover) and (pointer: fine) {
+  .dive .cert:hover { transform: rotate(0deg) translateY(-6px); }
+  .dive .cert:hover .cert-img img { filter: none; }
+}
+
+/* ---------- Scene 5: about. One sentence, then an index where each discipline points at the work that proves it ---------- */
+.dive .about { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 3rem clamp(2rem, 5vw, 5rem); align-items: start; padding: 18svh var(--gx); }
+.dive .about-l { position: sticky; top: calc(var(--hd) + 3rem); display: grid; align-content: start; gap: 1.8rem; }
+.dive .who { display: grid; grid-template-columns: 6.25rem minmax(0, 1fr); align-items: center; gap: 1.2rem; padding: 0.7rem; border-radius: 22px; background: rgba(0, 0, 0, 0.28); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06); }
+.dive .who-ph { display: block; aspect-ratio: 4 / 5; overflow: hidden; border-radius: 15px; }
+.dive .who img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; transform: scale(1.45); transform-origin: 50% 12%; border-radius: 15px; filter: grayscale(1) contrast(1.05); }
+.dive .who figcaption { display: grid; gap: 0.15rem; color: var(--mute); font-size: 0.88rem; line-height: 1.4; }
+.dive .who figcaption b { color: var(--ink); font-size: 1.02rem; font-weight: 600; letter-spacing: -0.01em; }
+.dive .who figcaption .when { padding-top: 0.2rem; font-size: 0.68rem; }
+.dive .bio { max-width: 34ch; font-size: clamp(1.15rem, 1.5vw, 1.35rem); line-height: 1.4; }
+.dive .motto { padding-top: 1.6rem; border-top: 1px solid rgba(255, 255, 255, 0.08); font-family: var(--display); font-size: clamp(1.5rem, 2.3vw, 2.1rem); font-weight: var(--display-weight); font-variation-settings: var(--display-var); line-height: 1; letter-spacing: var(--display-track); }
+.dive .motto span { display: block; }
+.dive .about-r { display: grid; gap: 1.2rem; }
+.dive .idx-h { color: var(--mute); }
+.dive .idx { border-top: 1px solid var(--line); counter-reset: d; }
+.dive .idx li { position: relative; display: grid; grid-template-columns: 2.6rem minmax(0, 1fr) auto; gap: 0.35rem 1rem; align-items: baseline; padding: 1.5rem 0 1.4rem; border-bottom: 1px solid var(--line); counter-increment: d; }
+.dive .idx li::before { content: counter(d, decimal-leading-zero); color: var(--mute); font-family: var(--mono); font-size: 0.68rem; }
+.dive .idx li::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: var(--ink); transform: scaleX(0); transform-origin: left; transition: transform 500ms var(--ease); }
+.dive .idx h3 { font-family: var(--display); font-size: clamp(1.9rem, 3.4vw, 3.1rem); font-weight: var(--display-weight); font-variation-settings: var(--display-var); line-height: 0.95; letter-spacing: var(--display-track); transition: transform 500ms var(--ease); }
+.dive .idx p { grid-column: 2; max-width: 40ch; color: var(--mute); }
+.dive .idx .stack { grid-column: 2; max-width: none; color: var(--mute); font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.04em; }
+.dive .idx .proof { grid-column: 3; grid-row: 1; justify-self: end; }
+.dive .idx .proof span { color: var(--mute); font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase; }
+.dive .also { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0.5rem 1rem; padding-top: 0.6rem; font-size: 0.92rem; }
+.dive .also dt { color: var(--mute); font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase; padding-top: 0.2rem; }
+@media (hover: hover) and (pointer: fine) {
+  .dive .idx li:hover::after, .dive .idx li:focus-within::after { transform: scaleX(1); }
+  .dive .idx li:hover h3 { transform: translateX(0.5rem); }
+}
+
+/* ---------- Liquid glass (after Apple's Liquid Glass and kube.io's web recreation) ----------
+   The ocean canvas does the lensing: inside each [data-glass] rect it samples the water through a
+   convex-squircle bezel using Snell's law, n = 1.5. CSS adds the frost, the tint and the specular rim. */
+.dive .glass { position: relative; isolation: isolate; border-radius: 30px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.025)); -webkit-backdrop-filter: blur(1.4px) saturate(1.6) brightness(0.86); backdrop-filter: blur(1.4px) saturate(1.6) brightness(0.86); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 -18px 30px -24px rgba(255, 255, 255, 0.12), 0 30px 70px -30px rgba(0, 0, 0, 0.95); }
+.dive .glass::before { content: ""; position: absolute; inset: 0; z-index: -1; padding: 1.2px; border-radius: inherit; background: linear-gradient(var(--spec, 150deg), rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.08) 26%, rgba(255, 255, 255, 0) 50%, rgba(255, 255, 255, 0.06) 74%, rgba(255, 255, 255, 0.36)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0); pointer-events: none; }
+.dive .pane { padding: clamp(1.25rem, 2.6vw, 2.4rem); }
+.dive .glass .label, .dive .glass .when, .dive .glass .mute { color: #a9a9a9; }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .dive .glass { background: rgba(20, 20, 20, 0.82); } }
+
+/* ---------- Scene 6: contact ---------- */
+.dive .contact { display: grid; grid-template-columns: minmax(0, 1fr); align-content: end; min-height: 100svh; padding: 20svh var(--gx) 5rem; }
+.dive .contact-card { display: grid; gap: 2rem; }
+.dive .contact .say { color: var(--ink); }
+.dive .contact .say + .say { color: var(--mute); }
+.dive .contact-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.2rem 2rem; }
+.dive .contact-row p { max-width: 40ch; color: var(--mute); }
+.dive .foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.6rem 1.5rem; padding-top: 1.4rem; border-top: 1px solid rgba(255, 255, 255, 0.08); color: var(--mute); font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.dive .foot a { text-underline-offset: 4px; }
+
+
+/* ---------- Full page for one item: the silver side ---------- */
+.dive dialog { color: var(--ink); }
+.dive .view { position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; overflow: hidden; }
+.dive .view::backdrop { background: transparent; }
+.dive .v-scroll { height: 100%; overflow-y: auto; overscroll-behavior: contain; }
+.dive .v-bar { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; padding-block: max(0.6rem, env(safe-area-inset-top, 0px)) 0.6rem; border-bottom: 1px solid var(--rule); background: var(--bg); }
+.dive .v-nav { display: flex; align-items: center; gap: 0.4rem; }
+.dive .v-nav .label { margin-right: 0.4rem; color: var(--mute); }
+.dive .v-body { max-width: 86rem; margin-inline: auto; padding-bottom: max(4rem, env(safe-area-inset-bottom, 0px)); }
+.dive .v-head { display: grid; gap: 0.9rem; padding-block: clamp(2rem, 6vw, 4.5rem) clamp(1.75rem, 4vw, 3rem); }
+.dive .v-kicker { color: var(--mute); }
+.dive .v-title { font-size: clamp(3rem, 10vw, 9rem); line-height: 0.88; padding-bottom: 0.1em; overflow-wrap: anywhere; }
+.dive .v-lede { max-width: 46ch; color: var(--mute); font-size: clamp(1.05rem, 1.6vw, 1.35rem); line-height: 1.42; }
+.dive .v-grid { display: grid; grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr); gap: clamp(1.75rem, 4vw, 4rem); align-items: start; }
+.dive .v-info { display: grid; gap: 1.8rem; }
+.dive .v-info h3 { margin-bottom: 0.7rem; color: var(--mute); }
+.dive .facts { display: grid; gap: 0.85rem; counter-reset: f; }
+.dive .facts li { position: relative; padding-left: 2.2rem; counter-increment: f; }
+.dive .facts li::before { content: counter(f, decimal-leading-zero); position: absolute; left: 0; top: 0.2rem; color: var(--mute); font-family: var(--label); font-size: 0.68rem; }
+.dive .v-piece { display: grid; gap: 1.25rem; min-width: 0; }
+.dive .v-piece .win { box-shadow: 0 18px 40px -26px rgba(0, 0, 0, 0.35); background: var(--surface); }
+.dive .cert-figure { padding: clamp(0.8rem, 3vw, 2rem); border: 1px solid var(--line); background: color-mix(in srgb, var(--ink) 6%, var(--bg)); }
+.dive .cert-figure img { width: 100%; height: auto; margin-inline: auto; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18); }
+.dive figcaption { margin-top: 0.5rem; color: var(--mute); font-size: 0.75rem; }
+
+/* KitaKo piece */
+.dive .kk-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.35rem; }
+.dive .kk-steps li { padding: 0.45rem 0.6rem; border: 1px solid var(--line); border-radius: min(var(--radius), 10px); font-size: 0.75rem; line-height: 1.3; transition: background-color 200ms, color 200ms; }
+.dive .kk-steps li.on { background: var(--ink); color: var(--bg); }
+.dive .kk-steps b { display: block; font-family: var(--label); font-size: 0.6rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.7; }
+.dive .kk-bar { display: flex; align-items: center; gap: 0.6rem; min-height: 2.8rem; padding: 0 0.9rem; border-radius: var(--radius); background: var(--ink); color: var(--bg); }
+.dive .kk-bar svg { flex: none; width: 1rem; height: 1rem; }
+.dive .kk-q { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.dive .kk-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.dive .kk-chips .chip { text-transform: none; letter-spacing: 0; font-family: var(--body); font-size: 0.9rem; }
+.dive .kk-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0.35rem; }
+.dive .tile { position: relative; display: grid; place-items: center; aspect-ratio: 1; border-radius: min(var(--radius), 10px); background: color-mix(in srgb, var(--ink) 10%, transparent); opacity: 0.35; transition: opacity 300ms, background-color 300ms, color 300ms, transform 300ms var(--ease); }
+.dive .tile svg { width: 1.35rem; height: 1.35rem; }
+.dive .tile-icons { display: flex; gap: 0.1rem; }
+.dive .tile-rank { position: absolute; top: 0.25rem; left: 0.35rem; font-family: var(--label); font-size: 0.6rem; opacity: 0; }
+.dive .tile.hit { opacity: 1; }
+.dive .tile.best { background: var(--ink); color: var(--bg); transform: scale(1.04); }
+.dive .tile.hit .tile-rank { opacity: 1; }
+
+/* iCARE piece */
+.dive .ic-board { display: grid; gap: 0.35rem; }
+.dive .ic-hours, .dive .ic-lane { display: grid; grid-template-columns: 7.2rem minmax(0, 1fr); gap: 0.6rem; align-items: center; }
+.dive .ic-hours .ticks { position: relative; height: 1.1rem; }
+.dive .ic-hours .ticks span { position: absolute; transform: translateX(-50%); font-family: var(--label); font-size: 0.6rem; color: var(--mute); }
+.dive .ic-hours .ticks span:first-child { transform: none; }
+.dive .ic-hours .ticks span:last-child { transform: translateX(-100%); }
+.dive .ic-room { font-size: 0.75rem; line-height: 1.25; }
+.dive .ic-room small { display: block; color: var(--mute); }
+.dive .ic-track { position: relative; height: 3.4rem; border: 1px solid var(--line); border-radius: min(var(--radius), 10px); background: repeating-linear-gradient(90deg, transparent 0, transparent calc(100% / 12 - 1px), var(--line) calc(100% / 12 - 1px), var(--line) calc(100% / 12)); }
+.dive .bk { position: absolute; top: 0.3rem; bottom: 0.3rem; display: grid; align-content: center; padding: 0 0.45rem; overflow: hidden; border-radius: min(var(--radius), 8px); background: color-mix(in srgb, var(--ink) 16%, var(--bg)); font-size: 0.68rem; line-height: 1.15; white-space: nowrap; }
+.dive .bk small { opacity: 0.75; }
+.dive .bk.clash { outline: 2px solid #e5484d; outline-offset: -2px; }
+.dive .mine { z-index: 2; background: var(--ink); color: var(--bg); cursor: grab; touch-action: none; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22); }
+.dive .mine.bad { background: #e5484d; color: #fff; }
+.dive .mine:active { cursor: grabbing; }
+.dive .ic-controls { display: flex; flex-wrap: wrap; gap: 0.5rem 1.2rem; align-items: center; }
+.dive .stepper { display: inline-flex; align-items: center; gap: 0.4rem; }
+.dive .stepper .chip { width: 2.4rem; padding: 0; justify-content: center; font-size: 1rem; }
+.dive .stepper output { min-width: 5.5rem; text-align: center; font-variant-numeric: tabular-nums; }
+.dive .checks { display: grid; gap: 0.35rem; }
+.dive .checks li { display: flex; gap: 0.55rem; align-items: baseline; }
+.dive .checks li::before { content: "✓"; flex: none; width: 1.3rem; height: 1.3rem; display: grid; place-items: center; border-radius: 50%; background: var(--ink); color: var(--bg); font-size: 0.75rem; }
+.dive .checks li.bad::before { content: "✕"; background: #e5484d; color: #fff; }
+.dive .verdict { font-family: var(--display); font-weight: var(--display-weight); font-variation-settings: var(--display-var); font-size: clamp(1.4rem, 2.4vw, 2rem); line-height: 1; letter-spacing: var(--display-track); text-transform: var(--display-case); }
+
+/* BekiLang piece */
+.dive .bk-presets { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.dive .bk-code { width: 100%; min-height: 13.5rem; padding: 0.9rem 1rem; border: 1px solid var(--line); border-radius: min(var(--radius), 12px); background: color-mix(in srgb, var(--ink) 92%, var(--bg)); color: var(--bg); font: 0.86rem/1.55 "JetBrains Mono", "IBM Plex Mono", ui-monospace, Menlo, monospace; resize: vertical; tab-size: 4; }
+.dive .bk-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.dive .bk-out { min-height: 6rem; margin: 0; padding: 0.8rem 1rem; border: 1px solid var(--line); border-radius: min(var(--radius), 12px); font: 0.86rem/1.55 "JetBrains Mono", "IBM Plex Mono", ui-monospace, Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.dive .bk-out .err { color: #e5484d; }
+.dive .bk-toks { display: flex; flex-wrap: wrap; gap: 0.25rem; min-height: 6rem; align-content: flex-start; padding: 0.8rem; border: 1px solid var(--line); border-radius: min(var(--radius), 12px); }
+.dive .tk { padding: 0.12rem 0.4rem; border-radius: 4px; font: 0.76rem/1.4 "JetBrains Mono", ui-monospace, monospace; border: 1px solid var(--line); }
+.dive .tk.type { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.dive .tk.key { font-weight: 700; border-color: var(--ink); }
+.dive .tk.op { font-style: italic; }
+.dive .tk.delim { color: var(--mute); border-style: dashed; }
+.dive .tk.str, .dive .tk.num, .dive .tk.bool, .dive .tk.char { background: color-mix(in srgb, var(--ink) 14%, transparent); }
+
+/* CitySense piece */
+.dive .cs-map { position: relative; aspect-ratio: 16 / 10; border: 1px solid var(--line); border-radius: min(var(--radius), 12px); overflow: hidden; }
+.dive .cs-map canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: crosshair; touch-action: pan-y; }
+.dive .cs-read { position: absolute; left: 0.6rem; bottom: 0.6rem; max-width: calc(100% - 1.2rem); padding: 0.35rem 0.6rem; border-radius: min(var(--radius), 8px); background: var(--ink); color: var(--bg); font-family: var(--label); font-size: 0.68rem; letter-spacing: 0.04em; pointer-events: none; }
+.dive .cs-layers { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.dive .cs-layers .chip i { width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--c); }
+.dive .cs-src { display: grid; gap: 0.2rem; font-size: 0.75rem; }
+.dive .cs-src b { font-weight: 600; }
+.dive .kk-chips .chip { font-size: 0.86rem; }
+.dive .bk-code { background: #0b0b0b; color: #d9d9d5; }
+.dive .verdict { font-family: var(--display); font-size: 1.6rem; font-weight: var(--display-weight); font-variation-settings: var(--display-var); letter-spacing: var(--display-track); }
+.dive .stepper .chip { font-family: var(--mono); }
+
+
+@media (max-width: 960px) {
+  .dive .hd nav { display: none; }
+  .dive .w-stage { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr); align-content: start; gap: 1.2rem; }
+  .dive .w-screen { grid-row: 2; }
+  .dive .w-items { align-self: start; }
+  .dive .w-item h3 { font-size: clamp(2.6rem, 11vw, 4rem); }
+  .dive .w-item p { font-size: 0.95rem; }
+  .dive .xp, .dive .about { grid-template-columns: minmax(0, 1fr); }
+  .dive .xp-h { position: static; }
+  .dive .about-l { position: static; }
+}
+@media (max-width: 760px) {
+  .dive .hd { padding-inline: 1rem; }
+  .dive .figs { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 2.5rem; }
+  .dive .w-ticks i { width: 1.2rem; }
+  .dive .w-top h2 { display: none; }
+  .dive .tl li { grid-template-columns: minmax(0, 1fr); }
+  .dive .tl { padding-left: 3.2rem; }
+  .dive .tl::before, .dive .tl-line { left: 1.55rem; }
+  .dive .tl li::before { left: -1.95rem; }
+  .dive .idx li { grid-template-columns: 2rem minmax(0, 1fr); }
+  .dive .idx .proof { grid-column: 2; grid-row: auto; justify-self: start; }
+  .dive .also { grid-template-columns: minmax(0, 1fr); gap: 0.2rem; }
+  .dive .also dd + dt { margin-top: 0.6rem; }
+  .dive .cert { width: 70vw; }
+  .dive .v-grid { grid-template-columns: minmax(0, 1fr); }
+  .dive .v-piece { order: -1; }
+  .dive .v-nav .label { display: none; }
+  .dive .ic-hours, .dive .ic-lane { grid-template-columns: minmax(0, 1fr); gap: 0.25rem; }
+  .dive .ic-hours .room-sp { display: none; }
+  .dive .kk-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  html.dive-page { scroll-behavior: auto; }
+  .dive *, .dive *::before, .dive *::after { animation: none !important; transition: none !important; }
+  .dive .rec { height: auto; }
+  .dive .rec-stage { position: relative; height: auto; }
+  .dive .strip { width: auto; overflow-x: auto; }
+}
+.dive .hd nav a.nav-cv { color: var(--bg); font-family: var(--body); font-size: 0.86rem; letter-spacing: 0; text-transform: none; }

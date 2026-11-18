@@ -39,6 +39,7 @@ test('the public portfolio still contains crawlable identity and Work content', 
   expect(response.ok()).toBeTruthy();
   const html = await response.text();
   expect(html).toMatch(/Amiel Josiah/);
-  expect(html).toContain('work-gallery-content');
+  expect(html).toContain('class="w-item');
+  expect(html).toContain('KitaKo');
   expect(html).not.toMatch(/<meta[^>]+name="robots"[^>]+content="[^"]*noindex/);
 });

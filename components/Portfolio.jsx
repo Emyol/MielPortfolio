@@ -1,20 +1,7 @@
-﻿import Navbar from "./Navbar";
-import Hero from "./Hero";
-import About from "./About";
-import CertificatesAwards from "./CertificatesAwards";
-import Projects from "./Projects";
-import Leadership from "./Leadership";
-import Footer from "./Footer";
-import ScrollProgress from "./ScrollProgress";
-import PageMotion from "./PageMotion";
-const sections = {
-  about: About,
-  credentials: CertificatesAwards,
-  projects: Projects,
-  leadership: Leadership,
-  contact: Footer,
-};
+﻿import Dive from './dive/Dive';
+
 const SITE_URL = "https://project-miel.vercel.app";
+
 export default function Portfolio({ content, preview = false }) {
   const jsonLd = {
     "@context": "https://schema.org",
@@ -43,21 +30,7 @@ export default function Portfolio({ content, preview = false }) {
           }}
         />
       )}
-      <a href="#main" className="skip-link">
-        Skip to content
-      </a>
-      <ScrollProgress />
-      <Navbar content={content} />
-      <main id="main" className="field-page">
-        <PageMotion />
-        <Hero content={content} />
-        {content.navigation.items
-          .filter((item) => !item.archived)
-          .map((item) => {
-            const Section = sections[item.section];
-            return Section ? <Section key={item.id} content={content} /> : null;
-          })}
-      </main>
+      <Dive content={content} />
     </>
   );
 }

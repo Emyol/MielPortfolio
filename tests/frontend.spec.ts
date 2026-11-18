@@ -1,26 +1,88 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 
-test('touch visitors can read every Work description before opening a repository', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+// The engine marks the page once its listeners are attached (after hydration).
+const ready = (page: Page) => expect(page.locator('.dive[data-ready]')).toBeAttached();
+
+// The Dive home page: one ocean canvas, scroll scenes, liquid-glass panels and case pages.
+
+test('every section reads without JavaScript', async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
   await page.goto('/');
-  const entries = page.locator('.work-gallery-content');
-  await expect(entries).toHaveCount(4);
-  for (const entry of await entries.all()) {
-    await entry.scrollIntoViewIfNeeded();
-    await expect(entry).toHaveCSS('opacity', '1');
-    const bounds = await entry.boundingBox();
-    const link = await entry.locator('..').boundingBox();
-    expect(bounds!.y).toBeGreaterThanOrEqual(link!.y);
-    expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(link!.y + link!.height + 1);
-  }
+  await expect(page.locator('.w-item h3')).toHaveCount(4);
+  await expect(page.locator('#tl li')).toHaveCount(7);
+  await expect(page.locator('#awards li')).toHaveCount(4);
+  await expect(page.locator('.cert')).toHaveCount(6);
+  await expect(page.locator('#idx li')).toHaveCount(4);
+  await expect(page.getByRole('heading', { name: 'Have a system' })).toBeAttached();
+  await context.close();
 });
 
-test('all practices remain readable on mobile without waiting for animation', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
+for (const [width, height] of [[1360, 850], [390, 844]]) {
+  test(`no horizontal overflow at ${width}px while scrolling every scene`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+    await page.setViewportSize({ width, height });
+    await page.goto('/');
+    await ready(page);
+    for (const id of ['work', 'experience', 'recognition', 'about', 'contact']) {
+      await page.evaluate((s) => document.getElementById(s)!.scrollIntoView(), id);
+      await page.waitForTimeout(250);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
+    }
+    expect(errors).toEqual([]);
+  });
+}
+
+test('a project opens as a full page, steps with the arrow keys, and Escape returns focus', async ({ page }) => {
   await page.goto('/');
-  const practices = page.locator('.discipline-practice-grid');
-  await expect(practices).toBeVisible();
-  await expect(practices.locator('.discipline-practice-card')).toHaveCount(8);
-  await expect(practices.getByText('Operational leadership')).toBeVisible();
-  await expect(practices.getByText('Campus logistics')).toBeVisible();
+  await ready(page);
+  await page.evaluate(() => document.getElementById('about')!.scrollIntoView());
+  const trigger = page.locator('#idx button').first();
+  await trigger.click();
+  const view = page.locator('#view');
+  await expect(view).toBeVisible();
+  await expect(page.locator('#v-title')).toHaveText('KitaKo');
+  await expect(view.getByRole('link', { name: /Open the repository/ })).toHaveAttribute('href', /github\.com\/Emyol\/KitaKo/);
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('#v-title')).toHaveText('iCARE Reservation');
+  await page.keyboard.press('Escape');
+  await expect(view).toBeHidden();
+  await expect(trigger).toBeFocused();
+  await expect(page.locator('html')).not.toHaveClass(/dive-locked/);
+});
+
+test('the pinned work stage changes project as you scroll', async ({ page }) => {
+  await page.goto('/');
+  await ready(page);
+  const box = await page.evaluate(() => { const s = document.getElementById('work')!; return { top: s.offsetTop, h: s.offsetHeight }; });
+  await page.evaluate((y) => window.scrollTo(0, y), box.top + 10);
+  await expect(page.locator('.w-item.on h3')).toHaveText('KitaKo');
+  await page.evaluate((b) => window.scrollTo(0, b.top + (b.h - innerHeight) * 0.99), box);
+  await expect(page.locator('.w-item.on h3')).toHaveText('CitySense');
+  await expect(page.locator('#w-count')).toHaveText('04 / 04');
+});
+
+test('a certificate opens with its details', async ({ page }) => {
+  await page.goto('/');
+  await ready(page);
+  await page.evaluate(() => document.getElementById('recognition')!.scrollIntoView());
+  await page.locator('.cert').first().click({ force: true });
+  await expect(page.locator('#v-title')).toHaveText(/PMI Project Management Ready/);
+  await expect(page.locator('#v-kicker')).toContainText('Certificate 01');
+});
+
+test('reduced motion shows finished figures and stops the ocean loop', async ({ browser }) => {
+  const context = await browser.newContext({ reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/');
+  await ready(page);
+  await page.evaluate(() => document.querySelector('.figs')!.scrollIntoView());
+  await expect(page.locator('.figs [data-count="700"]')).toHaveText('700');
+  await expect(page.locator('.rv').first()).toHaveClass(/in/);
+  expect(errors).toEqual([]);
+  await context.close();
 });
