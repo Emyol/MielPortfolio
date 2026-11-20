@@ -166,11 +166,11 @@ html.dive-js .dive .hero.in .fit > span { transform: none; transition: transform
 .dive .awards li { display: flex; gap: 1rem; font-size: 0.95rem; }
 .dive .awards .when { min-width: 3rem; }
 .dive .strip { display: flex; align-items: center; gap: clamp(1rem, 2vw, 1.75rem); width: max-content; padding-inline: var(--gx); will-change: transform; }
-.dive .cert { display: grid; flex: none; width: clamp(15rem, 26vw, 23rem); padding: 0; border: 0; border-radius: 24px; color: var(--ink); text-align: left; cursor: pointer; transform: rotate(var(--r, 0deg)); transition: transform 400ms var(--ease), border-color 200ms ease; }
+.dive .cert { display: grid; grid-template-columns: minmax(0, 1fr); flex: none; width: clamp(15rem, 26vw, 23rem); padding: 0; border: 0; border-radius: 24px; color: var(--ink); text-align: left; cursor: pointer; transform: rotate(var(--r, 0deg)); transition: transform 400ms var(--ease), border-color 200ms ease; }
 .dive .cert:nth-child(odd) { --r: -1.6deg; }
 .dive .cert:nth-child(even) { --r: 1.2deg; margin-top: 3rem; }
-.dive .cert-img { display: block; aspect-ratio: 4 / 3; margin: 0.7rem 0.7rem 0; padding: 0.8rem; border-radius: 16px; background: rgba(0, 0, 0, 0.35); }
-.dive .cert-img img { width: 100%; height: 100%; object-fit: contain; filter: grayscale(1); transition: filter 300ms ease; }
+.dive .cert-img { display: block; min-width: 0; aspect-ratio: 4 / 3; margin: 0.7rem 0.7rem 0; padding: 0.8rem; border-radius: 16px; background: rgba(0, 0, 0, 0.35); }
+.dive .cert-img img { display: block; width: 100%; max-width: 100%; height: 100%; object-fit: contain; filter: grayscale(1); transition: filter 300ms ease; }
 .dive .cert-meta { display: grid; gap: 0.3rem; padding: 0.8rem 1rem 1rem; }
 .dive .cert-meta .label { color: var(--mute); font-size: 0.6rem; }
 .dive .cert-meta b { font-family: var(--display); font-size: 1.2rem; font-weight: var(--display-weight); font-variation-settings: var(--display-var); line-height: 1.02; letter-spacing: var(--display-track); }
