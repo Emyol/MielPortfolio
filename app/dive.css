@@ -77,6 +77,8 @@ html.dive-page body { margin: 0; overflow-x: clip; background: #070707; }
   .dive .gauge { position: fixed; top: var(--m); right: var(--m); bottom: var(--m); z-index: 55; display: block; width: 3rem; border-left: 1px solid var(--rule); background: var(--bg); color: var(--mute); font-family: var(--mono); }
   .dive .gauge::before { content: ""; position: absolute; inset: 0.6rem 0 0.6rem auto; width: 0.6rem; background: repeating-linear-gradient(to bottom, var(--rule) 0 1px, transparent 1px 1.25%); }
   .dive .gauge a { position: absolute; right: 0.95rem; transform: translateY(-50%); font-size: 0.6rem; letter-spacing: 0.08em; text-decoration: none; writing-mode: vertical-rl; transition: color 160ms ease; }
+  html.dive-js .dive .gauge a { top: 0; }
+  html.dive-js .dive .gauge a:not([style]) { visibility: hidden; }
   .dive .gauge a[aria-current="true"] { color: var(--ink); }
   .dive .gauge-now { position: absolute; top: 0; right: 0; left: -1px; height: 0; border-top: 1px solid var(--accent); will-change: transform; }
   .dive .gauge-now span { position: absolute; top: 0; right: 0; left: 0; z-index: 1; padding: 0.3rem 0 0.35rem; border-bottom: 1px solid var(--rule); background: var(--bg); color: var(--ink); font-size: 0.6rem; text-align: center; font-variant-numeric: tabular-nums; white-space: nowrap; }

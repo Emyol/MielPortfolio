@@ -46,6 +46,7 @@ Classes: **Public** · **Internal** · **Confidential** (PII, business data) · 
 - **Publishing:** one transaction copies the saved draft revision and its asset allowlist (`publish_portfolio`); `202610180001_publish_safeupdate.sql` keeps it working under Supabase's safe-update guard.
 - **Keys:** only the publishable (or legacy anon) key is used. A service-role key must never be added to this project's env.
 - **Next.js:** `proxy.ts` (this version's middleware) refreshes the owner session and marks `/admin` and `/api/admin` responses private and non-indexed. Admin route handlers run on the Node runtime.
+- **Image optimizer:** `/_next/image` accepts only the static images under `/projects/` and `/certificates/` (no query or `?v=1` to `?v=22`) and `/hero-profile.png`, via `images.localPatterns` in `next.config.mjs`, so it cannot be pointed at arbitrary paths, uploaded media or endless query variants.
 - **Uploads:** JPEG, PNG, WebP, PDF only; SVG is deliberately excluded; contents are checked against their declared type; stored under server-generated names.
 - **Env files:** `.env` and `.env*.local` are git-ignored; `.env.example` holds names only.
 - **Redesign note:** the planned UI redesign is front-end only. If it adds content fields (for example practice-to-Work relations), they go through `lib/content/model.ts` validation and the existing save/publish path.

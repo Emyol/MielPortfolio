@@ -9,11 +9,13 @@ const display = Fraunces({
   axes: ['SOFT', 'WONK', 'opsz'],
 });
 
-// Public Sans stays for the admin editor (app/admin/admin.css).
+// Public Sans stays for the admin editor (app/admin/admin.css). It is not preloaded, so the public page does not
+// download it; the browser fetches it only where it is used.
 const body = Public_Sans({
   subsets: ['latin'],
   variable: '--font-body-loaded',
   display: 'swap',
+  preload: false,
 });
 
 const sans = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' });

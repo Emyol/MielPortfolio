@@ -3,8 +3,8 @@
 > The project's working memory. Read this first at the start of every session; update it at the end of every meaningful unit of work and before the session ends.
 > Keep it **true and short**: rewrite stale sections instead of appending to them. History goes in the Session Log, not in the sections above it.
 
-**Last updated:** 2026-11-18 (UTC+8): by Claude Code (Opus 5.5)
-**Branch:** `main` (fast-forwarded to the Dive work and pushed 2026-11-18; `feat/dive-redesign` points at the same commit) · **Last commit:** `8556d4e`
+**Last updated:** 2026-11-20 (UTC+8): by Claude Code (Opus 5.5)
+**Branch:** `main` (fast-forwarded to the Dive work and pushed 2026-11-18; `feat/dive-redesign` points at the same commit) · **Last commit:** `d0bea87` (performance work since then is uncommitted)
 **Overall status:** 🟡 Dive is on `main` and pushed; whether Vercel deployed it was not checked; `tests/motion.spec.ts` still targets the old page and fails
 
 ---
@@ -22,6 +22,7 @@ One-page portfolio ("Surface") for Amiel Acuña, built as a Craft Showcase: a vi
 - **Quality bar (owner, 2026-11-15):** https://xanderdacillo.vercel.app/ shows the expected level of design and polish. What it does: very large type (heavy grotesk, condensed poster caps, italic serif), one monospace label system, off-white and near-black grounds with a full-bleed colour per project, a bespoke interactive piece for every project, scroll-revealed statement text, a stats band, smooth scrolling. Match the level, do not copy the look.
 
 ## 3. What works (verified)
+- 2026-11-20, performance pass (uncommitted): Lighthouse 13.6 against a local production build, before → after: mobile 78 → 98 (total blocking time 950 → 180 ms, main-thread work 9.8 → 2.6 s, speed index 3.1 → 1.8 s), desktop 87 → 100 (CLS 0.258 → 0.003). Mobile under 4× CPU throttling: the main thread went from about 19 fps with 3.4 s of long tasks per 5 s to full frame rate with none. The ocean draws in a worker; the main-thread fallback (no OffscreenCanvas) and reduced motion render the same, checked by screenshot at 390 px. `next build`, typecheck, frontend (7), admin (4) and content (6) tests pass. The owner's numbers came from the live site; live Lighthouse was not re-run after this change. Not checked in Safari or Firefox or on a real phone.
 - 2026-11-18 on `feat/dive-redesign`: `next build` succeeds; `npm run typecheck` passes; `tests/frontend.spec.ts` (rewritten for Dive, 7 tests) and `tests/admin.spec.ts` (4) pass twice in a row against `next dev`; `tests/content.test.ts` passes (6). Checked by script in Edge at 1360 and 390 px: no console errors or warnings, no horizontal overflow, case pages open from the work stage, the About index and certificates, arrow keys step, Escape closes and restores focus. Not checked by hand, on a real phone, in Safari or Firefox, or for frame rate.
 - Earlier: nothing in the app was run or tested by the 2026-11-15/16 sessions. The redesign prototype (outside the repo) was rendered once in Edge at 1360px and 400px with no console errors.
 
@@ -59,6 +60,7 @@ One-page portfolio ("Surface") for Amiel Acuña, built as a Craft Showcase: a vi
 ## 7. Key decisions
 | Date | Decision | Why | Alternatives rejected |
 |------|----------|-----|-----------------------|
+| 2026-11-20 | The ocean draws in a Web Worker on an OffscreenCanvas (`components/dive/ocean-core.js`, `ocean.worker.js`), with the same code on the main thread as a fallback | Its per-frame drawing was about 80% of main-thread time on phones and caused all long tasks; moving it keeps the visuals identical | A glyph atlas with drawImage (measured slower than fillText in Chrome); lowering frame rate or canvas resolution (visible change); `experimental.inlineCss` (no measurable gain) |
 | 2026-11-18 | Implement Dive (ADR-0003): server-rendered markup plus a dependency-free client engine; design-only details in `lib/dive/extras.js` | Owner approved the prototype and asked to implement it; extras in code avoid the stored-content validation trap | Rebuilding in GSAP/React components (slower, no fidelity gain); adding fields to `seed.json` without an upgrade step |
 | 2026-11-15 | Owner decision: leave Silver Field. The redesign is a new design language from top to bottom, elegant, with no photograph in the hero and a hero centrepiece that hooks visitors | Owner saw the Silver Field interactive prototype and found the theme itself plain | Keeping Silver Field with more interactivity (first prototype); amplifying Silver Field's glyphs, metal, or type (three studies built but never shown, because the owner changed the brief first) |
 | earlier | ADR-0002: keep the ASCII portrait as Signature Material; GSAP for entrances, Motion for state, CSS for feedback | See `docs/adr/0002-ascii-portrait-motion.md` | Canvas UI Liquid hero (ADR-0001) |
@@ -77,7 +79,7 @@ One-page portfolio ("Surface") for Amiel Acuña, built as a Craft Showcase: a vi
 ## 10. Architecture snapshot
 - `app/page.jsx` → `components/Portfolio.jsx` renders Navbar, Hero, then sections in the order of `content.navigation.items` (About, CertificatesAwards, Projects, Leadership, Footer). Section order is owner-editable content.
 - Content: `lib/content/model.ts` (shape), `lib/content/repository.ts` (published content from Supabase, seed fallback), `lib/content/seed.json`.
-- Home page (branch `feat/dive-redesign`): `components/dive/Dive.jsx` → `DiveRoot.jsx` → `engine.js`; styles `app/dive.css`; extras `lib/dive/extras.js`. `app/globals.css` (Tailwind 4 + shadcn tokens) still loads for /admin.
+- Home page: `components/dive/Dive.jsx` → `DiveRoot.jsx` → `engine.js`; the ocean is drawn by `ocean-core.js`, in `ocean.worker.js` where OffscreenCanvas is supported; styles `app/dive.css`; extras `lib/dive/extras.js`. Static images in `public/projects`, `public/certificates` and `hero-profile.png` are served through the Next image optimizer (allowlist in `next.config.mjs` and `OPTIMIZE` in `Dive.jsx`, which must stay in step); uploaded media is not. `app/globals.css` (Tailwind 4 + shadcn tokens) still loads for /admin.
 - Previous home (still on `main`): `app/liquid-field.css`, `components/PageMotion.jsx`, `lib/motion.ts`, `components/originkit/ui/ascii-reveal-custom-style.tsx`.
 - Admin: `app/admin/*` (editor, preview), `app/api/admin/*` (content, publish, upload, export), `app/api/media/[name]` (asset proxy), `app/auth/*` (GitHub OAuth via Supabase), `proxy.ts` (session refresh, no-store on admin paths), `supabase/migrations/` (tables, RLS, publish functions). Setup: `docs/admin-setup.md`.
 - Tests: `tests/*.spec.ts` (Playwright: motion, frontend, admin), `tests/content.test.ts`.
@@ -107,6 +109,7 @@ One-page portfolio ("Surface") for Amiel Acuña, built as a Craft Showcase: a vi
 - 2026-11-18, later: committed 0d36651 (Dive), 102f066 (DESIGN.md, ADR-0003), 2cbd7fe (agent docs) and pushed `feat/dive-redesign`. Left uncommitted on purpose: the earlier motion edits, `tests/motion.spec.ts`, `docs/superpowers/`.
 - 2026-11-18, latest: owner said "commit to main". Fast-forwarded `main` from 979710f to 8556d4e and pushed. The motion edits and `docs/superpowers/` remain uncommitted.
 - 2026-11-18, after the push: replaced the four screenshots in `public/projects/` with fresh 1600×900 captures of the live sites (kitako-stochastic4.vercel.app, icare-reservation.vercel.app/availability, beki-lang.vercel.app, stochastics-city-sense.netlify.app); the CitySense map shows "API key required" watermarks from its CARTO basemap on the live site itself. Section titles on glass panels now shrink only when they would overflow (`fitAll` in engine.js), fixing "Experience" running past its panel; checked at 390 to 1920 px. Frontend and admin tests pass (11). Not committed.
+- 2026-11-20: the owner shared live Lighthouse results (desktop 85, mobile 71) and asked for better performance without changing the site. Moved the ocean drawing into a Web Worker (same code, main-thread fallback), cached the noise lattice, fitted the hero headline before first paint and placed the gauge marks with transforms (no layout shift), served static images as sized WebP/AVIF with lazy loading, and stopped preloading the admin-only font. Results and checks in §3. Not committed.
 - Left open: the owner's review of the plan and its decisions table; how to execute it.
 - Next session should: read the owner's pick, then design the full page in that language before writing the design doc.
 

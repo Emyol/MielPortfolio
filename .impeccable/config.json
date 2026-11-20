@@ -8,6 +8,15 @@
         "value": "100px",
         "createdAt": "2026-11-18T05:08:15.693Z",
         "reason": "Claude: 100px is a measuring baseline in fitAll (engine.js) that is immediately replaced by the fitted size, not a rendered type step"
+      },
+      {
+        "rule": "broken-image",
+        "value": "*",
+        "files": [
+          "components/dive/Dive.jsx"
+        ],
+        "createdAt": "2026-11-20T15:23:59.895Z",
+        "reason": "Claude: src is set by spreading responsive(...) (an optimized srcset or the original URL), which the detector cannot see"
       }
     ]
   }

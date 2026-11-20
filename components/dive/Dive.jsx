@@ -1,3 +1,4 @@
+import { getImageProps } from 'next/image';
 import { activeItems, getMetrics } from '@/lib/content/model';
 import { DISCIPLINE_PROOF, WORK_EXTRAS } from '@/lib/dive/extras';
 import DiveRoot from './DiveRoot';
@@ -8,6 +9,18 @@ import { SPRITE } from './sprite';
 
 const SECTION_ID = { projects: 'work', leadership: 'experience', credentials: 'recognition', about: 'about', contact: 'contact' };
 const ORDER = [['projects', 'Work'], ['leadership', 'Experience'], ['credentials', 'Recognition'], ['about', 'About'], ['contact', 'Contact']];
+const FIT_HERO = "document.querySelectorAll('.hero .fit').forEach(function(f){var room=f.parentElement.clientWidth,line=f.firstElementChild;if(room<=0)return;f.style.fontSize='100px';var w=line.scrollWidth;if(w)f.style.fontSize=(100*room/w*0.995).toFixed(2)+'px';})";
+// The images shipped in public/ go through Next's image optimizer, so each screen gets a resized WebP or AVIF;
+// anything else (such as uploaded media) keeps its own URL. next.config.mjs allows exactly these paths and versions.
+const OPTIMIZE = /^(?:\/(?:projects|certificates)\/[\w-]+\.(?:jpe?g|png|webp)(?:\?v=(?:[1-9]|1\d|2[0-2]))?|\/hero-profile\.png)$/;
+const responsive = (src, sizes, width, height) => {
+  if (!src || !OPTIMIZE.test(src)) return { src };
+  const { props } = getImageProps({ src, alt: '', width, height, sizes });
+  return { src: props.src, srcSet: props.srcSet, sizes: props.sizes };
+};
+// Rendered widths: screenshots about 90vw on phones and about half the window from 1024px; certificates at most 330px.
+const SHOT_SIZES = '(min-width: 1024px) 54vw, 90vw';
+const CERT_SIZES = '(max-width: 700px) 60vw, 330px';
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 const month = (ym) => (ym ? MONTHS[Number(ym.slice(5, 7)) - 1] + ' ' + ym.slice(0, 4) : '');
@@ -77,8 +90,10 @@ export default function Dive({ content }) {
             <div className="hero-card glass pane" data-glass>
               <h1>
                 <span className="visually-hidden">{data.water.join(' ')} </span>
-                <span className="say"><span className="fit"><span>{say || data.water.join(' ')}</span></span></span>
+                <span className="say"><span className="fit" suppressHydrationWarning><span>{say || data.water.join(' ')}</span></span></span>
               </h1>
+              {/* Fits the headline before the first paint (same sum as fitAll in engine.js), so the card does not jump when the engine starts. */}
+              <script dangerouslySetInnerHTML={{ __html: FIT_HERO }} />
               <div className="hero-row">
                 <div className="actions">
                   <a className="chip fill btn-lg" href={fixHref(content.hero.primaryHref) || '#work'}>{content.hero.primaryLabel}</a>
@@ -122,7 +137,7 @@ export default function Dive({ content }) {
                   <span className="win">
                     <span className="win-bar"><i aria-hidden="true"><b /></i><span id="w-wintitle">{data.systems[0].window}</span><em /></span>
                     <span className="w-shots" id="w-shots">
-                      {data.systems.map((s) => <img key={s.id} src={s.img} alt={'Screenshot of ' + s.title} width="1100" height="619" draggable="false" />)}
+                      {data.systems.map((s) => <img key={s.id} {...responsive(s.img, SHOT_SIZES, 1600, 900)} alt={'Screenshot of ' + s.title} width="1100" height="619" draggable="false" loading="lazy" decoding="async" />)}
                       <canvas id="w-fx" aria-hidden="true" />
                     </span>
                   </span>
@@ -158,7 +173,7 @@ export default function Dive({ content }) {
                 <div className="strip" id="strip">
                   {data.certs.map((c, i) => (
                     <button className="cert glass" data-glass type="button" data-cert={i} key={i} aria-label={c.title + ', ' + c.kicker + '. Open.'}>
-                      <span className="cert-img"><img src={c.img} alt="" draggable="false" loading="lazy" /></span>
+                      <span className="cert-img"><img {...responsive(c.img, CERT_SIZES, 1024, 790)} alt="" draggable="false" loading="lazy" decoding="async" /></span>
                       <span className="cert-meta"><span className="label">{c.kicker}</span><b>{c.title}</b></span>
                     </button>
                   ))}
@@ -172,7 +187,7 @@ export default function Dive({ content }) {
               <div className="about-l glass pane" data-glass>
                 <h2 className="big split" id="about-h">About</h2>
                 <figure className="who rv">
-                  <span className="who-ph"><img src={content.profile.portrait || '/hero-profile.png'} alt={content.profile.portraitAlt} width="208" height="260" loading="lazy" /></span>
+                  <span className="who-ph"><img {...responsive(content.profile.portrait || '/hero-profile.png', '145px', 960, 958)} alt={content.profile.portraitAlt} width="208" height="260" loading="lazy" decoding="async" /></span>
                   <figcaption><b>{shortName}</b><span>{content.profile.jobTitle}, {content.profile.school}</span><span className="when">Manila · <span id="clock">UTC+8</span></span></figcaption>
                 </figure>
                 {bio && <p className="bio rv">{bio}</p>}

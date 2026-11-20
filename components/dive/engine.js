@@ -2,6 +2,8 @@
 // Ported from the approved prototype. The markup is server-rendered by Dive.jsx; this script only enhances it.
 // startDive returns a cleanup that removes every listener, timer and animation frame it created.
 /* eslint-disable */
+import { createOcean, grid } from './ocean-core';
+
 export function startDive(host, data) {
   'use strict';
   const ac = new AbortController(), signal = ac.signal;
@@ -37,7 +39,6 @@ export function startDive(host, data) {
   let modalOpen = false;
   const fields = [];
   const syncAll = () => fields.forEach((f) => f.sync());
-  const hash2 = (a, b) => { let h = Math.imul(a | 0, 374761393) ^ Math.imul(b | 0, 668265263); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967295; };
   const smooth = (x) => x * x * (3 - 2 * x);
   function win(title, tag) {
     const w = el('span', 'win'), bar = el('span', 'win-bar'), dots = el('i');
@@ -59,24 +60,13 @@ export function startDive(host, data) {
   };
 
   /* ================= The ocean: one field of characters behind the whole page ================= */
+  // The drawing lives in ocean-core.js. Where the browser can, it runs in a worker on an OffscreenCanvas so the
+  // main thread stays free for scrolling and input; this side reads the page each frame and sends it over.
   const ocean = (() => {
-    const cv = $('#ocean'), ctx = cv.getContext('2d'), RAMP = ' .:-=+*#%@', seed = R() * 1000;
-    const off = document.createElement('canvas'), octx = off.getContext('2d', { willReadFrequently: true });
+    let cv = $('#ocean');
     const heroEl = $('#hero-water'), heroSec = $('.hero'), ptr = { x: 0, y: 0, on: false };
-    let d = null, cols = 0, rows = 0, cw = 0, chh = 0, raf = 0, waves = [], ink = 'rgb(236, 236, 236)', dim = 'rgba(236, 236, 236, 0.34)', accent = '#2997ff';
-    let quiet = [], glass = [], fish = null, sk = null, text = null, tStart = 0, lastTouch = 0, lastW = 0, sy = 0, rim = 'rgba(236, 236, 236, 0.6)', frost = 'rgba(236, 236, 236, 0.16)';
-    // Liquid glass lens. Bezel profile is the convex squircle y = (1 - (1 - x)^4)^(1/4); each sample is how far
-    // a ray bends at that point by Snell's law (air n = 1 into glass n = 1.5), normalised to 0..1.
-    const LENS = (() => {
-      const N = 48, f = (x) => Math.pow(1 - Math.pow(1 - clamp(x, 0, 1), 4), 0.25), out = [];
-      let mx = 0;
-      for (let i = 0; i < N; i++) {
-        const x = Math.max(0.004, i / (N - 1)), dl = 0.001, slope = (f(x + dl) - f(x - dl)) / (2 * dl);
-        const a1 = Math.atan(slope), a2 = Math.asin(Math.sin(a1) / 1.5), m = f(x) * Math.tan(a1 - a2);
-        out.push(m); mx = Math.max(mx, m);
-      }
-      return out.map((m) => m / mx);
-    })();
+    let g = null, raf = 0, lastTouch = 0, sy = 0, tStart = 0, core = null, worker = null, busy = false, pending = null;
+    let quietNodes = null, glassNodes = null;
     const radii = new WeakMap();
     const glassOf = (n) => {
       const b = n.getBoundingClientRect();
@@ -84,203 +74,89 @@ export function startDive(host, data) {
       const hx = b.width / 2, hy = b.height / 2;
       return { l: b.left, t: b.top, r: b.right, b: b.bottom, cx: b.left + hx, cy: b.top + hy, hx, hy, rad: Math.min(radii.get(n), hx, hy), bez: Math.min(34, hx * 0.5, hy * 0.6) };
     };
-    // Returns the offset (CSS px) to sample the water from, and where the cell sits: 0..1 across the bezel, 1 inside, -1 outside.
-    const lensAt = (g, x, y, out) => {
-      const px = x - g.cx, py = y - g.cy, qx = Math.abs(px) - g.hx + g.rad, qy = Math.abs(py) - g.hy + g.rad;
-      let sd, nx, ny;
-      if (qx > 0 && qy > 0) { const L = Math.hypot(qx, qy); sd = L - g.rad; nx = qx / L; ny = qy / L; }
-      else if (qx > qy) { sd = qx - g.rad; nx = 1; ny = 0; } else { sd = qy - g.rad; nx = 0; ny = 1; }
-      if (sd >= 0) return false;
-      nx *= px < 0 ? -1 : 1; ny *= py < 0 ? -1 : 1;
-      const k = -sd / g.bez;
-      if (k >= 1) { out.k = 1; out.dx = 0; out.dy = 0; return true; }
-      const m = LENS[Math.round(k * (LENS.length - 1))] * g.bez * 1.15;
-      out.k = k; out.dx = -nx * m; out.dy = -ny * m;
-      return true;
-    };
-    const lens = { k: -1, dx: 0, dy: 0 };
+    // A canvas handed to a worker cannot be drawn on again here, so a restart (or a fallback) gets a fresh one.
+    const freshCanvas = () => { const n = cv.cloneNode(false); delete n.dataset.offscreen; cv.replaceWith(n); cv = n; };
+    const local = () => { core = createOcean(cv, (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }); };
+    const call = (type, ...args) => { if (worker) worker.postMessage({ type, args }); else if (core) core[type](...args); };
+    const flush = () => { busy = true; worker.postMessage({ type: 'frame', args: [pending] }); pending = null; };
+    function fallback() {
+      if (!worker) return;
+      worker.terminate(); worker = null; busy = false; pending = null;
+      freshCanvas(); local(); rebuild();
+    }
+    if (cv.dataset.offscreen) freshCanvas();
+    if (typeof Worker !== 'undefined' && typeof OffscreenCanvas !== 'undefined' && 'transferControlToOffscreen' in cv) {
+      try {
+        worker = new Worker(new URL('./ocean.worker.js', import.meta.url), { type: 'module' });
+        const oc = cv.transferControlToOffscreen();
+        cv.dataset.offscreen = 'true';
+        worker.postMessage({ type: 'init', canvas: oc }, [oc]);
+        worker.onmessage = () => { busy = false; if (pending) flush(); };
+        worker.onerror = fallback;
+        timers.add(() => { if (worker) worker.terminate(); });
+      } catch (err) { if (worker) worker.terminate(); worker = null; if (cv.dataset.offscreen) freshCanvas(); }
+    }
+    if (!worker) local();
 
+    // The headline written in the water, as a mask on the character grid. Built here because it needs the page's fonts.
     function buildText() {
       const r = heroEl.getBoundingClientRect();
-      if (r.height < 40) { text = null; return; }
-      const trows = Math.max(1, Math.round(r.height * d.dpr / chh)), tc = document.createElement('canvas'), tx = tc.getContext('2d', { willReadFrequently: true });
+      if (r.height < 40) return null;
+      const trows = Math.max(1, Math.round(r.height * g.dpr / g.chh)), cols = g.cols, tc = document.createElement('canvas'), tx = tc.getContext('2d', { willReadFrequently: true });
       tc.width = cols; tc.height = trows;
       const lines = data.water.length ? data.water : [''];
       const family = getComputedStyle(host).getPropertyValue('--display').trim() || 'Georgia, serif';
       tx.font = '900 100px ' + family;
       const widest = Math.max(...lines.map((l) => tx.measureText(l).width));
       const size = Math.min(100 * r.width / Math.max(1, widest), r.height / (lines.length > 1 ? 1.78 : 1.05));
-      tx.setTransform(cols / d.w, 0, 0, trows / r.height, 0, 0);
+      tx.setTransform(cols / g.w, 0, 0, trows / r.height, 0, 0);
       tx.font = '900 ' + size.toFixed(1) + 'px ' + family;
       tx.fillStyle = '#fff';
       const base2 = r.height - size * 0.06, base1 = base2 - size * 0.86;
       if (lines.length > 1) { tx.fillText(lines[0], r.left, base1); tx.fillText(lines[1], r.left, base2); } else tx.fillText(lines[0], r.left, base2);
       const px = tx.getImageData(0, 0, cols, trows).data, mask = new Float32Array(cols * trows);
       for (let i = 0; i < mask.length; i++) mask[i] = Math.min(1, px[i * 4 + 3] / 255 * 1.7);
-      text = { mask, rows: trows, top: r.top + scrollY, h: r.height };
       if (!tStart) tStart = performance.now();
+      return { mask, rows: trows, top: r.top + scrollY, h: r.height, start: tStart };
     }
-    function initShark() {
-      const L = clamp(d.w * 0.32, 150, 480), N = 28, sp = L / N, hx = d.w * 0.62, hy = d.h * 0.2;
-      sk = { L, N, sp, x: hx, y: hy, a: Math.PI, boost: 0, wp: null, wpT: 0, wake: 0, last: 0, segs: Array.from({ length: N }, (_, i) => ({ x: hx + i * sp, y: hy })) };
-    }
-    const inQuiet = (x, y, pad) => quiet.some((q) => x > q.left - pad && x < q.right + pad && y > q.top - pad && y < q.bottom + pad);
-    function pickWaypoint() {
-      for (let k = 0; k < 10; k++) { const x = d.w * (0.06 + R() * 0.88), y = d.h * (0.1 + R() * 0.8); if (!inQuiet(x, y, 60)) return { x, y }; }
-      return { x: d.w * (0.06 + R() * 0.88), y: d.h * (0.1 + R() * 0.8) };
-    }
-    function startle(x, y) { if (!sk || reduced) return; if (Math.hypot(x - sk.x, y - sk.y) < sk.L) { sk.boost = 1.3; sk.wp = { x: clamp(sk.x + (sk.x - x) * 3, d.w * 0.06, d.w * 0.94), y: clamp(sk.y + (sk.y - y) * 3, d.h * 0.08, d.h * 0.92) }; sk.wpT = performance.now() + 5000; } }
-    function stepShark(now) {
-      const s = sk, segs = s.segs, dt = s.last ? Math.min(0.05, (now - s.last) / 1000) : 0.016; s.last = now;
-      if (!reduced) {
-        if (!s.wp || now > s.wpT || Math.hypot(s.wp.x - s.x, s.wp.y - s.y) < 70) { s.wp = pickWaypoint(); s.wpT = now + 11000; }
-        const follow = ptr.on && s.boost <= 0 && now - lastTouch < 2500, tx = follow ? ptr.x : s.wp.x, ty = follow ? ptr.y : s.wp.y, near = Math.hypot(tx - s.x, ty - s.y);
-        let da = Math.atan2(ty - s.y, tx - s.x) - s.a; da = Math.atan2(Math.sin(da), Math.cos(da));
-        s.a += clamp(da, -1, 1) * (0.9 + s.boost) * dt * (follow && near < 46 ? 0.15 : 1);
-        s.boost = Math.max(0, s.boost - dt);
-        const speed = (follow && near < 46 ? 10 : 46) * (1 + s.boost * 2) * (s.L / 300), wig = Math.sin(now * 0.0032) * 0.05;
-        s.x += Math.cos(s.a + wig) * speed * dt; s.y += Math.sin(s.a + wig) * speed * dt;
-        segs[0].x = s.x; segs[0].y = s.y;
-        for (let i = 1; i < s.N; i++) { const p = segs[i - 1], q = segs[i], ang = Math.atan2(q.y - p.y, q.x - p.x); q.x = p.x + Math.cos(ang) * s.sp; q.y = p.y + Math.sin(ang) * s.sp; }
-        if (now - s.wake > 2600) { s.wake = now; const tl = segs[s.N - 1]; waves.push({ x: tl.x * d.dpr, y: tl.y * d.dpr, t: now, k: 0.3 }); }
-      }
-      const t = reduced ? 0 : now * 0.001, P = [];
-      for (let i = 0; i < s.N; i++) {
-        const u = i / (s.N - 1), j = Math.max(1, i), ang = Math.atan2(segs[j - 1].y - segs[j].y, segs[j - 1].x - segs[j].x), nx = -Math.sin(ang), ny = Math.cos(ang);
-        const sway = reduced ? 0 : Math.sin(t * 3.2 - u * 5) * s.L * 0.04 * u * u;
-        const w = s.L * (0.012 + 0.105 * (u < 0.14 ? 0.8 + 0.2 * (u / 0.14) : Math.pow(1 - (u - 0.14) / 0.86, 1.2)));
-        P.push({ x: segs[i].x + nx * sway, y: segs[i].y + ny * sway, nx, ny, fx: Math.cos(ang), fy: Math.sin(ang), w });
-      }
-      octx.setTransform(1, 0, 0, 1, 0, 0); octx.clearRect(0, 0, cols, rows); octx.setTransform(cols / d.w, 0, 0, rows / d.h, 0, 0);
-      octx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-      octx.beginPath();
-      P.forEach((p) => { octx.moveTo(p.x + p.w, p.y); octx.arc(p.x, p.y, p.w, 0, TAU); });
-      [-1, 1].forEach((side) => {
-        const a = P[5], b = P[9], c = P[11], reach = s.L * 0.19;
-        octx.moveTo(a.x + a.nx * side * a.w * 0.7, a.y + a.ny * side * a.w * 0.7);
-        octx.lineTo(c.x + c.nx * side * (c.w + reach), c.y + c.ny * side * (c.w + reach));
-        octx.lineTo(b.x + b.nx * side * b.w * 0.6, b.y + b.ny * side * b.w * 0.6);
-        octx.closePath();
-        const e = P[s.N - 1], g = P[s.N - 4], span = s.L * (side < 0 ? 0.1 : 0.06);
-        octx.moveTo(g.x, g.y);
-        octx.lineTo(e.x - e.fx * s.L * 0.05 + e.nx * side * span, e.y - e.fy * s.L * 0.05 + e.ny * side * span);
-        octx.lineTo(e.x, e.y);
-        octx.closePath();
-      });
-      octx.fill('nonzero');
-      octx.globalCompositeOperation = 'destination-out'; octx.fillStyle = 'rgba(0, 0, 0, 0.62)';
-      const dot = Math.max(d.w / cols * 0.5, s.L * 0.009);
-      octx.beginPath();
-      for (let i = 1; i < s.N - 7; i++) [-0.58, 0, 0.58].forEach((k) => { if ((i + (k === 0 ? 1 : 0)) % 2) return; const p = P[i]; octx.moveTo(p.x + p.nx * k * p.w + dot, p.y + p.ny * k * p.w); octx.arc(p.x + p.nx * k * p.w, p.y + p.ny * k * p.w, dot, 0, TAU); });
-      octx.fill(); octx.globalCompositeOperation = 'source-over';
-      const px = octx.getImageData(0, 0, cols, rows).data;
-      for (let i = 0; i < fish.length; i++) fish[i] = px[i * 4 + 3] / 255;
-    }
-
     function measure() {
       const w = cv.clientWidth, h = cv.clientHeight;
       if (!w || !h) return false;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
-      d = { w, h, dpr, W: cv.width, H: cv.height };
-      cols = clamp(Math.round(w / (w < 700 ? 6 : 8.5)), 40, 230); cw = d.W / cols; chh = cw * 1.7; rows = Math.ceil(d.H / chh);
-      off.width = cols; off.height = rows; fish = new Float32Array(cols * rows);
-      if (!sk || w !== lastW) initShark();
-      lastW = w;
-      buildText();
+      g = grid(w, h, dpr);
+      call('resize', w, h, dpr);
+      call('setText', buildText());
       return true;
     }
     function frame(now) {
-      if (!d) return;
-      const t = reduced ? 4 : now * 0.001, dpr = d.dpr, rowCss = chh / dpr, colCss = cw / dpr;
-      quiet = $$('[data-quiet]').map((n) => n.getBoundingClientRect()).filter((q) => q.width && q.bottom > -60 && q.top < d.h + 60);
-      glass = $$('[data-glass]').filter((n) => n.offsetParent && getComputedStyle(n).visibility !== 'hidden').map(glassOf).filter((g) => g.hx > 0 && g.b > 0 && g.t < d.h);
-      waves = waves.filter((w) => now - w.t < 2400);
-      if (sk) stepShark(now);
-      const max = Math.max(1, document.documentElement.scrollHeight - innerHeight), depth = clamp(scrollY / max, 0, 1);
-      const flow = scrollY / rowCss * 0.35, snowShift = scrollY / rowCss * 0.9;
-      const heroH = heroSec.offsetHeight, s = reduced ? 0 : smooth(clamp(scrollY / (heroH * 0.6), 0, 1));
-      const appear = reduced ? 1 : 1 - Math.pow(1 - clamp((now - tStart - 200) / 1700, 0, 1), 3);
-      const dens = 0.42 * (1 - depth * 0.35), glow2 = (110 * dpr) * (110 * dpr), pX = ptr.x * dpr, pY = ptr.y * dpr;
-      ctx.clearRect(0, 0, d.W, d.H);
-      ctx.font = chh.toFixed(2) + 'px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
-      ctx.textBaseline = 'top';
-      let cur = '';
-      for (let r = 0; r < rows; r++) {
-        const y = (r + 0.5) * chh, yCss = y / dpr, rr = r + flow;
-        const qRow = quiet.filter((q) => yCss > q.top - 14 && yCss < q.bottom + 14);
-        const gRow = glass.filter((g) => yCss > g.t && yCss < g.b);
-        const mRow = text ? (scrollY + yCss - text.top) / (text.h / text.rows) : -1e9;
-        for (let c = 0; c < cols; c++) {
-          const x = (c + 0.5) * cw, xCss = x / dpr;
-          lens.k = -1;
-          for (let n = 0; n < gRow.length; n++) { const g = gRow[n]; if (xCss > g.l && xCss < g.r && lensAt(g, xCss, yCss, lens)) break; }
-          const sc = c + (lens.k >= 0 ? lens.dx / colCss : 0), sr = rr + (lens.k >= 0 ? lens.dy / rowCss : 0);
-          const cloud = vnoise(sc * 0.07 + t * 0.09, sr * 0.11 - t * 0.05, seed) * 0.62 + vnoise(sc * 0.19 - t * 0.07, sr * 0.27 + t * 0.04, seed + 31) * 0.38;
-          let v = clamp((cloud - 0.45) * 2.4, 0, 1) * dens, crest = 0, lit = false, ch = '';
-          const sn = hash2(c, Math.floor(r + snowShift + t * 1.4));
-          if (sn > 0.9955 && lens.k < 0) v = Math.max(v, 0.2 + (sn - 0.9955) * 140);
-          if (ptr.on) { const dx = x - pX, dy = y - pY; v += 0.18 * Math.exp(-(dx * dx + dy * dy) / glow2); }
-          let ox = 0, oy = 0;
-          for (let n = 0; n < waves.length; n++) {
-            const w = waves[n], age = (now - w.t) / 1000, dist = Math.hypot(x - w.x, y - w.y) || 1;
-            const q = (dist - age * 560 * dpr) / (44 * dpr), k = 0.7 * (w.k || 1) * Math.exp(-age * 1.5) * Math.exp(-q * q);
-            crest += k;
-            const push = k * q * 2.6 * cw; ox += (x - w.x) / dist * push; oy += (y - w.y) / dist * push;
-          }
-          if (text && mRow > -30 && mRow < text.rows + 30) {
-            const hh = hash2(c, Math.round(mRow));
-            const sc = Math.round(c - ox / cw + (hh - 0.5) * s * 22), sr = Math.round(mRow - oy / chh + s * (3 + hh * 18));
-            if (sc >= 0 && sc < cols && sr >= 0 && sr < text.rows) {
-              const m = text.mask[sr * cols + sc] * appear * (1 - s * 0.6);
-              if (m > 0.03) { v = Math.max(v, m * (0.74 + 0.26 * vnoise(c * 0.21 + t * 0.5, r * 0.33 - t * 0.3, seed + 7))); lit = m > 0.25; if (s > 0.12 && hh > 0.7) ch = hh > 0.86 ? 'o' : '°'; }
-            }
-          }
-          if (fish) {
-            const fc = lens.k >= 0 ? clamp(Math.round(c + lens.dx / colCss), 0, cols - 1) : c, fr = lens.k >= 0 ? clamp(Math.round(r + lens.dy / rowCss), 0, rows - 1) : r;
-            const a = fish[fr * cols + fc]; if (a > 0.01) { v = a < 0.3 ? v * (1 - a / 0.3) : 0.3 + (a - 0.3) / 0.7 * 0.7; lit = a > 0.3; }
-          }
-          let out = v + crest;
-          if (lens.k >= 0) {
-            // Inside the glass: the bezel shows the water bent and bright, the flat middle shows it frosted and dim.
-            if (lens.k < 1) out = out * 1.25 + 0.05 * (1 - lens.k); else out *= 0.7;
-            ch = RAMP[Math.round(clamp(out, 0, 1) * 9)];
-            if (ch === ' ') continue;
-            const want = crest > 0.22 ? accent : (lens.k < 1 ? rim : frost);
-            if (want !== cur) { cur = want; ctx.fillStyle = want; }
-            ctx.fillText(ch, c * cw, r * chh);
-            continue;
-          }
-          if (qRow.length && qRow.some((q) => xCss > q.left - 14 && xCss < q.right + 14)) { if (crest < 0.25) continue; out = crest; ch = ""; }
-          if (!ch) ch = RAMP[Math.round(clamp(out, 0, 1) * 9)];
-          else if (out < 0.08) ch = ' ';
-          if (ch === ' ') continue;
-          const want = crest > 0.22 ? accent : (lit ? ink : dim);
-          if (want !== cur) { cur = want; ctx.fillStyle = want; }
-          ctx.fillText(ch, c * cw, r * chh);
-        }
-      }
+      if (!g) return;
+      if (!quietNodes) { quietNodes = $$('[data-quiet]'); glassNodes = $$('[data-glass]'); }
+      const quiet = quietNodes.map((n) => n.getBoundingClientRect()).filter((q) => q.width && q.bottom > -60 && q.top < g.h + 60).map((q) => ({ left: q.left, top: q.top, right: q.right, bottom: q.bottom }));
+      const glass = glassNodes.filter((n) => n.offsetParent && getComputedStyle(n).visibility !== 'hidden').map(glassOf).filter((q) => q.hx > 0 && q.b > 0 && q.t < g.h);
+      const st = { now, scrollY, max: Math.max(1, document.documentElement.scrollHeight - innerHeight), heroH: heroSec.offsetHeight, quiet, glass, ptr: { x: ptr.x, y: ptr.y, on: ptr.on }, lastTouch };
+      if (!worker) { core.frame(st); return; }
+      pending = st;
+      if (!busy) flush();
     }
     const loop = (now) => { raf = requestAnimationFrame(loop); frame(now); };
-    const running = () => !document.hidden && !reduced && !modalOpen && d;
+    const running = () => !document.hidden && !reduced && !modalOpen && g;
     function sync() { if (running()) { if (!raf) raf = requestAnimationFrame(loop); } else if (raf) { cancelAnimationFrame(raf); raf = 0; } }
-    function recolor() { const cs = getComputedStyle(document.body); ink = cs.color; const rgb = ink.match(/\d+/g) || [236, 236, 236]; const tone = (a) => 'rgba(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ', ' + a + ')'; dim = tone(0.34); rim = tone(0.62); frost = tone(0.16); accent = cs.getPropertyValue('--accent').trim() || ink; }
-    function rebuild() { if (!measure()) return; recolor(); sync(); frame(performance.now()); }
+    function recolor() { const cs = getComputedStyle(document.body), ink = cs.color; const rgb = ink.match(/\d+/g) || [236, 236, 236]; const tone = (a) => 'rgba(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ', ' + a + ')'; call('setColors', { ink, dim: tone(0.34), rim: tone(0.62), frost: tone(0.16), accent: cs.getPropertyValue('--accent').trim() || ink }); }
+    function rebuild() { if (!measure()) return; call('setReduced', reduced); recolor(); sync(); frame(performance.now()); }
     const skip = (e) => e.target.closest('a, button, input, textarea, select, dialog, .w-screen');
     addEventListener('pointermove', (e) => { ptr.x = e.clientX; ptr.y = e.clientY; ptr.on = e.pointerType !== 'touch'; lastTouch = performance.now(); }, { passive: true });
     on(document, 'pointerleave', () => { ptr.on = false; });
-    addEventListener('pointerdown', (e) => { if (!d || reduced || skip(e)) return; lastTouch = performance.now(); waves.push({ x: e.clientX * d.dpr, y: e.clientY * d.dpr, t: performance.now() }); startle(e.clientX, e.clientY); });
-    // The water carries the shark a little as you scroll, so it trails behind and then swims to catch up.
+    addEventListener('pointerdown', (e) => { if (!g || reduced || skip(e)) return; const now = performance.now(); lastTouch = now; call('wave', e.clientX * g.dpr, e.clientY * g.dpr, now); call('startle', e.clientX, e.clientY, now); });
     addEventListener('scroll', () => {
       const dy = scrollY - sy; sy = scrollY;
-      if (sk && !reduced) { const k = clamp(dy, -80, 80) * 0.22; sk.y -= k; sk.segs.forEach((p) => { p.y -= k; }); if (sk.y < -sk.L || sk.y > d.h + sk.L) { sk.wp = pickWaypoint(); sk.wpT = performance.now() + 9000; } }
-      if (reduced && d) requestAnimationFrame(() => frame(performance.now()));
+      if (g && !reduced) call('nudge', dy, performance.now());
+      if (reduced && g) requestAnimationFrame(() => frame(performance.now()));
     }, { passive: true });
-    setInterval(() => { if (running() && performance.now() - lastTouch > 5000 && scrollY < innerHeight) waves.push({ x: d.W * (0.2 + R() * 0.6), y: d.H * (0.25 + R() * 0.4), t: performance.now() }); }, 6400);
-    setTimeout(() => { if (running()) waves.push({ x: d.W * 0.3, y: d.H * 0.55, t: performance.now() }); }, 2200);
+    setInterval(() => { if (running() && performance.now() - lastTouch > 5000 && scrollY < innerHeight) call('wave', g.W * (0.2 + R() * 0.6), g.H * (0.25 + R() * 0.4), performance.now()); }, 6400);
+    setTimeout(() => { if (running()) call('wave', g.W * 0.3, g.H * 0.55, performance.now()); }, 2200);
     let lw = 0, lh = 0;
     addEventListener('resize', () => { const w = cv.clientWidth, h = cv.clientHeight; if (w === lw && Math.abs(h - lh) < 2) return; lw = w; lh = h; requestAnimationFrame(rebuild); });
-    const ripple = (x, y) => { if (!d || reduced) return; waves.push({ x: x * d.dpr, y: y * d.dpr, t: performance.now(), k: 0.45 }); };
+    const ripple = (x, y) => { if (!g || reduced) return; call('wave', x * g.dpr, y * g.dpr, performance.now(), 0.45); };
     const api = { sync, recolor, rebuild, ripple };
     fields.push(api);
     return api;
@@ -396,10 +272,11 @@ export function startDive(host, data) {
     });
   }
   const DEPTH = 40, gauge = $('.gauge'), secs = ['work', 'experience', 'recognition', 'about', 'contact'].map((id) => document.getElementById(id)).filter(Boolean);
+  // Placed with a transform rather than top, so moving them is not a layout shift.
   function placeMarks() {
     if (!gauge) return;
     const max = Math.max(1, document.documentElement.scrollHeight - innerHeight), H = gauge.clientHeight;
-    secs.forEach((s) => { const a = $('a[data-sec="' + s.id + '"]', gauge), p = clamp((s.getBoundingClientRect().top + scrollY) / max, 0, 1); if (a && H) a.style.top = (14 + (H - 28) * p).toFixed(1) + 'px'; });
+    secs.forEach((s) => { const a = $('a[data-sec="' + s.id + '"]', gauge), p = clamp((s.getBoundingClientRect().top + scrollY) / max, 0, 1); if (a && H) a.style.transform = 'translateY(calc(' + (14 + (H - 28) * p).toFixed(1) + 'px - 50%))'; });
   }
   const navLinks = $$('.hd nav a[href^="#"], .gauge a[data-sec]');
   let curSec = '';
