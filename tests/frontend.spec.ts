@@ -9,7 +9,7 @@ test('every section reads without JavaScript', async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto('/');
-  await expect(page.locator('.w-item h3')).toHaveCount(4);
+  await expect(page.locator('.w-item h3')).toHaveCount(7);
   await expect(page.locator('#tl li')).toHaveCount(7);
   await expect(page.locator('#awards li')).toHaveCount(4);
   await expect(page.locator('.cert')).toHaveCount(6);
@@ -46,7 +46,7 @@ test('a project opens as a full page, steps with the arrow keys, and Escape retu
   await expect(page.locator('#v-title')).toHaveText('KitaKo');
   await expect(view.getByRole('link', { name: /Open the repository/ })).toHaveAttribute('href', /github\.com\/Emyol\/KitaKo/);
   await page.keyboard.press('ArrowRight');
-  await expect(page.locator('#v-title')).toHaveText('iCARE Reservation');
+  await expect(page.locator('#v-title')).toHaveText('Homestead');
   await page.keyboard.press('Escape');
   await expect(view).toBeHidden();
   await expect(trigger).toBeFocused();
@@ -61,7 +61,7 @@ test('the pinned work stage changes project as you scroll', async ({ page }) => 
   await expect(page.locator('.w-item.on h3')).toHaveText('KitaKo');
   await page.evaluate((b) => window.scrollTo(0, b.top + (b.h - innerHeight) * 0.99), box);
   await expect(page.locator('.w-item.on h3')).toHaveText('CitySense');
-  await expect(page.locator('#w-count')).toHaveText('04 / 04');
+  await expect(page.locator('#w-count')).toHaveText('07 / 07');
 });
 
 test('a certificate opens with its details', async ({ page }) => {

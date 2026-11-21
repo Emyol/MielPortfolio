@@ -493,6 +493,39 @@
         "demoUrl": ""
       },
       {
+        "id": "homestead",
+        "archived": false,
+        "title": "Homestead",
+        "meta": "NASA Space Apps Challenge · 2026",
+        "description": "A co-op space-mission game: scavenge parts, build a spacecraft, fly it together, and learn which design choice decided the run.",
+        "imgSrc": "/projects/homestead.jpg?v=1",
+        "icon": "Globe2",
+        "linkHref": "https://github.com/TadeyRuk/Homestead",
+        "demoUrl": "https://seedlign.itch.io/homestead"
+      },
+      {
+        "id": "eventflow",
+        "archived": false,
+        "title": "EventFlow",
+        "meta": "n8n Buildathon finals, Track D · 2026",
+        "description": "Event lifecycle automation on n8n that checks people in by token and certifies only those who attended and submitted.",
+        "imgSrc": "/projects/eventflow.jpg?v=1",
+        "icon": "Workflow",
+        "linkHref": "https://github.com/Seedlign/eventflow-n8n",
+        "demoUrl": ""
+      },
+      {
+        "id": "kislap",
+        "archived": false,
+        "title": "Kislap",
+        "meta": "AppBuildersPH Hackathon · 2026",
+        "description": "A reading game for Filipino children that listens to each sentence with a speech model running on the child's own device.",
+        "imgSrc": "/projects/kislap.jpg?v=1",
+        "icon": "Smartphone",
+        "linkHref": "https://github.com/Romeo-04/kislap",
+        "demoUrl": "https://romeo-04.github.io/kislap/"
+      },
+      {
         "id": "icare",
         "archived": false,
         "title": "iCARE Reservation",

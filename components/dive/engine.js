@@ -701,7 +701,378 @@ export function startDive(host, data) {
     requestAnimationFrame(resize);
     return wrap;
   }
-  const BUILDERS = { kitako: buildKitako, icare: buildIcare, bekilang: buildBekilang, citysense: buildCitysense };
+  // Kislap: the reading scorer from Romeo-04/kislap (src/scoring, src/content/syllables.ts), ported line for line.
+  function buildKislap() {
+    const SC = { correct: 0.8, unclear: 0.5, spacing: 0.85, stars: [0.5, 0.7, 0.9] };
+    const VARIANTS = new Map([['kamusta', 'kumusta'], ['favourite', 'favorite'], ['basketbol', 'basketball'], ['nagbasketbol', 'nagbasketball']]);
+    const NUMS = new Map();
+    [[0, ['zero', 'sero']], [1, ['isa', 'isang']], [2, ['dalawa', 'dalawang']], [3, ['tatlo', 'tatlong']], [4, ['apat']], [5, ['lima', 'limang']], [6, ['anim']], [7, ['pito', 'pitong']], [8, ['walo', 'walong']], [9, ['siyam']], [10, ['sampu', 'sampung']]]
+      .forEach(([n, ws]) => { NUMS.set(String(n), '#' + n); ws.forEach((w) => NUMS.set(w, '#' + n)); });
+    const canonical = (w) => NUMS.get(w) || w;
+    function tokenize(text) {
+      const src = text.normalize('NFC');
+      const ms = Array.from(src.matchAll(/[\p{L}\p{M}\p{N}]+(?:[-'’][\p{L}\p{M}\p{N}]+)*/gu));
+      return ms.map((m, i) => {
+        const cleaned = m[0].toLowerCase().replace(/[-'’]/g, '');
+        const start = i === 0 ? 0 : m.index, end = ms[i + 1] ? ms[i + 1].index : src.length;
+        return { word: src.slice(start, end).trim(), normalized: VARIANTS.get(cleaned) || cleaned };
+      });
+    }
+    function similarity(a, b) {
+      const l = Array.from(a.normalize('NFC')), r = Array.from(b.normalize('NFC')), len = Math.max(l.length, r.length);
+      if (!len) return 1;
+      let prev = Array.from({ length: r.length + 1 }, (_, k) => k);
+      for (let i = 1; i <= l.length; i++) {
+        const cur = [i];
+        for (let j = 1; j <= r.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (l[i - 1] === r[j - 1] ? 0 : 1));
+        prev = cur;
+      }
+      return 1 - prev[r.length] / len;
+    }
+    const fold = (w) => w.normalize('NFD').replace(/\p{M}/gu, '');
+    const wordSim = (e, h) => { const c = canonical(e); if (c.startsWith('#') && c === canonical(h)) return 1; return similarity(fold(e), fold(h)); };
+    function alignScored(ex, he) {
+      const n = ex.length, m = he.length;
+      const cost = Array.from({ length: n + 1 }, () => Array(m + 1).fill(Infinity)), step = Array.from({ length: n + 1 }, () => Array(m + 1));
+      cost[0][0] = 0;
+      for (let i = 0; i <= n; i++) for (let j = 0; j <= m; j++) {
+        if (!i && !j) continue;
+        const opts = [];
+        if (i > 0 && j > 0) opts.push([cost[i - 1][j - 1] + 1 - wordSim(ex[i - 1], he[j - 1]), 'pair']);
+        if (i > 0 && j > 1) { const s = wordSim(ex[i - 1], he[j - 2] + he[j - 1]); if (s >= SC.spacing) opts.push([cost[i - 1][j - 2] + 1 - s, 'split']); }
+        if (i > 1 && j > 0) { const s = wordSim(ex[i - 2] + ex[i - 1], he[j - 1]); if (s >= SC.spacing) opts.push([cost[i - 2][j - 1] + 2 * (1 - s), 'join']); }
+        if (i > 0) opts.push([cost[i - 1][j] + 1, 'skip']);
+        if (j > 0) opts.push([cost[i][j - 1] + 1, 'extra']);
+        for (const [c, s] of opts) if (c < cost[i][j] - 1e-9) { cost[i][j] = c; step[i][j] = s; }
+      }
+      const out = Array.from({ length: n }, () => ({ similarity: 0 }));
+      let i = n, j = m;
+      while (i > 0 || j > 0) {
+        const s = step[i][j];
+        if (s === 'pair') { out[i - 1] = { heard: he[j - 1], similarity: wordSim(ex[i - 1], he[j - 1]) }; i--; j--; }
+        else if (s === 'split') { const h = he[j - 2] + he[j - 1]; out[i - 1] = { heard: h, similarity: wordSim(ex[i - 1], h) }; i--; j -= 2; }
+        else if (s === 'join') { const sim = wordSim(ex[i - 2] + ex[i - 1], he[j - 1]); out[i - 2] = { heard: he[j - 1], similarity: sim }; out[i - 1] = { heard: he[j - 1], similarity: sim }; i -= 2; j--; }
+        else if (s === 'skip') i--;
+        else j--;
+      }
+      return out;
+    }
+    function scoreReading(text, heardText) {
+      const ex = tokenize(text), he = tokenize(heardText).map((w) => w.normalized);
+      const al = alignScored(ex.map((w) => w.normalized), he);
+      let credit = 0;
+      const words = ex.map((w, k) => {
+        const sim = al[k].similarity, status = sim >= SC.correct ? 'correct' : sim >= SC.unclear ? 'unclear' : 'missed';
+        credit += status === 'correct' ? 1 : status === 'unclear' ? 0.5 : 0;
+        return { word: w.word, status, heard: al[k].heard };
+      });
+      return { words, accuracy: words.length ? credit / words.length : 0 };
+    }
+    const starsFor = (a) => (a >= SC.stars[2] ? 3 : a >= SC.stars[1] ? 2 : a >= SC.stars[0] ? 1 : 0);
+    const VOWELS = new Set(['a', 'e', 'i', 'o', 'u']), ONSETS = new Set(['bl', 'br', 'dr', 'gl', 'gr', 'kl', 'kr', 'pl', 'pr', 'tr', 'ts', 'sw', 'sy', 'dy', 'ky', 'py']);
+    const base = (ch) => ch.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+    function syllabifyPart(part) {
+      const u = [];
+      for (let i = 0; i < part.length; i++) { if (base(part[i]) === 'n' && base(part[i + 1] || '') === 'g') { u.push(part.slice(i, i + 2)); i++; } else u.push(part[i]); }
+      const vAt = u.flatMap((x, i) => (VOWELS.has(base(x)) ? [i] : []));
+      if (vAt.length <= 1) return part ? [part] : [];
+      const cuts = [];
+      for (let v = 0; v < vAt.length - 1; v++) {
+        const cl = u.slice(vAt[v] + 1, vAt[v + 1]);
+        const keep = cl.length <= 1 ? 0 : cl.length === 2 ? 1 : ONSETS.has(cl.slice(-2).map(base).join('')) ? cl.length - 2 : cl.length - 1;
+        cuts.push(vAt[v] + 1 + keep);
+      }
+      const out = []; let s = 0;
+      cuts.forEach((c) => { out.push(u.slice(s, c).join('')); s = c; });
+      out.push(u.slice(s).join(''));
+      return out;
+    }
+    const syllabify = (w) => w.split('-').map((p) => p.replace(/[^\p{L}]/gu, '')).filter(Boolean).flatMap(syllabifyPart);
+
+    const SAMPLES = [
+      { label: 'Read well', text: 'Ilaw ni Ningning ang gabay nila.', heard: 'ilaw ni ningning ang gabay nila' },
+      { label: 'Skipped words', text: 'Takot ang pusa sa dilim.', heard: 'takot pusa delim' },
+      { label: 'Stumbled', text: 'Dahan-dahan nilang diniligan ang sampaguita.', heard: 'dahan dahan nilang dinilig ang sampagita' },
+      { label: 'Taglish', text: 'Sa ilalim ng buwan, may story time sa barangay.', heard: 'sa ilalim ng buwan may storytime sa barangay' },
+    ];
+    const wrap = el('div', 'panel');
+    const presets = el('div', 'bk-presets'); presets.setAttribute('role', 'group'); presets.setAttribute('aria-label', 'Example readings');
+    const sentence = el('p', 'ks-sentence');
+    const field = el('label', 'ks-heard'); const fieldLab = el('span', 'label mute', 'What the speech model heard');
+    const input = el('input'); input.type = 'text'; input.spellcheck = false; input.autocomplete = 'off';
+    field.append(fieldLab, input);
+    const result = el('div', 'ks-result'), stars = el('span', 'ks-stars'), say = el('p', 'ks-say');
+    say.setAttribute('aria-live', 'polite');
+    result.append(stars, say);
+    const detail = el('p', 'ks-detail');
+    const note = el('p', 'note', 'This runs Kislap’s scorer (same cut-offs: 0.80 correct, 0.50 unclear; Ningning cheers from 70%) and its syllable rules, ported to JavaScript. The speech model is not running here: change what it heard and the marks follow. Tap a word to see its syllables.');
+    wrap.append(presets, sentence, field, result, detail, note);
+    let cur = 0, picked = -1;
+    function show() {
+      const s = SAMPLES[cur], r = scoreReading(s.text, input.value), n = starsFor(r.accuracy);
+      sentence.replaceChildren(...r.words.map((w, i) => {
+        const b = el('button', 'ks-w ' + w.status, w.word); b.type = 'button';
+        b.setAttribute('aria-pressed', String(i === picked));
+        b.setAttribute('aria-label', w.word + ', ' + w.status);
+        b.addEventListener('click', () => { picked = i; show(); });
+        return b;
+      }));
+      stars.textContent = '★★★'.slice(0, n) + '☆☆☆'.slice(0, 3 - n);
+      stars.setAttribute('aria-label', n + ' of 3 stars');
+      const cheer = r.accuracy >= 0.7;
+      say.replaceChildren(el('b', '', 'Ningning: '), document.createTextNode(cheer ? 'Galing!' : 'Subukan natin ulit!'), el('small', '', cheer ? '  Great!' : '  Let’s try again!'));
+      const w = r.words[picked];
+      if (!w) { detail.textContent = Math.round(r.accuracy * 100) + '% of the words read. Green is correct, yellow unclear, orange missed.'; return; }
+      detail.replaceChildren(el('b', '', syllabify(w.word).join(' · ')), document.createTextNode(w.heard ? '   Narinig ni Ningning: “' + w.heard + '”' : '   Hindi narinig ni Ningning ang salitang ito.'));
+    }
+    SAMPLES.forEach((s, i) => { const b = el('button', 'chip', s.label); b.type = 'button'; b.addEventListener('click', () => { cur = i; picked = -1; input.value = s.heard; $$('.chip', presets).forEach((x, j) => x.setAttribute('aria-pressed', String(j === i))); show(); }); presets.append(b); });
+    input.addEventListener('input', show);
+    presets.firstChild.click();
+    return wrap;
+  }
+
+  // EventFlow: the lifecycle rules from Seedlign/eventflow-n8n (src/engine.js) on the organizer's 15-event batch.
+  function buildEventflow() {
+    const PEOPLE = [
+      ['REG-8001', 'Juancho Santos', 'N8NPH-7A9B2C1D'], ['REG-8002', 'Maria Teresa Cruz', 'N8NPH-3E4F5G6H'], ['REG-8003', 'Ramil Villanueva', 'N8NPH-9I0J1K2L'],
+      ['REG-8004', 'Angelica Bautista', 'N8NPH-5M6N7O8P'], ['REG-8005', 'Kevin Bryan Tan', 'N8NPH-9Q0R1S2T'],
+    ];
+    const TOKEN = Object.fromEntries(PEOPLE.map(([id, , t]) => [id, t]));
+    const NAME = Object.fromEntries(PEOPLE.map(([id, n]) => [id, n]));
+    const BATCH = [
+      ['registration_submitted', 'REG-8001'], ['registration_submitted', 'REG-8002'], ['checkin_scanned', 'REG-8001', 'Desk 01'], ['registration_submitted', 'REG-8003'],
+      ['checkin_scanned', 'REG-8002', 'Desk 02'], ['project_submitted', 'REG-8001'], ['registration_submitted', 'REG-8004'], ['checkin_scanned', 'REG-8003', 'Desk 01'],
+      ['duplicate_checkin_attempt', 'REG-8001', 'Desk 03'], ['project_submitted', 'REG-8002'], ['registration_submitted', 'REG-8005'], ['unverified_project_submission_attempt', 'REG-8004'],
+      ['checkin_scanned', 'REG-8004', 'Desk 02'], ['project_submitted', 'REG-8003'], ['project_submitted', 'REG-8004'],
+    ].map(([type, id, desk], i) => ({ seq: i + 1, type, id, token: type.startsWith('registration') ? '' : TOKEN[id], desk }));
+    const INTENT = { registration_submitted: 'register', checkin_scanned: 'checkin', duplicate_checkin_attempt: 'checkin', project_submitted: 'submit', unverified_project_submission_attempt: 'submit' };
+    let state = {}, next = 0, pass = 1, log = [], sent = 0, timer = 0;
+    function decide(ev) {
+      const intent = INTENT[ev.type];
+      if (intent === 'register') {
+        if (state[ev.id]) return { o: 'DUPLICATE', r: 'already registered' };
+        state[ev.id] = { status: 'Registered' }; sent++;
+        return { o: 'OK', r: 'registered with pre-issued token, entry pass emailed' };
+      }
+      if (!ev.token) return { o: 'INVALID', r: 'no token presented' };
+      const owner = Object.keys(state).find((k) => TOKEN[k] === ev.token);
+      if (!owner) return { o: 'INVALID', r: 'token not on file' };
+      if (ev.id && ev.id !== owner) return { o: 'INVALID', r: 'token belongs to a different attendee' };
+      const row = state[owner];
+      if (intent === 'checkin') {
+        if (row.status !== 'Registered') return { o: 'DUPLICATE', r: 'already checked in' };
+        row.status = 'Attended';
+        return { o: 'OK', r: 'checked in by ' + ev.desk };
+      }
+      if (row.status === 'Completed') return { o: 'DUPLICATE', r: 'credential already issued' };
+      if (row.status === 'Registered') return { o: 'UNVERIFIED', r: 'submission before check-in, no credential issued' };
+      row.status = 'Completed'; sent++;
+      return { o: 'OK', r: 'checked in and submitted, certificate and badge emailed' };
+    }
+    const wrap = el('div', 'panel');
+    const row1 = el('div', 'bk-row'), btns = el('div', 'seg');
+    const bNext = el('button', 'chip fill', 'Next event'), bAll = el('button', 'chip', 'Play the batch'), bReset = el('button', 'chip', 'Reset');
+    [bNext, bAll, bReset].forEach((b) => { b.type = 'button'; btns.append(b); });
+    const progress = el('span', 'label mute');
+    row1.append(btns, progress);
+    const people = el('ul', 'ef-people');
+    const funnel = el('p', 'ef-funnel');
+    const logEl = el('ol', 'ef-log'); logEl.setAttribute('aria-live', 'polite');
+    const tryRow = el('div', 'bk-presets'); tryRow.setAttribute('role', 'group'); tryRow.setAttribute('aria-label', 'Try to break it');
+    const tries = [
+      ['Scan Juancho’s token as Kevin', () => ({ seq: 'live', type: 'checkin_scanned', id: 'REG-8005', token: TOKEN['REG-8001'], desk: 'Desk 04' })],
+      ['Scan with no token', () => ({ seq: 'live', type: 'checkin_scanned', id: 'REG-8005', token: '', desk: 'Desk 04' })],
+      ['Submit for Kevin', () => ({ seq: 'live', type: 'project_submitted', id: 'REG-8005', token: TOKEN['REG-8005'] })],
+    ];
+    tries.forEach(([label, make]) => { const b = el('button', 'chip', label); b.type = 'button'; b.addEventListener('click', () => { stop(); apply(make()); }); tryRow.append(b); });
+    const note = el('p', 'note', 'The 15 events and five people are the organizer’s test batch (dummy data). The rules are EventFlow’s: the token is the only proof, the sheet’s status decides the outcome, not the event’s label, and a certificate needs a check-in first. In the real workflow this is one n8n Code node between Google Sheets and Gmail.');
+    wrap.append(row1, people, funnel, logEl, el('p', 'label mute', 'Try to break it'), tryRow, note);
+    function apply(ev) {
+      const d = decide(ev);
+      log.unshift({ ev, d });
+      render();
+    }
+    function step() {
+      if (next >= BATCH.length) { next = 0; pass++; }
+      apply(BATCH[next++]);
+    }
+    function stop() { clearInterval(timer); timer = 0; bAll.setAttribute('aria-pressed', 'false'); }
+    function render() {
+      people.replaceChildren(...PEOPLE.map(([id, n, t]) => {
+        const li = el('li'), st = state[id] ? state[id].status : 'Not registered';
+        li.append(el('span', '', n), el('code', '', t), el('span', 'ef-st ' + st.toLowerCase().replace(' ', '-'), st));
+        return li;
+      }));
+      const rows = Object.values(state);
+      funnel.textContent = 'Registered ' + rows.length + ' · Attended ' + rows.filter((r) => r.status !== 'Registered').length + ' · Completed ' + rows.filter((r) => r.status === 'Completed').length + ' · Emails sent ' + sent;
+      logEl.replaceChildren(...log.slice(0, 6).map(({ ev, d }) => {
+        const li = el('li');
+        li.append(el('span', 'ef-o ' + d.o.toLowerCase(), d.o), el('span', 'ef-ev', (ev.seq === 'live' ? 'Live' : 'Seq ' + pad2(ev.seq)) + ' · ' + ev.type + ' · ' + NAME[ev.id]), el('small', '', d.r));
+        return li;
+      }));
+      if (!log.length) logEl.append(el('li', 'mute', 'Press Next event to process the first registration.'));
+      progress.textContent = (pass > 1 ? 'Run ' + pass + ' · ' : '') + next + ' / ' + BATCH.length;
+      bNext.textContent = next >= BATCH.length ? 'Run the batch again' : 'Next event';
+    }
+    bNext.addEventListener('click', () => { stop(); step(); });
+    bAll.addEventListener('click', () => {
+      if (timer) { stop(); return; }
+      if (next >= BATCH.length) { next = 0; pass++; }
+      bAll.setAttribute('aria-pressed', 'true');
+      if (reduced) { while (next < BATCH.length) step(); stop(); return; }
+      timer = setInterval(() => { if (!wrap.isConnected || next >= BATCH.length) { stop(); return; } step(); }, 450);
+    });
+    bReset.addEventListener('click', () => { stop(); state = {}; next = 0; pass = 1; log = []; sent = 0; render(); });
+    render();
+    return wrap;
+  }
+
+  // Homestead: the build phase and the mission report, with the part data from TadeyRuk/Homestead
+  // (prototype/js/data.js) and the report's lines from prototype/js/report.js. The outcome is a quick reading of
+  // the build, not the game's flight and surface simulation.
+  function buildHomestead() {
+    const CABIN = 200, BASE_LOAD = 150;
+    const SLOTS = [['prop', 'Propulsion', 'Pilot'], ['power', 'Power', 'Rocket Engineer'], ['comms', 'Comms', 'Comms Engineer'], ['payload', 'Payload', 'Science Officer']];
+    const CAT = { prop: '#f08c32', power: '#5a96f5', comms: '#9aa3ad', payload: '#e6b946' };
+    const P = {
+      solid: { slot: 'prop', cost: 6, name: 'Solid motor', mass: 180, power: -10, lift: 600, flight: 'Lifts 600 kg. Steers in fixed pulses', fact: 'Solid boosters give huge thrust but cannot be throttled or shut down once lit. Shuttle and SLS pair them with liquid engines for control.' },
+      chem: { slot: 'prop', cost: 10, name: 'Chemical engine', mass: 300, power: -30, lift: 900, flight: 'Lifts 900 kg. Responsive, thirsty', fact: 'The RL10 has flown since the 1960s because it restarts and throttles cleanly, but every burn spends propellant that had to be launched too.' },
+      storable: { slot: 'prop', cost: 9, name: 'Storable engine', mass: 260, power: -25, lift: 800, flight: 'Lifts 800 kg. Restarts every time', fact: 'Orion’s service module engine is a refurbished Space Shuttle OMS engine. Its two propellants ignite on contact, so it restarts reliably every time.' },
+      ion: { slot: 'prop', cost: 12, name: 'Ion drive', mass: 120, power: -250, lift: 500, flight: 'Lifts 500 kg. Slow, sips fuel', fact: 'Dawn’s ion engines pushed about as hard as a sheet of paper weighs, but ran for years on very little xenon and visited two worlds.' },
+      hall: { slot: 'prop', cost: 11, name: 'Hall thruster', mass: 140, power: -350, lift: 550, flight: 'Lifts 550 kg. More push than ion, power hungry', fact: 'Psyche flies on Hall-effect thrusters that push xenon out with electric and magnetic fields. They give more thrust than Dawn’s ion engines, but each one draws kilowatts of power.' },
+      solar_s: { slot: 'power', cost: 4, name: 'Small solar array', mass: 60, power: 300, solar: true, heat: 0, recharge: 7, flight: 'Drops in solar flares', fact: 'InSight ran on two small solar arrays. Mars dust slowly covered them, and the mission ended when power ran out.' },
+      rosa: { slot: 'power', cost: 7, name: 'Roll-out solar array', mass: 70, power: 550, solar: true, heat: 0, recharge: 13, flight: 'Light and strong, drops in flares', fact: 'Roll-Out Solar Arrays unroll like a carpet. They were tested on the ISS, flew on DART, and now upgrade the station’s power.' },
+      solar_l: { slot: 'power', cost: 8, name: 'Large solar array', mass: 150, power: 600, solar: true, heat: 0, recharge: 16, flight: 'Plenty of power, bigger debris target', fact: 'Juno needs three 9 m solar wings to make a few hundred watts at Jupiter, where sunlight is 25 times weaker than at Earth.' },
+      rtg: { slot: 'power', cost: 16, name: 'Radioisotope generator', mass: 110, power: 450, solar: false, heat: 0.35, recharge: 11, flight: 'Steady, ignores flares, runs hot', fact: 'Curiosity and Perseverance carry an MMRTG, so dust storms and night do not stop them. The waste heat has to be managed all the time.' },
+      reactor: { slot: 'power', cost: 20, name: 'Fission reactor', mass: 230, power: 800, solar: false, heat: 0.6, recharge: 18, flight: 'Huge steady power, runs very hot', fact: 'In 2018 NASA’s KRUSTY test ran a small Kilopower reactor at full power. Reactors like it are meant to power a base on the Moon or Mars through night and dust.' },
+      lga: { slot: 'comms', cost: 2, name: 'Low-gain antenna', mass: 15, power: -20, rate: 0.22, flight: 'Hardly drifts, short warning', fact: 'Rover low-gain antennas work in almost any direction, but only at a trickle. They are the backup, not the science link.' },
+      reflectarray: { slot: 'comms', cost: 3, name: 'CubeSat reflectarray', mass: 20, power: -50, rate: 0.4, flight: 'Light, narrow beam', fact: 'The MarCO CubeSats unfolded a flat reflectarray antenna and relayed InSight’s landing on Mars back to Earth as it happened.' },
+      uhf: { slot: 'comms', cost: 5, name: 'UHF relay radio', mass: 25, power: -40, rate: 0.7, flight: 'Easy to hold, little warning', fact: 'Curiosity and Perseverance send most of their data by UHF radio to orbiters like Mars Reconnaissance Orbiter, which pass it on to Earth.' },
+      dish: { slot: 'comms', cost: 7, name: 'High-gain dish', mass: 70, power: -80, rate: 0.5, flight: 'Drifts when the pilot turns', fact: 'Mars Reconnaissance Orbiter carries a 3 m dish so its cameras’ data can get home. A strong instrument needs a link that can keep up.' },
+      laser: { slot: 'comms', cost: 12, name: 'Laser terminal', mass: 40, power: -120, rate: 0.95, flight: 'Hardest to keep on target', fact: 'The Deep Space Optical Communications demo on Psyche sent data by laser far faster than radio, but the beam has to be pointed with extreme precision.' },
+      neutron: { slot: 'payload', cost: 4, name: 'Neutron spectrometer', mass: 25, power: -30, heat: 0.4, rich: 10, flight: 'Runs cool', fact: 'Lunar Prospector’s neutron spectrometer found extra hydrogen at the lunar poles in 1998, a sign of water ice. LEND on the Lunar Reconnaissance Orbiter keeps mapping it.' },
+      camera: { slot: 'payload', cost: 5, name: 'Camera', mass: 30, power: -40, heat: 0.55, rich: 8, flight: 'Barely heats the core', fact: 'HiRISE takes sharp pictures quickly, but a picture answers fewer questions than a spectrum or a radar profile.' },
+      spectro: { slot: 'payload', cost: 9, name: 'Spectrometer', mass: 80, power: -110, heat: 1.05, rich: 13, flight: 'Needs cooling', fact: 'SuperCam on Perseverance reads rock chemistry from a distance. Its detectors have to be kept cold to work.' },
+      radar: { slot: 'payload', cost: 11, name: 'Radar sounder', mass: 160, power: -200, heat: 1.7, rich: 19, flight: 'Overheats fast', fact: 'SHARAD looks up to a kilometre under the Martian surface, at the cost of mass, power and long observation passes.' },
+      sam: { slot: 'payload', cost: 14, name: 'Sample lab', mass: 120, power: -230, heat: 1.4, rich: 24, flight: 'Runs very hot', fact: 'SAM on Curiosity bakes rock powder in tiny ovens and reads the gases that come off. It is the rover’s biggest instrument.' },
+      sal_prop: { slot: 'prop', cost: 0, salvage: true, name: 'Salvage motor', mass: 220, power: -20, lift: 560, flight: 'Weak and sluggish', fact: 'Real missions pick the engine first, because it decides how much everything else is allowed to weigh.' },
+      sal_power: { slot: 'power', cost: 0, salvage: true, name: 'Salvage cell', mass: 80, power: 240, solar: true, heat: 0, recharge: 4, flight: 'Barely enough power', fact: 'Real missions size the power system with margin. Running a spacecraft at its power limit leaves nothing for a bad day.' },
+      sal_comms: { slot: 'comms', cost: 0, salvage: true, name: 'Salvage antenna', mass: 30, power: -30, rate: 0.1, flight: 'Almost no warning', fact: 'Mars Reconnaissance Orbiter carries a 3 m dish so its cameras’ data can get home. A strong instrument needs a link that can keep up.' },
+      sal_payload: { slot: 'payload', cost: 0, salvage: true, name: 'Salvage sensor', mass: 40, power: -40, heat: 0.6, rich: 5, flight: 'Runs warm', fact: 'The instrument is the reason the mission flies. Real teams choose it first and build the spacecraft around it.' },
+    };
+    const MISSIONS = {
+      moon: { short: 'Moon', credits: 20, target: 33, scans: 3, solarFlight: 1, solarSurface: 1, card: 'About 3 days away · radio delay about 1.3 s · solar flares', hazard: 'solar flare', hazardFact: 'The Moon has no thick atmosphere or global magnetic field, so solar particles reach the surface. Crews need shelter within minutes of a warning.' },
+      mars: { short: 'Mars', credits: 40, target: 50, scans: 4, solarFlight: 0.6, solarSurface: 0.43, card: 'About 7 months away · radio delay 3 to 22 min · sunlight about 43% of Earth’s · dust storms', hazard: 'dust storm', hazardFact: 'In 2018 a planet-wide dust storm cut off power to the Opportunity rover, and the mission ended. Planners now schedule surface work around Mars weather.' },
+    };
+    let mission = 'mars';
+    const build = { prop: null, power: null, comms: null, payload: null };
+    const lc = (s) => s.charAt(0).toLowerCase() + s.slice(1);
+    const slotWord = (s) => (s === 'prop' ? 'propulsion' : s);
+
+    const wrap = el('div', 'panel');
+    const misSeg = el('div', 'seg'); misSeg.setAttribute('role', 'group'); misSeg.setAttribute('aria-label', 'Mission');
+    const brief = el('p', 'hs-brief');
+    const slotsEl = el('div', 'hs-slots');
+    const meters = el('div', 'hs-meters');
+    const meter = () => { const m = el('div', 'hs-meter'), t = el('span', 'label'), bar = el('span', 'hs-bar'), fill = el('i'); bar.append(fill); m.append(t, bar); meters.append(m); return { m, t, fill }; };
+    const mMass = meter(), mPower = meter(), mCost = meter();
+    const row = el('div', 'bk-row'), launch = el('button', 'chip fill', 'Launch'), clear = el('button', 'chip', 'Clear the pad');
+    launch.type = clear.type = 'button';
+    const hint = el('span', 'label mute');
+    const btns = el('div', 'seg'); btns.append(launch, clear);
+    row.append(btns, hint);
+    const report = el('div', 'hs-report'); report.setAttribute('aria-live', 'polite'); report.hidden = true;
+    const note = el('p', 'note', 'Mission Control’s brief, the parts and their numbers come from the game’s data file, and each part is based on real NASA hardware. In the game you scavenge these parts on a launch campus against the clock, fly what you built from four crew stations, then land and work the surface. Here the report is a quick reading of the build, not the game’s flight and surface run.');
+    wrap.append(misSeg, brief, slotsEl, meters, row, report, note);
+
+    const slotUi = {};
+    SLOTS.forEach(([slot, label, role]) => {
+      const box = el('div', 'hs-slot'); box.style.setProperty('--c', CAT[slot]);
+      const head = el('p', 'hs-slot-h'); head.append(el('b', '', label), el('span', '', 'sets the ' + role + '’s station'));
+      const chips = el('div', 'hs-parts'); chips.setAttribute('role', 'group'); chips.setAttribute('aria-label', label + ' part');
+      const buttons = Object.entries(P).filter(([, p]) => p.slot === slot && !p.salvage).map(([id, p]) => {
+        const b = el('button', 'chip'); b.type = 'button';
+        b.append(document.createTextNode(p.name), el('small', '', p.cost + ' cr'));
+        b.title = p.flight;
+        b.addEventListener('click', () => { build[slot] = build[slot] === id ? null : id; hideReport(); render(); });
+        chips.append(b);
+        return [id, b];
+      });
+      const line = el('p', 'hs-slot-line');
+      box.append(head, chips, line);
+      slotsEl.append(box);
+      slotUi[slot] = { box, line, buttons };
+    });
+    Object.entries(MISSIONS).forEach(([id, m]) => { const b = el('button', 'chip', m.short); b.type = 'button'; b.addEventListener('click', () => { mission = id; hideReport(); render(); }); misSeg.append(b); });
+
+    function hideReport() { report.hidden = true; SLOTS.forEach(([s]) => slotUi[s].box.classList.remove('blame')); }
+    function model(withSalvage) {
+      const parts = {};
+      SLOTS.forEach(([s]) => { parts[s] = build[s] ? P[build[s]] : withSalvage ? P['sal_' + s] : null; });
+      let mass = CABIN, draw = BASE_LOAD, cost = 0;
+      Object.values(parts).forEach((p) => { if (!p) return; mass += p.mass; if (p.power < 0) draw += -p.power; cost += p.cost; });
+      return { parts, mass, draw, cost, lift: parts.prop ? parts.prop.lift : 0, supply: parts.power ? parts.power.power : 0 };
+    }
+    function render() {
+      const mi = MISSIONS[mission], m = model(false);
+      $$('.chip', misSeg).forEach((b) => b.setAttribute('aria-pressed', String(b.textContent === mi.short)));
+      brief.replaceChildren(el('b', '', 'Mission Control: '), document.createTextNode(mi.short + ' survey. Uplink ' + mi.target + ' data units. Budget ' + mi.credits + ' credits. ' + mi.card + '.'));
+      SLOTS.forEach(([s]) => {
+        const u = slotUi[s], p = build[s] ? P[build[s]] : null;
+        u.buttons.forEach(([id, b]) => b.setAttribute('aria-pressed', String(build[s] === id)));
+        u.line.textContent = p ? p.mass + ' kg · ' + (p.power > 0 ? '+' : '') + p.power + ' W · ' + p.flight : 'Empty. It gets a ' + lc(P['sal_' + s].name) + ' at launch.';
+        u.box.classList.toggle('empty', !p);
+      });
+      const set = (mt, text, frac, bad, warn) => { mt.t.textContent = text; mt.fill.style.setProperty('--f', clamp(frac, 0, 1).toFixed(3)); mt.m.classList.toggle('bad', bad); mt.m.classList.toggle('warn', !bad && warn); };
+      set(mMass, m.lift ? 'Mass ' + m.mass + ' of ' + m.lift + ' kg lift' : 'Mass ' + m.mass + ' kg · no engine yet', m.lift ? m.mass / m.lift : 0, m.lift > 0 && m.mass > m.lift, m.lift > 0 && m.mass / m.lift > 0.86);
+      const sup = m.parts.power ? Math.round(m.supply * (m.parts.power.solar ? mi.solarFlight : 1)) : 0;
+      set(mPower, sup ? 'Power ' + m.draw + ' of ' + sup + ' W in flight' : 'Power draw ' + m.draw + ' W · no power yet', sup ? m.draw / sup : 0, sup > 0 && m.draw > sup, sup > 0 && m.draw / sup > 0.85);
+      set(mCost, 'Cost ' + m.cost + ' of ' + mi.credits + ' credits', m.cost / mi.credits, m.cost > mi.credits, false);
+      hint.textContent = SLOTS.filter(([s]) => build[s]).length + ' of 4 slots filled';
+    }
+    function analyze() {
+      const mi = MISSIONS[mission], m = model(true), p = m.parts;
+      const sal = (s) => (build[s] ? null : 'The ' + slotWord(s) + ' slot was still empty at launch, so it got a ' + lc(p[s].name) + '.');
+      const supFlight = p.power.power * (p.power.solar ? mi.solarFlight : 1), heavyPct = Math.round(m.mass / m.lift * 100);
+      const heat = p.payload.heat + (p.power.heat || 0), upload = mi.target / p.comms.rate, recharge = p.power.recharge * (p.power.solar ? mi.solarSurface : 1);
+      const scansNeeded = Math.ceil(mi.target / p.payload.rich);
+      let r;
+      if (m.mass > m.lift) {
+        const other = ['power', 'comms', 'payload'].map((s) => p[s]).sort((a, b) => b.mass - a.mass)[0];
+        r = { ok: false, slot: 'prop', head: 'The rocket never reached orbit.', chain: ['The build weighed ' + m.mass + ' kg, and the ' + lc(p.prop.name) + ' lifts ' + m.lift + ' kg.', 'The heaviest part after the engine was the ' + lc(other.name) + ' at ' + other.mass + ' kg.', sal('prop') || 'The pad showed the mass meter in red before launch. Launch is never blocked.'], real: 'The launch vehicle sets a hard limit on mass. Real teams keep a mass budget with margin from the first day, and when one part grows, another has to shrink.' };
+      } else if (m.draw > supFlight) {
+        const hungry = ['prop', 'comms', 'payload'].map((s) => p[s]).sort((a, b) => a.power - b.power)[0];
+        r = { ok: false, slot: 'power', head: 'The breaker kept tripping on the way to ' + mi.short + '.', chain: ['The parts and life support drew ' + m.draw + ' W, and the ' + lc(p.power.name) + ' made ' + Math.round(supFlight) + ' W in flight' + (p.power.solar && mi.solarFlight < 1 ? ', with sunlight fading on the way to Mars' : '') + '.', 'Each trip switched life support off until the Rocket Engineer shed a load. Switching off the engine needs the pilot to agree, and switching off the antenna drops the link.', sal('power') || 'The hungriest part was the ' + lc(hungry.name) + ' at ' + -hungry.power + ' W.'], real: p.power.fact };
+      } else if (heat >= 1.7) {
+        r = { ok: false, slot: 'payload', head: 'The instrument landed damaged.', chain: ['The core ran too hot in flight. ' + p.payload.name + ': ' + lc(p.payload.flight) + '.', p.power.heat ? 'The ' + lc(p.power.name) + ' adds its own heat to the core.' : 'The Science Officer could not open the coolant valve far enough.', 'A damaged instrument returns less data from every site.'], real: p.payload.fact };
+      } else if (upload > 180) {
+        r = { ok: false, slot: 'comms', head: 'Data was still waiting in the lander when the extraction ship arrived.', chain: ['Uploads were slow: the ' + lc(p.comms.name) + ' sends ' + p.comms.rate.toFixed(2) + ' units per second, so ' + mi.target + ' units take ' + Math.round(upload) + ' s of a five-minute sortie.', sal('comms') || 'The ' + lc(p.payload.name) + ' collected data faster than the link could send it.'], real: p.comms.fact };
+      } else if (p.power.solar && recharge < 6) {
+        r = { ok: false, slot: 'power', head: 'A suit ran out in the ' + mi.hazard + '.', chain: ['The ' + lc(p.power.name) + ' recharges a suit at ' + recharge.toFixed(1) + '% per second' + (mission === 'mars' ? ', because sunlight at Mars is 43% of Earth’s' : '') + '.', 'Suits drain faster inside the hazard, and the walk back to the lander was long.'], real: mi.hazardFact };
+      } else if (scansNeeded > mi.scans + 1) {
+        r = { ok: false, slot: 'payload', head: 'Not enough data for Mission Control.', chain: ['The ' + lc(p.payload.name) + ' gives ' + p.payload.rich + ' data units for a rich site, so ' + mi.target + ' units takes at least ' + scansNeeded + ' rich scans.', sal('payload') || 'The rich sites are far from the lander, and the clock ran out.'], real: p.payload.fact };
+      } else {
+        r = { ok: true, slot: 'payload', head: 'The build can do the job. Now the crew has to fly it.', chain: ['The ' + lc(p.payload.name) + ' gives ' + p.payload.rich + ' data units for each rich site.', 'The ' + lc(p.comms.name) + ' sends it home at ' + p.comms.rate.toFixed(2) + ' units per second.', 'The build is at ' + heavyPct + '% of what the ' + lc(p.prop.name) + ' can lift.'], real: p.payload.fact };
+      }
+      if (m.cost > mi.credits) r.chain.push('It cost ' + m.cost + ' credits against a cap of ' + mi.credits + ', and going over the cap costs score.');
+      return r;
+    }
+    launch.addEventListener('click', () => {
+      const r = analyze();
+      report.replaceChildren();
+      report.classList.toggle('ok', r.ok);
+      report.append(el('p', 'label mute', 'Mission report'), el('p', 'verdict', r.head));
+      const ul = el('ul', 'hs-chain'); r.chain.filter(Boolean).forEach((c) => ul.append(el('li', '', c))); report.append(ul);
+      const real = el('p', 'hs-real'); real.append(el('b', '', 'What real missions do: '), document.createTextNode(r.real)); report.append(real);
+      report.hidden = false;
+      SLOTS.forEach(([s]) => slotUi[s].box.classList.toggle('blame', s === r.slot && !r.ok));
+    });
+    clear.addEventListener('click', () => { SLOTS.forEach(([s]) => { build[s] = null; }); hideReport(); render(); });
+    render();
+    return wrap;
+  }
+
+  const BUILDERS = { kitako: buildKitako, icare: buildIcare, bekilang: buildBekilang, citysense: buildCitysense, kislap: buildKislap, eventflow: buildEventflow, homestead: buildHomestead };
 
   /* ================= Full page for one item ================= */
   const view = $('#view'), vScroll = $('#v-scroll');
@@ -790,7 +1161,7 @@ export function startDive(host, data) {
   on(view, 'cancel', (e) => { e.preventDefault(); close(); });
   host.dataset.ready = 'true';
   on(view, 'keydown', (e) => {
-    if (e.target.closest('textarea, .mine')) return;
+    if (e.target.closest('textarea, input, canvas, .mine')) return;
     if (e.key === 'ArrowLeft') step(-1); else if (e.key === 'ArrowRight') step(1);
   });
 
