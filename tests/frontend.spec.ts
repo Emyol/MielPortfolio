@@ -11,7 +11,7 @@ test('every section reads without JavaScript', async ({ browser }) => {
   await page.goto('/');
   await expect(page.locator('.w-item h3')).toHaveCount(7);
   await expect(page.locator('#tl li')).toHaveCount(7);
-  await expect(page.locator('#awards li')).toHaveCount(4);
+  await expect(page.locator('#awards li')).toHaveCount(8);
   await expect(page.locator('.cert')).toHaveCount(6);
   await expect(page.locator('#idx li')).toHaveCount(4);
   await expect(page.getByRole('heading', { name: 'Have a system' })).toBeAttached();

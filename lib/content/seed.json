@@ -205,6 +205,30 @@
         "icon": "Network"
       },
       {
+        "id": "entry-18",
+        "archived": false,
+        "alt": "React",
+        "category": "Runtime",
+        "src": "",
+        "icon": "Code2"
+      },
+      {
+        "id": "entry-19",
+        "archived": false,
+        "alt": "Supabase",
+        "category": "Runtime",
+        "src": "",
+        "icon": "Database"
+      },
+      {
+        "id": "entry-20",
+        "archived": false,
+        "alt": "n8n",
+        "category": "Runtime",
+        "src": "",
+        "icon": "Workflow"
+      },
+      {
         "id": "entry-10",
         "archived": false,
         "alt": "On-device ML",
@@ -235,6 +259,22 @@
         "category": "Domains",
         "src": "",
         "icon": "Braces"
+      },
+      {
+        "id": "entry-21",
+        "archived": false,
+        "alt": "Cybersecurity (CTF)",
+        "category": "Domains",
+        "src": "",
+        "icon": "Network"
+      },
+      {
+        "id": "entry-22",
+        "archived": false,
+        "alt": "Automation",
+        "category": "Domains",
+        "src": "",
+        "icon": "Workflow"
       },
       {
         "id": "entry-14",
@@ -361,11 +401,43 @@
     "title": "Awards & distinctions",
     "items": [
       {
+        "id": "entry-5",
+        "archived": false,
+        "year": "2026",
+        "title": "Track D Champion, Hack with the Flow: n8n Buildathon Finals",
+        "organization": "n8n Philippines User Group",
+        "description": ""
+      },
+      {
+        "id": "entry-6",
+        "archived": false,
+        "year": "2026",
+        "title": "Champion, CyberXploit Capture the Flag",
+        "organization": "FEU Tech Alliance of Information Technology Students",
+        "description": ""
+      },
+      {
+        "id": "entry-7",
+        "archived": false,
+        "year": "2026",
+        "title": "2nd Place, OpenAI Campus Hackathon",
+        "organization": "FEU Institute of Technology",
+        "description": ""
+      },
+      {
         "id": "entry-1",
         "archived": false,
         "year": "2026",
         "title": "Rank 2, Batch ’27 and Rank 5, BSCSSE",
         "organization": "",
+        "description": ""
+      },
+      {
+        "id": "entry-8",
+        "archived": false,
+        "year": "2026",
+        "title": "1st Runner-Up, SEEN 2026: Cyber Rumble Capture the Flag",
+        "organization": "Google Developer Group PUP",
         "description": ""
       },
       {
