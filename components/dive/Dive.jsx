@@ -169,7 +169,7 @@ export default function Dive({ content }) {
                 <div className="awards" id="awards">
                   <ul className="medals">
                     {medals.map((m, i) => (
-                      <li className="medal rv" style={{ '--i': i }} data-place={m.place} data-year={m.year} key={m.id}>
+                      <li className="medal rv" style={{ '--i': i }} data-quiet data-place={m.place} data-year={m.year} key={m.id}>
                         <canvas className="coin" aria-hidden="true" />
                         <span className="coin-alt" aria-hidden="true">{ordinal(m.place)}</span>
                         <span className="label">{m.label} · {m.year}</span>
@@ -187,7 +187,7 @@ export default function Dive({ content }) {
                 </div>
               </div>
               <div className="rec-certs"><div className="rec-stage">
-                <p className="label rec-certs-h">{content.credentials.galleryTitle || 'Certificates'}</p>
+                <p className="label rec-certs-h" data-quiet>{content.credentials.galleryTitle || 'Certificates'}</p>
                 <div className="strip" id="strip">
                   {data.certs.map((c, i) => (
                     <button className="cert glass" data-glass type="button" data-cert={i} key={i} aria-label={c.title + ', ' + c.kicker + '. Open.'}>
