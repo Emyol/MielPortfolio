@@ -12,6 +12,9 @@ test('every section reads without JavaScript', async ({ browser }) => {
   await expect(page.locator('.w-item h3')).toHaveCount(7);
   await expect(page.locator('#tl li')).toHaveCount(7);
   await expect(page.locator('#awards li')).toHaveCount(8);
+  await expect(page.locator('#awards li.medal')).toHaveCount(4);
+  await expect(page.locator('#awards li.medal').first().locator('.coin-alt')).toHaveText('1st');
+  await expect(page.locator('#awards .also-item')).toHaveCount(4);
   await expect(page.locator('.cert')).toHaveCount(6);
   await expect(page.locator('#idx li')).toHaveCount(4);
   await expect(page.getByRole('heading', { name: 'Have a system' })).toBeAttached();

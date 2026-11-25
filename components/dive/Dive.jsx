@@ -1,6 +1,6 @@
 import { getImageProps } from 'next/image';
 import { activeItems, getMetrics } from '@/lib/content/model';
-import { DISCIPLINE_PROOF, WORK_EXTRAS } from '@/lib/dive/extras';
+import { DISCIPLINE_PROOF, WORK_EXTRAS, splitAwards } from '@/lib/dive/extras';
 import DiveRoot from './DiveRoot';
 import { SPRITE } from './sprite';
 
@@ -8,6 +8,7 @@ import { SPRITE } from './sprite';
 // DiveRoot (client) then adds the ocean, the scroll scenes, the glass and the case pages.
 
 const SECTION_ID = { projects: 'work', leadership: 'experience', credentials: 'recognition', about: 'about', contact: 'contact' };
+const ordinal = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');
 const ORDER = [['projects', 'Work'], ['leadership', 'Experience'], ['credentials', 'Recognition'], ['about', 'About'], ['contact', 'Contact']];
 const FIT_HERO = "document.querySelectorAll('.hero .fit').forEach(function(f){var room=f.parentElement.clientWidth,line=f.firstElementChild;if(room<=0)return;f.style.fontSize='100px';var w=line.scrollWidth;if(w)f.style.fontSize=(100*room/w*0.995).toFixed(2)+'px';})";
 // The images shipped in public/ go through Next's image optimizer, so each screen gets a resized WebP or AVIF;
@@ -48,7 +49,7 @@ export default function Dive({ content }) {
   const name = content.profile.fullName.trim().split(/\s+/);
   const shortName = name.length > 1 ? name[0] + ' ' + name[name.length - 1] : name[0];
   const roles = [...activeItems(content.experience.items)].sort((a, b) => Number(b.current) - Number(a.current) || (b.endDate || '').localeCompare(a.endDate || '') || b.startDate.localeCompare(a.startDate));
-  const awards = activeItems(content.awards.items);
+  const { medals, also } = splitAwards(activeItems(content.awards.items));
   const disciplines = activeItems(content.practices.items).filter((p) => p.kind === 'Discipline');
   const stack = activeItems(content.stack.items);
   const proofStacks = Object.values(DISCIPLINE_PROOF).map((p) => p.stack).join(' ');
@@ -163,13 +164,30 @@ export default function Dive({ content }) {
 
           {shown.has('credentials') && (
             <section className="rec" id="recognition" aria-labelledby="rec-h">
-              <div className="rec-stage">
-                <div className="rec-head glass pane" data-glass>
-                  <h2 className="big split" id="rec-h">Recognition</h2>
-                  <ul className="awards" id="awards">
-                    {awards.map((a, i) => <li className="rv" style={{ '--i': i }} key={a.id}><span className="when">{a.year}</span><span>{a.title}</span></li>)}
+              <div className="rec-medals">
+                <div className="rec-head glass pane" data-glass><h2 className="big split" id="rec-h">Recognition</h2></div>
+                <div className="awards" id="awards">
+                  <ul className="medals">
+                    {medals.map((m, i) => (
+                      <li className="medal rv" style={{ '--i': i }} data-place={m.place} data-year={m.year} key={m.id}>
+                        <canvas className="coin" aria-hidden="true" />
+                        <span className="coin-alt" aria-hidden="true">{ordinal(m.place)}</span>
+                        <span className="label">{m.label} · {m.year}</span>
+                        <b>{m.short}</b>
+                        {m.organization && <span className="org">{m.organization}</span>}
+                      </li>
+                    ))}
                   </ul>
+                  {also.length > 0 && (
+                    <div className="also glass" data-glass>
+                      <span className="label">Also</span>
+                      <ul>{also.map((a) => <li className="also-item" key={a.id}><span className="when">{a.year}</span><span>{a.title}</span></li>)}</ul>
+                    </div>
+                  )}
                 </div>
+              </div>
+              <div className="rec-certs"><div className="rec-stage">
+                <p className="label rec-certs-h">{content.credentials.galleryTitle || 'Certificates'}</p>
                 <div className="strip" id="strip">
                   {data.certs.map((c, i) => (
                     <button className="cert glass" data-glass type="button" data-cert={i} key={i} aria-label={c.title + ', ' + c.kicker + '. Open.'}>
@@ -178,7 +196,7 @@ export default function Dive({ content }) {
                     </button>
                   ))}
                 </div>
-              </div>
+              </div></div>
             </section>
           )}
 

@@ -158,13 +158,28 @@ html.dive-js .dive .hero.in .fit > span { transform: none; transition: transform
 .dive .tl .org { color: var(--mute); }
 .dive .tl li + li { border-top: 1px solid rgba(255, 255, 255, 0.06); }
 
-/* ---------- Scene 4: recognition, a strip that slides past ---------- */
-.dive .rec { position: relative; height: 280svh; }
+/* ---------- Scene 4: recognition, medals on their own screen, then a strip that slides past ---------- */
+.dive .rec { position: relative; }
+.dive .rec-medals { display: flex; flex-direction: column; justify-content: center; gap: clamp(1.25rem, 3svh, 2.5rem); min-height: 100svh; padding: calc(var(--hd) + var(--m) + 2rem) var(--gx) clamp(2rem, 6svh, 4rem); }
+.dive .rec-head { align-self: flex-start; }
+.dive .awards { display: grid; gap: clamp(1.25rem, 3svh, 2.5rem); }
+.dive .medals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(0.75rem, 2vw, 1.5rem); margin: 0; padding: 0; list-style: none; }
+.dive .medal { display: grid; justify-items: center; align-content: start; gap: 0.35rem; text-align: center; }
+.dive .medal .coin { display: block; width: clamp(9rem, 19vw, 17rem); aspect-ratio: 1; margin-bottom: 0.4rem; }
+.dive .medal .coin-alt { display: none; font-family: var(--display); font-size: clamp(4rem, 9vw, 7rem); font-weight: 800; line-height: 1; letter-spacing: -0.05em; }
+html:not(.dive-js) .dive .medal .coin { display: none; }
+html:not(.dive-js) .dive .medal .coin-alt { display: block; }
+.dive .medal .label { color: var(--mute); }
+.dive .medal b { font-size: 1.05rem; font-weight: 500; }
+.dive .medal .org { color: var(--mute); font-size: 0.85rem; }
+.dive .also { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1.5rem; padding: 0.9rem 1.4rem; border-radius: 20px; }
+.dive .also ul { display: flex; flex-wrap: wrap; gap: 0.4rem 0; margin: 0; padding: 0; list-style: none; }
+.dive .also-item { display: flex; align-items: baseline; gap: 0.6rem; padding: 0 1.1rem; border-left: 1px solid var(--line); font-size: 0.9rem; }
+.dive .also-item:first-child { padding-left: 0; border-left: 0; }
+.dive .also-item .when { font-size: 0.75rem; }
+.dive .rec-certs { position: relative; height: 280svh; }
+.dive .rec-certs-h { margin: 0 var(--gx); color: var(--mute); }
 .dive .rec-stage { position: sticky; top: 0; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 2rem; height: 100svh; padding: calc(var(--hd) + var(--m) + 2rem) 0 clamp(2rem, 6svh, 4rem); overflow: hidden; }
-.dive .rec-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1.5rem 3rem; margin-inline: var(--gx); }
-.dive .awards { display: grid; gap: 0.35rem; }
-.dive .awards li { display: flex; gap: 1rem; font-size: 0.95rem; }
-.dive .awards .when { min-width: 3rem; }
 .dive .strip { display: flex; align-items: center; gap: clamp(1rem, 2vw, 1.75rem); width: max-content; padding-inline: var(--gx); will-change: transform; }
 .dive .cert { display: grid; grid-template-columns: minmax(0, 1fr); flex: none; width: clamp(15rem, 26vw, 23rem); padding: 0; border: 0; border-radius: 24px; color: var(--ink); text-align: left; cursor: pointer; transform: rotate(var(--r, 0deg)); transition: transform 400ms var(--ease), border-color 200ms ease; }
 .dive .cert:nth-child(odd) { --r: -1.6deg; }
@@ -406,6 +421,9 @@ html.dive-js .dive .hero.in .fit > span { transform: none; transition: transform
 }
 @media (max-width: 760px) {
   .dive .hd { padding-inline: 1rem; }
+  .dive .medals { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 1.75rem; }
+  .dive .medal .coin { width: min(9.5rem, 40vw); }
+  .dive .also-item { padding: 0; border-left: 0; flex-basis: 100%; }
   .dive .figs { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 2.5rem; }
   .dive .w-ticks i { width: 1.2rem; }
   .dive .w-top h2 { display: none; }
@@ -428,7 +446,7 @@ html.dive-js .dive .hero.in .fit > span { transform: none; transition: transform
 @media (prefers-reduced-motion: reduce) {
   html.dive-page { scroll-behavior: auto; }
   .dive *, .dive *::before, .dive *::after { animation: none !important; transition: none !important; }
-  .dive .rec { height: auto; }
+  .dive .rec-certs { height: auto; }
   .dive .rec-stage { position: relative; height: auto; }
   .dive .strip { width: auto; overflow-x: auto; }
 }

@@ -215,7 +215,7 @@ export function startDive(host, data) {
   function tlFrame() { if (!tl || !tlLine) return; const r = tl.getBoundingClientRect(), p = clamp((innerHeight * 0.75 - r.top) / r.height, 0, 1); tlLine.style.transform = 'scaleY(' + p.toFixed(4) + ')'; }
 
   /* ================= Recognition: certificates slide past ================= */
-  const strip = $('#strip'), recSec = $('#recognition');
+  const strip = $('#strip'), recSec = $('.rec-certs');
   const certEls = $$('.cert');
   certEls.forEach((b) => on(b, 'click', () => { sh.set = 'certs'; sh.items = CERTS; sh.cards = certEls; open(Number(b.dataset.cert)); }));
   function stripFrame() {
