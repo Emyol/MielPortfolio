@@ -15,6 +15,7 @@ test('every section reads without JavaScript', async ({ browser }) => {
   await expect(page.locator('#awards li.medal')).toHaveCount(4);
   await expect(page.locator('#awards li.medal').first().locator('.coin-alt')).toHaveText('1st');
   await expect(page.locator('#awards .also-item')).toHaveCount(4);
+  await expect(page.locator('#awards li.medal').first()).toContainText('Hack with the Flow: n8n Buildathon Finals');
   await expect(page.locator('.cert')).toHaveCount(6);
   await expect(page.locator('#idx li')).toHaveCount(4);
   await expect(page.getByRole('heading', { name: 'Have a system' })).toBeAttached();
@@ -118,3 +119,15 @@ test('reduced motion keeps medals still and drawn', async ({ browser }) => {
   expect(a).not.toEqual(blank);
   await context.close();
 });
+
+for (const width of [1360, 900]) {
+  test(`no Also line starts with a divider at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 850 });
+    await page.goto('/');
+    const stray = await page.locator('#awards .also ul').evaluate((ul) => {
+      const left = ul.getBoundingClientRect().left;
+      return Array.from(ul.children).filter((li) => Math.abs(li.getBoundingClientRect().left - left) < 2 && parseFloat(getComputedStyle(li).borderLeftWidth) > 0).length;
+    });
+    expect(stray).toBe(0);
+  });
+}

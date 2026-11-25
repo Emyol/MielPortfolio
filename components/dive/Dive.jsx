@@ -174,6 +174,7 @@ export default function Dive({ content }) {
                         <span className="coin-alt" aria-hidden="true">{ordinal(m.place)}</span>
                         <span className="label">{m.label} · {m.year}</span>
                         <b>{m.short}</b>
+                        <span className="visually-hidden">{m.title}</span>
                         {m.organization && <span className="org">{m.organization}</span>}
                       </li>
                     ))}

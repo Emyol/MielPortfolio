@@ -173,9 +173,8 @@ html:not(.dive-js) .dive .medal .coin-alt { display: block; }
 .dive .medal b { font-size: 1.05rem; font-weight: 500; }
 .dive .medal .org { color: var(--mute); font-size: 0.85rem; }
 .dive .also { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1.5rem; padding: 0.9rem 1.4rem; border-radius: 20px; }
-.dive .also ul { display: flex; flex-wrap: wrap; gap: 0.4rem 0; margin: 0; padding: 0; list-style: none; }
-.dive .also-item { display: flex; align-items: baseline; gap: 0.6rem; padding: 0 1.1rem; border-left: 1px solid var(--line); font-size: 0.9rem; }
-.dive .also-item:first-child { padding-left: 0; border-left: 0; }
+.dive .also ul { display: flex; flex-wrap: wrap; gap: 0.4rem 2rem; margin: 0; padding: 0; list-style: none; }
+.dive .also-item { display: flex; align-items: baseline; gap: 0.6rem; font-size: 0.9rem; }
 .dive .also-item .when { font-size: 0.75rem; }
 .dive .rec-certs { position: relative; height: 280svh; }
 .dive .rec-certs-h { margin: 0 var(--gx); color: var(--mute); }
@@ -423,7 +422,7 @@ html:not(.dive-js) .dive .medal .coin-alt { display: block; }
   .dive .hd { padding-inline: 1rem; }
   .dive .medals { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 1.75rem; }
   .dive .medal .coin { width: min(9.5rem, 40vw); }
-  .dive .also-item { padding: 0; border-left: 0; flex-basis: 100%; }
+  .dive .also-item { flex-basis: 100%; }
   .dive .figs { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 2.5rem; }
   .dive .w-ticks i { width: 1.2rem; }
   .dive .w-top h2 { display: none; }
