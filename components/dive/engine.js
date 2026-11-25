@@ -3,6 +3,7 @@
 // startDive returns a cleanup that removes every listener, timer and animation frame it created.
 /* eslint-disable */
 import { createOcean, grid } from './ocean-core';
+import { makeMask, drawCoin } from './medal-coin';
 
 export function startDive(host, data) {
   'use strict';
@@ -222,6 +223,54 @@ export function startDive(host, data) {
     if (reduced || !strip || !recSec) return;
     const r = recSec.getBoundingClientRect(), p = clamp(-r.top / Math.max(1, r.height - innerHeight), 0, 1), travel = Math.max(0, strip.scrollWidth - strip.parentElement.clientWidth);
     strip.style.transform = 'translateX(' + (-p * travel).toFixed(1) + 'px)';
+  }
+
+  /* ================= Recognition: medals turn in the glyph water ================= */
+  // Drawn only while the medals screen is in view, at most 30 frames a second; still and face-on under reduced motion.
+  const medalWrap = $('.rec-medals');
+  const coins = $$('li.medal').map((li, i) => ({ li, c: $('canvas.coin', li), angle: [-0.35, 0.25, -0.15, 0.4][i % 4], hover: false, front: null, back: null, tint: li.dataset.place === '1' ? 1 : 0.68 })).filter((k) => k.c);
+  let coinRaf = 0, coinLast = 0, coinsOn = false, coinFonts = null;
+  function coinMasks() {
+    const cs = getComputedStyle(medalWrap || root);
+    coinFonts = { display: cs.getPropertyValue('--display').trim() || 'Georgia, serif', mono: cs.getPropertyValue('--mono').trim() || 'monospace' };
+    coins.forEach((k) => { k.front = makeMask(k.li.dataset.place || '', 128, coinFonts.display); k.back = makeMask('’' + String(k.li.dataset.year || '').slice(-2), 74, coinFonts.display); });
+  }
+  function coinSize(k) {
+    const css = k.c.clientWidth, px = Math.round(css * Math.min(2, window.devicePixelRatio || 1));
+    if (css && k.c.width !== px) { k.c.width = px; k.c.height = px; }
+    return css;
+  }
+  function drawCoins() {
+    if (!coinFonts) coinMasks();
+    coins.forEach((k) => { const css = coinSize(k); if (!css) return; const g = k.c.getContext('2d'); g.setTransform(k.c.width / css, 0, 0, k.c.width / css, 0, 0); drawCoin(g, css, k.angle, k.front, k.back, k.tint, coinFonts.mono); });
+  }
+  function coinTick(t) {
+    coinRaf = 0;
+    if (!coinsOn || reduced) return;
+    if (!coinLast || t - coinLast >= 32) {
+      const dt = coinLast ? Math.min(0.1, (t - coinLast) / 1000) : 0;
+      coins.forEach((k) => { if (k.hover) { const tgt = Math.round(k.angle / TAU) * TAU; k.angle += (tgt - k.angle) * Math.min(1, dt * 6); } else k.angle += dt * 0.9; });
+      coinLast = t; drawCoins();
+    }
+    coinRaf = requestAnimationFrame(coinTick);
+  }
+  function coinsMotion() {
+    if (coinRaf) { cancelAnimationFrame(coinRaf); coinRaf = 0; }
+    coinLast = 0;
+    if (reduced) { coins.forEach((k) => { k.angle = 0; }); drawCoins(); return; }
+    if (coinsOn) coinRaf = requestAnimationFrame(coinTick);
+  }
+  if (coins.length && medalWrap) {
+    coins.forEach((k) => { on(k.li, 'pointerenter', (e) => { if (e.pointerType === 'mouse') k.hover = true; }); on(k.li, 'pointerleave', () => { k.hover = false; }); });
+    if ('IntersectionObserver' in window) {
+      const coinIo = new IntersectionObserver((ents) => { coinsOn = ents.some((en) => en.isIntersecting); coinsMotion(); });
+      coinIo.observe(medalWrap);
+      timers.add(() => coinIo.disconnect());
+    } else { coinsOn = true; }
+    drawCoins(); coinsMotion();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (stopped) return; coinMasks(); drawCoins(); });
+    on(motionQuery, 'change', () => { reduced = motionQuery.matches; coinsMotion(); });
+    addEventListener('resize', () => { if (!coinRaf) drawCoins(); });
   }
 
   /* ================= About: hovering a discipline sends a ripple through the water ================= */

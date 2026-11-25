@@ -89,3 +89,32 @@ test('reduced motion shows finished figures and stops the ocean loop', async ({ 
   expect(errors).toEqual([]);
   await context.close();
 });
+
+const coinSnap = (page: Page) => page.locator('canvas.coin').first().evaluate((c: HTMLCanvasElement) => c.toDataURL());
+
+test('medals turn while on screen', async ({ page }) => {
+  await page.goto('/');
+  await ready(page);
+  await page.evaluate(() => document.querySelector('.rec-medals')!.scrollIntoView());
+  await page.waitForTimeout(300);
+  const a = await coinSnap(page);
+  await page.waitForTimeout(400);
+  expect(a).not.toEqual(await coinSnap(page));
+  const blank = await page.locator('canvas.coin').first().evaluate((c: HTMLCanvasElement) => { const b = document.createElement('canvas'); b.width = c.width; b.height = c.height; return b.toDataURL(); });
+  expect(a).not.toEqual(blank);
+});
+
+test('reduced motion keeps medals still and drawn', async ({ browser }) => {
+  const context = await browser.newContext({ reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  await page.goto('/');
+  await ready(page);
+  await page.evaluate(() => document.querySelector('.rec-medals')!.scrollIntoView());
+  await page.waitForTimeout(300);
+  const a = await coinSnap(page);
+  await page.waitForTimeout(400);
+  expect(await coinSnap(page)).toEqual(a);
+  const blank = await page.locator('canvas.coin').first().evaluate((c: HTMLCanvasElement) => { const b = document.createElement('canvas'); b.width = c.width; b.height = c.height; return b.toDataURL(); });
+  expect(a).not.toEqual(blank);
+  await context.close();
+});
