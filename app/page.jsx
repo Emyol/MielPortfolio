@@ -24,7 +24,7 @@ export async function generateMetadata() {
       title,
       description,
       siteName: content.profile.fullName,
-      images: image ? [{ url: image, alt: content.profile.fullName }] : [],
+      images: image ? [{ url: image, alt: content.profile.fullName, ...(image === "/og-hero.jpg" ? { width: 1200, height: 630 } : {}) }] : [],
     },
     twitter: {
       card: "summary_large_image",

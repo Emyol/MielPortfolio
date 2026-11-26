@@ -3,7 +3,7 @@
 > The project's working memory. Read this first at the start of every session; update it at the end of every meaningful unit of work and before the session ends.
 > Keep it **true and short**: rewrite stale sections instead of appending to them. History goes in the Session Log, not in the sections above it.
 
-**Last updated:** 2026-11-26 (UTC+8): by Claude Code (Opus 5.5); mobile performance pass pushed to `main` (see Session Log)
+**Last updated:** 2026-11-26 (UTC+8): by Claude Code (Opus 5.5); share thumbnail is now a hero screenshot (see Session Log)
 **Branch:** `main` (Recognition medals merged from `feat/recognition-medals` and pushed 2026-11-26; the branch is deleted)
 **Overall status:** 🟡 Dive is on `main` and pushed; whether Vercel deployed it was not checked; `tests/motion.spec.ts` still targets the old page and fails
 
@@ -89,6 +89,9 @@ One-page portfolio ("Surface") for Amiel Acuña, built as a Craft Showcase: a vi
 ---
 
 ## Session log
+
+### 2026-11-26: Claude Code (Opus 5.5), share thumbnail
+- The owner asked for the link preview to show the hero instead of the portrait. `public/og-hero.jpg` is a 1200x630 capture of the hero (laid out at 1600x840, scaled 0.75, about 5 s after load so the headline and the water lettering are in) from a local production build; `seo.image` in `lib/content/seed.json` points at it, and `app/page.jsx` declares 1200x630 for it. The portrait still serves About and the JSON-LD `image`. If Supabase content is ever published, its `seo.image` must be set the same way. Re-capture the image if the hero changes. Link previews cache, so already-shared links may show the old portrait until the platform refreshes it.
 
 ### 2026-11-26: Claude Code (Opus 5.5), mobile performance
 - The owner shared live mobile Lighthouse from Brave (perf 89, a11y 98: LCP 3.0 s, TBT 250 ms, forced reflow, heading order). Reproduced locally (83). Causes: the engine started inside hydration, just before the first paint; it built the medal coins and screenshot glyph maps at start-up; the ocean measured every glass pane each frame; all seven screenshots and a 118 KB Fraunces file downloaded before the first paint; on phones the "Selected work" h2 was `display:none`.
