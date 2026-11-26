@@ -1,6 +1,7 @@
 import { getImageProps } from 'next/image';
 import { activeItems, getMetrics } from '@/lib/content/model';
 import { DISCIPLINE_PROOF, WORK_EXTRAS, splitAwards } from '@/lib/dive/extras';
+import { fitCqi } from '@/lib/dive/fit';
 import DiveRoot from './DiveRoot';
 import { SPRITE } from './sprite';
 
@@ -10,7 +11,7 @@ import { SPRITE } from './sprite';
 const SECTION_ID = { projects: 'work', leadership: 'experience', credentials: 'recognition', about: 'about', contact: 'contact' };
 const ordinal = (n) => n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th');
 const ORDER = [['projects', 'Work'], ['leadership', 'Experience'], ['credentials', 'Recognition'], ['about', 'About'], ['contact', 'Contact']];
-const FIT_HERO = "document.querySelectorAll('.hero .fit').forEach(function(f){var room=f.parentElement.clientWidth,line=f.firstElementChild;if(room<=0)return;f.style.fontSize='100px';var w=line.scrollWidth;if(w)f.style.fontSize=(100*room/w*0.995).toFixed(2)+'px';})";
+const FIT_HERO = "document.querySelectorAll('.hero .fit:not([data-fixed])').forEach(function(f){var room=f.parentElement.clientWidth,line=f.firstElementChild;if(room<=0)return;f.style.fontSize='100px';var w=line.scrollWidth;if(w)f.style.fontSize=(100*room/w*0.995).toFixed(2)+'px';})";
 // The images shipped in public/ go through Next's image optimizer, so each screen gets a resized WebP or AVIF;
 // anything else (such as uploaded media) keeps its own URL. next.config.mjs allows exactly these paths and versions.
 const OPTIMIZE = /^(?:\/(?:projects|certificates)\/[\w-]+\.(?:jpe?g|png|webp)(?:\?v=(?:[1-9]|1\d|2[0-2]))?|\/hero-profile\.png)$/;
@@ -27,6 +28,8 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 const month = (ym) => (ym ? MONTHS[Number(ym.slice(5, 7)) - 1] + ' ' + ym.slice(0, 4) : '');
 const fixHref = (href) => (href && href.startsWith('#') && SECTION_ID[href.slice(1)] ? '#' + SECTION_ID[href.slice(1)] : href);
 const halves = (text) => { const w = text.trim().split(/\s+/), k = Math.ceil(w.length / 2); return [w.slice(0, k).join(' '), w.slice(k).join(' ')].filter(Boolean); };
+// A fitted line: sized on the server from the font's metrics when it can be (see lib/dive/fit.js), else in the browser.
+const Fit = ({ text, ...rest }) => { const c = fitCqi(text); return <span className="fit" {...rest} {...(c ? { 'data-fixed': '', style: { fontSize: c + 'cqi' } } : {})}><span>{text}</span></span>; };
 const Arrow = () => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><use href="#i-arrow" /></svg>;
 const Icon = ({ name }) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true"><use href={'#i-' + name} /></svg>;
 
@@ -91,7 +94,7 @@ export default function Dive({ content }) {
             <div className="hero-card glass pane" data-glass>
               <h1>
                 <span className="visually-hidden">{data.water.join(' ')} </span>
-                <span className="say"><span className="fit" suppressHydrationWarning><span>{say || data.water.join(' ')}</span></span></span>
+                <span className="say"><Fit text={say || data.water.join(' ')} suppressHydrationWarning /></span>
               </h1>
               {/* Fits the headline before the first paint (same sum as fitAll in engine.js), so the card does not jump when the engine starts. */}
               <script dangerouslySetInnerHTML={{ __html: FIT_HERO }} />
@@ -243,7 +246,7 @@ export default function Dive({ content }) {
           {shown.has('contact') && (
             <section className="contact" id="contact" aria-labelledby="contact-h">
               <div className="contact-card glass pane" data-glass>
-                <h2 id="contact-h">{contactLines.map((l, i) => <span className="say" key={i}><span className="fit"><span>{l}</span></span></span>)}</h2>
+                <h2 id="contact-h">{contactLines.map((l, i) => <span className="say" key={i}><Fit text={l} /></span>)}</h2>
                 <div className="contact-row">
                   <p>{content.contact.description}</p>
                   <div className="actions">

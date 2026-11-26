@@ -96,7 +96,7 @@ html.dive-js .dive .split.in .w > span { transform: none; transition: transform 
 .dive .hero-water { min-height: 16rem; }
 .dive .fit { display: block; padding-bottom: 0.27em; font-family: var(--display); font-size: 9vw; font-weight: var(--display-weight); font-variation-settings: var(--display-var); line-height: 0.88; letter-spacing: var(--display-track); white-space: nowrap; }
 .dive .fit > span { display: inline-block; }
-.dive .say { display: block; overflow: hidden; }
+.dive .say { display: block; overflow: hidden; container-type: inline-size; } /* fitted lines are sized in cqi of this box */
 .dive .hero h1 { font-size: 1rem; font-weight: inherit; color: var(--mute); }
 html.dive-js .dive .hero .fit > span { transform: translateY(110%); }
 html.dive-js .dive .hero.in .fit > span { transform: none; transition: transform 1200ms var(--ease) 900ms; }
@@ -141,6 +141,8 @@ html.dive-js .dive .hero.in .fit > span { transform: none; transition: transform
 .dive .win > img { align-self: start; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; object-position: 50% 0; }
 .dive .w-shots { position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; }
 .dive .w-shots img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 0; }
+/* Only the first screenshot is shown until the engine starts; the rest (lazy) are then fetched after the first paint. */
+html.dive-js .dive .w-shots:not(.ready) img ~ img { display: none; }
 .dive .w-shots canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .dive .w-screen .win { transition: transform 500ms var(--ease); }
 @media (hover: hover) and (pointer: fine) { .dive .w-screen:hover .win { transform: translateY(-4px); } }
@@ -425,7 +427,8 @@ html:not(.dive-js) .dive .medal .coin-alt { display: block; }
   .dive .also-item { flex-basis: 100%; }
   .dive .figs { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 2.5rem; }
   .dive .w-ticks i { width: 1.2rem; }
-  .dive .w-top h2 { display: none; }
+  /* Hidden from sight, not from the outline: screen readers and the heading order still need it. */
+  .dive .w-top h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .dive .tl li { grid-template-columns: minmax(0, 1fr); }
   .dive .tl { padding-left: 3.2rem; }
   .dive .tl::before, .dive .tl-line { left: 1.55rem; }

@@ -15,6 +15,12 @@ export function startDive(host, data) {
   const setInterval = (fn, ms) => { const id = window.setInterval(fn, ms); timers.add(() => window.clearInterval(id)); return id; };
   const setTimeout = (fn, ms) => { const id = window.setTimeout(() => { if (!stopped) fn(); }, ms); timers.add(() => window.clearTimeout(id)); return id; };
   const clearTimeout = (id) => window.clearTimeout(id);
+  // Runs fn when the main thread is free (or after a short wait where requestIdleCallback is missing).
+  const idle = (fn) => {
+    if (!window.requestIdleCallback) { setTimeout(fn, 200); return; }
+    const id = window.requestIdleCallback(() => { if (!stopped) fn(); }, { timeout: 2000 });
+    timers.add(() => window.cancelIdleCallback(id));
+  };
   const requestAnimationFrame = (fn) => window.requestAnimationFrame((t) => { if (!stopped) fn(t); });
   const cancelAnimationFrame = (id) => window.cancelAnimationFrame(id);
   const $ = (s, r = document) => r.querySelector(s);
@@ -67,8 +73,17 @@ export function startDive(host, data) {
     let cv = $('#ocean');
     const heroEl = $('#hero-water'), heroSec = $('.hero'), ptr = { x: 0, y: 0, on: false };
     let g = null, raf = 0, lastTouch = 0, sy = 0, tStart = 0, core = null, worker = null, busy = false, pending = null;
-    let quietNodes = null, glassNodes = null;
+    let quietNodes = null, glassNodes = null, near = null;
     const radii = new WeakMap();
+    // Only panes on or near the screen are measured each frame. Until the observer first answers, every pane counts.
+    function watchNear() {
+      quietNodes = $$('[data-quiet]'); glassNodes = $$('[data-glass]');
+      near = new Set([...quietNodes, ...glassNodes]);
+      if (!('IntersectionObserver' in window)) return;
+      const nio = new IntersectionObserver((ents) => ents.forEach((en) => { if (en.isIntersecting) near.add(en.target); else near.delete(en.target); }), { rootMargin: '60px 0px' });
+      near.forEach((n) => nio.observe(n));
+      timers.add(() => nio.disconnect());
+    }
     const glassOf = (n) => {
       const b = n.getBoundingClientRect();
       if (!radii.has(n)) radii.set(n, parseFloat(getComputedStyle(n).borderTopLeftRadius) || 0);
@@ -131,9 +146,9 @@ export function startDive(host, data) {
     }
     function frame(now) {
       if (!g) return;
-      if (!quietNodes) { quietNodes = $$('[data-quiet]'); glassNodes = $$('[data-glass]'); }
-      const quiet = quietNodes.map((n) => n.getBoundingClientRect()).filter((q) => q.width && q.bottom > -60 && q.top < g.h + 60).map((q) => ({ left: q.left, top: q.top, right: q.right, bottom: q.bottom }));
-      const glass = glassNodes.filter((n) => n.offsetParent && getComputedStyle(n).visibility !== 'hidden').map(glassOf).filter((q) => q.hx > 0 && q.b > 0 && q.t < g.h);
+      if (!near) watchNear();
+      const quiet = quietNodes.filter((n) => near.has(n)).map((n) => n.getBoundingClientRect()).filter((q) => q.width && q.bottom > -60 && q.top < g.h + 60).map((q) => ({ left: q.left, top: q.top, right: q.right, bottom: q.bottom }));
+      const glass = glassNodes.filter((n) => near.has(n) && n.offsetParent && getComputedStyle(n).visibility !== 'hidden').map(glassOf).filter((q) => q.hx > 0 && q.b > 0 && q.t < g.h);
       const st = { now, scrollY, max: Math.max(1, document.documentElement.scrollHeight - innerHeight), heroH: heroSec.offsetHeight, quiet, glass, ptr: { x: ptr.x, y: ptr.y, on: ptr.on }, lastTouch };
       if (!worker) { core.frame(st); return; }
       pending = st;
@@ -169,8 +184,12 @@ export function startDive(host, data) {
   const wFx = $('#w-fx'), wTicks = $$('.w-ticks i'), workSec = $('#work');
   const texts = $$('.w-item');
   const shots = $$('#w-shots img');
+  // The CSS holds back every screenshot but the first until now; workFrame clips them before the next paint.
+  // They are fetched straight away (not lazily), so each one is ready before the scroll wipe reveals it.
+  if ($('#w-shots')) { shots.forEach((img) => { img.loading = 'eager'; }); $('#w-shots').classList.add('ready'); }
   const FX = { cols: 96, rows: 0, lums: [] };
-  shots.forEach((img, i) => { const go = () => { FX.rows = Math.round(FX.cols * 9 / 16 / 1.7); FX.lums[i] = lumOf(img, FX.cols, FX.rows); }; if (img.complete && img.naturalWidth) go(); else on(img, 'load', go, { once: true }); });
+  // The glyph maps of the screenshots are only needed once the work screen scrolls, so they are read when the browser is idle.
+  shots.forEach((img, i) => { const go = () => idle(() => { FX.rows = Math.round(FX.cols * 9 / 16 / 1.7); FX.lums[i] = lumOf(img, FX.cols, FX.rows); }); if (img.complete && img.naturalWidth) go(); else on(img, 'load', go, { once: true }); });
   let wActive = -1;
   function setActive(i) {
     if (i === wActive) return;
@@ -229,7 +248,7 @@ export function startDive(host, data) {
   // Drawn only while the medals screen is in view, at most 30 frames a second; still and face-on under reduced motion.
   const medalWrap = $('.rec-medals');
   const coins = $$('li.medal').map((li, i) => ({ li, c: $('canvas.coin', li), angle: [-0.35, 0.25, -0.15, 0.4][i % 4], hover: false, front: null, back: null, tint: li.dataset.place === '1' ? 1 : 0.68 })).filter((k) => k.c);
-  let coinRaf = 0, coinLast = 0, coinsOn = false, coinFonts = null;
+  let coinRaf = 0, coinLast = 0, coinsOn = false, coinFonts = null, coinsDrawn = false;
   function coinMasks() {
     const cs = getComputedStyle(medalWrap || root);
     coinFonts = { display: cs.getPropertyValue('--display').trim() || 'Georgia, serif', mono: cs.getPropertyValue('--mono').trim() || 'monospace' };
@@ -257,20 +276,25 @@ export function startDive(host, data) {
   function coinsMotion() {
     if (coinRaf) { cancelAnimationFrame(coinRaf); coinRaf = 0; }
     coinLast = 0;
-    if (reduced) { coins.forEach((k) => { k.angle = 0; }); drawCoins(); return; }
+    if (reduced) { coins.forEach((k) => { k.angle = 0; }); if (coinsDrawn) drawCoins(); return; }
     if (coinsOn) coinRaf = requestAnimationFrame(coinTick);
   }
   if (coins.length && medalWrap) {
+    // The coins are first drawn when the medals come near the screen (or when the browser is idle), not at start-up:
+    // building their masks and faces is the costliest thing the page does before anyone scrolls.
+    const firstDraw = () => { if (coinsDrawn || stopped) return; coinsDrawn = true; drawCoins(); };
     coins.forEach((k) => { on(k.li, 'pointerenter', (e) => { if (e.pointerType === 'mouse') k.hover = true; }); on(k.li, 'pointerleave', () => { k.hover = false; }); });
     if ('IntersectionObserver' in window) {
-      const coinIo = new IntersectionObserver((ents) => { coinsOn = ents.some((en) => en.isIntersecting); coinsMotion(); });
+      const coinIo = new IntersectionObserver((ents) => { coinsOn = ents.some((en) => en.isIntersecting); if (coinsOn) firstDraw(); coinsMotion(); });
       coinIo.observe(medalWrap);
-      timers.add(() => coinIo.disconnect());
-    } else { coinsOn = true; }
-    drawCoins(); coinsMotion();
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (stopped) return; coinMasks(); drawCoins(); });
-    on(motionQuery, 'change', () => { reduced = motionQuery.matches; coinsMotion(); });
-    addEventListener('resize', () => { if (!coinRaf) drawCoins(); });
+      const nearIo = new IntersectionObserver((ents) => { if (ents.some((en) => en.isIntersecting)) { nearIo.disconnect(); firstDraw(); } }, { rootMargin: '100% 0px' });
+      nearIo.observe(medalWrap);
+      timers.add(() => { coinIo.disconnect(); nearIo.disconnect(); });
+      setTimeout(() => idle(firstDraw), 4000);
+    } else { coinsOn = true; firstDraw(); coinsMotion(); }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (stopped || !coinsDrawn) return; coinMasks(); drawCoins(); });
+    on(motionQuery, 'change', () => { reduced = motionQuery.matches; if (coinsDrawn) coinsMotion(); });
+    addEventListener('resize', () => { if (coinsDrawn && !coinRaf) drawCoins(); });
   }
 
   /* ================= About: hovering a discipline sends a ripple through the water ================= */
@@ -284,7 +308,8 @@ export function startDive(host, data) {
   // Local time in Manila
   const clock = $('#clock');
   const tickClock = () => { if (!clock) return; try { clock.textContent = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Manila', hour: '2-digit', minute: '2-digit' }).format(new Date()) + ' local'; } catch (err) { clock.textContent = 'UTC+8'; } };
-  tickClock(); setInterval(tickClock, 30000);
+  // The first time-zone lookup is slow on a cold start, and the server already shows "UTC+8", so it waits for an idle moment.
+  idle(tickClock); setInterval(tickClock, 30000);
 
   /* ================= Arrivals: words rise, rows slide in, figures count ================= */
   $$('.split').forEach((h) => { if (h.querySelector('.w')) return; const words = h.textContent.trim().split(/\s+/); h.textContent = ''; words.forEach((w, i) => { const o = el('span', 'w'), inner = el('span', '', w); o.style.setProperty('--i', String(i)); o.setAttribute('aria-hidden', 'true'); o.append(inner); h.append(o, document.createTextNode(' ')); }); h.setAttribute('aria-label', words.join(' ')); });
@@ -306,19 +331,19 @@ export function startDive(host, data) {
 
   /* ================= Fitted lines, the gauge and the scroll scenes ================= */
   function fitAll() {
-    $$('.fit').forEach((f) => {
-      const box = f.parentElement, room = box.clientWidth, line = f.firstElementChild;
-      if (room <= 0) return;
-      f.style.fontSize = '100px';
-      const w = line.scrollWidth;
-      if (w) f.style.fontSize = (100 * room / w * 0.995).toFixed(2) + 'px';
-    });
+    // Lines sized on the server (data-fixed, in cqi) follow their box by themselves; the rest are measured here.
+    // Every write, then every read, then every write: one layout for all the lines instead of one per line.
+    const fits = $$('.fit:not([data-fixed])').map((f) => ({ f, room: f.parentElement.clientWidth }));
+    fits.forEach(({ f, room }) => { if (room > 0) f.style.fontSize = '100px'; });
+    fits.forEach((x) => { x.w = x.room > 0 ? x.f.firstElementChild.scrollWidth : 0; });
+    fits.forEach(({ f, room, w }) => { if (w) f.style.fontSize = (100 * room / w * 0.995).toFixed(2) + 'px'; });
     // A section title on a glass panel shrinks only when it would run past the panel's edge.
-    $$('.pane .big').forEach((h) => {
-      h.style.fontSize = '';
+    const bigs = $$('.pane .big');
+    bigs.forEach((h) => { h.style.fontSize = ''; });
+    bigs.map((h) => {
       const pane = h.closest('.pane'), cs = getComputedStyle(pane), room = pane.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight), w = h.scrollWidth;
-      if (room > 0 && w > room) h.style.fontSize = (parseFloat(getComputedStyle(h).fontSize) * room / w * 0.98).toFixed(2) + 'px';
-    });
+      return room > 0 && w > room ? [h, (parseFloat(getComputedStyle(h).fontSize) * room / w * 0.98).toFixed(2) + 'px'] : null;
+    }).forEach((x) => { if (x) x[0].style.fontSize = x[1]; });
   }
   const DEPTH = 40, gauge = $('.gauge'), secs = ['work', 'experience', 'recognition', 'about', 'contact'].map((id) => document.getElementById(id)).filter(Boolean);
   // Placed with a transform rather than top, so moving them is not a layout shift.
@@ -343,8 +368,10 @@ export function startDive(host, data) {
   const relayout = () => { fitAll(); placeMarks(); scenes(); };
   addEventListener('resize', () => requestAnimationFrame(relayout));
   relayout();
-  ocean.rebuild();
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { relayout(); ocean.rebuild(); });
+  // The ocean's first build runs as its own task, so start-up never blocks the page in one long piece.
+  setTimeout(() => ocean.rebuild(), 0);
+  // Fonts that are still loading change the fitted lines and the headline in the water; ones already loaded do not.
+  if (document.fonts && document.fonts.ready && document.fonts.status !== 'loaded') document.fonts.ready.then(() => { if (stopped) return; relayout(); ocean.rebuild(); });
   addEventListener('load', relayout);
   on(motionQuery, 'change', () => { reduced = motionQuery.matches; ocean.rebuild(); relayout(); });
 

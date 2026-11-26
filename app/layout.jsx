@@ -6,7 +6,8 @@ const display = Fraunces({
   subsets: ['latin'],
   variable: '--font-display-loaded',
   display: 'swap',
-  axes: ['SOFT', 'WONK', 'opsz'],
+  // The page sets SOFT to 0, the font's default, so only WONK and opsz are downloaded (a smaller file).
+  axes: ['WONK', 'opsz'],
 });
 
 // Public Sans stays for the admin editor (app/admin/admin.css). It is not preloaded, so the public page does not
